@@ -1,0 +1,48 @@
+ÜBUNGSZETTEL
+-------------------------------------------------------------------------------
+
+This is a project intending to provide a service for aggregating exercise sheets
+at university and presenting them to users in a convinient way. It is written
+for PHP ≥ 5.3 and, since I'm (the original author) enrolled at a German university,
+most of the code is written in German. Feel free to translate it, if you want!
+
+As for the code's
+
+LICENSE:
+
+Copyright (c) 2010, Phillip Berndt
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+If you are unfamiliar with the GPL, you can receive a copy of the GNU General
+Public License at <http://www.gnu.org/licenses/>. If you are unable to obtain
+yourself a copy, you may not use this program.
+
+
+Since, as stated above, the majority of the code is written for German
+readers/programmers, I'll continue this readme in German:
+
+INSTALLATION:
+
+Das Script benötigt zum Laufen
+ * PHP, mindestens in Version 5.3. Durch ersetzen der Inlinefunktionen
+   durch create_function-Aufrufe läuft das Script auch unter 5.2
+ * Es werden die PHP-Erweiterungen PDO und CURL benötigt
+   Getestet unterstützte Datenbanken sind MySQL und SQLite
+ * Für volle Funktionalität werden die Shellanwendungen
+    * ImageMagick (Der convert-Aufruf)
+    * pdftk
+   benötigt.
+ * Schreibrechte auf den Ordner ./cache/
+In der system.php können oben die Konfigurationseinstellungen geändert werden.
+Via der Variablen $init_database kann die Datenbank automatisch initialisiert
+werden. Dabei ist im Fall von SQLite zu bedenken, dass neben der Datenbankdatei
+auch das aktuelle Verzeichnis Schreibrechte benötigt.
