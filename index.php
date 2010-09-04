@@ -3,6 +3,7 @@
 
 	$q = isset($_GET['q']) ? $_GET['q'] : 'main';
 	ob_start();
+	header('Content-Type: text/html; charset=utf-8');
 ?>
 <!DOCTYPE HTML>
 <html>

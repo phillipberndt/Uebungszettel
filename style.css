@@ -60,7 +60,7 @@ div#content table input[type=text] { border: none; font-size: medium;
 .bes-left { display: table-cell; width: 300px; height: 300px; margin: 0; padding: 0; border: 1px solid #488; border-right: none; }
 .bes-left dt { background: #ddf; display: block; text-weight: bold; font-size: small; padding: 1px 1px 1px 3px; }
 .bes-left dd { margin: 0; padding: 3px; font-size: small; min-height: 1em; }
-.bes-right { display: table-cell; margin: 0; min-height: 280px; min-width: 80%; border: 1px solid #488; padding: 10px; }
+.bes-right { display: table-cell; margin: 0; min-height: 280px; min-width: 400px; border: 1px solid #488; padding: 10px; }
 .bes-right pre { margin: 0; margin-left: 30px; padding: 0; }
 .small { font-size: small; }
 .indent { margin: 0 0 5px 20px; }

@@ -10,7 +10,7 @@
 	}
 
 	ob_end_clean();
-	header('Content-type: application/atom+xml');
+	header('Content-type: application/atom+xml; charset=utf-8');
 	echo('<?xml version="1.0"?>');
 
 	$base_url = htmlspecialchars('http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'].'/');
