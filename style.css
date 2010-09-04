@@ -1,0 +1,87 @@
+html, body { padding: 0; margin: 0; font-family: sans-serif; }
+h1 { margin: 0; padding: 10px; background: #eef; }
+#nav { background: #ccf; list-style: none; min-width: 100%; margin: 0; padding: 0; border-bottom: 1px solid #488; clear: right; 
+	margin-bottom: 100px; }
+#nav li { float: left; display: block; margin: 0px; border-right: 1px solid #488; border-bottom: 1px solid #488; }
+#nav a { display: block; width: 10em; background: #ddf; border: 1px solid #fff; text-align: center; text-decoration: none;
+	color: #000; padding: 10px 3px; }
+#nav a:hover { background: #eef; }
+#nav a:active { font-width: bold; }
+
+label { display: block; width: 300px; clear: right; padding: 3px; }
+label span { position: absolute; }
+label input, label select { margin-left: 150px; width: 150px; }
+div#content label { width: 100%; }
+div#content label input, div#content label select { width: 300px; }
+
+#login { display: block; min-width: 100%; text-align: center; margin-top: 200px;  }
+#login div { text-align: left; width: 320px; border: 1px solid #488; padding: 10px; background: #eef; margin-left: auto; margin-right: auto;}
+p.info { margin-top: 50px; font-size: small; padding: 10px; border: 1px solid #ddd; background: #f5f5f5; -moz-border-radius: 2px; display: inline-block; margin-left: auto; margin-right: auto; }
+p.nomargin { margin-top: 0; }
+#login label + label { margin-bottom: 10px; }
+#login .error { color: red; font-size: x-small; display: block; margin: -2px 13px 5px 0px; text-align: right; }
+
+div#error { display: block; width: 400px; margin-top: 200px; border: 1px solid #488; padding: 10px; background: #eef;
+	margin-left: auto; margin-right: auto; text-align: center; }
+
+#status { margin: -30px 20px 0; border: 1px solid #fa0; background: #fc0; padding: 10px 30px; }
+
+div#content { margin: 0 20px; width: 80%; margin-bottom: 50px; }
+
+div#content table { width: 100%; border-collapse: collapse;  }
+div#content th { text-align: left; background: #eef; }
+div#content td, div#content th { border: 1px solid #eee; padding: 3px; vertical-align: top;}
+table#kurse td + td + td { width: 100px; }
+table#kurse tr td:first-child { width: 20px; }
+table#kurse-uebersicht td:first-child  { width: 130px; }
+table#kurse-uebersicht td:first-child a { color: #000; }
+table#kurse-uebersicht td:first-child + td + td { width: 200px; }
+table#kurse-uebersicht td:first-child + td + td + td { width: 10px; }
+table#kurse-uebersicht tr.neu td:first-child + td { background: url('new.png') no-repeat right center; }
+table#kurse tr.private td { background: #fafafa; }
+
+div#content .right a {
+	color: #000;
+}
+div#content .right {
+	text-align: right;
+	margin: 0;
+}
+
+form.feeds input[type=submit], .bes-right input[type=button], input.subright {
+	display: block;
+	margin: 5px 0 0 auto;
+}
+
+div#content table input[type=text] { border: none; font-size: medium;
+	padding: 0; margin: 0; }
+
+.bes { display: table-row; }
+.bes-left { display: table-cell; width: 300px; height: 300px; margin: 0; padding: 0; border: 1px solid #488; border-right: none; }
+.bes-left dt { background: #ddf; display: block; text-weight: bold; font-size: small; padding: 1px 1px 1px 3px; }
+.bes-left dd { margin: 0; padding: 3px; font-size: small; min-height: 1em; }
+.bes-right { display: table-cell; margin: 0; min-height: 280px; min-width: 80%; border: 1px solid #488; padding: 10px; }
+.bes-right pre { margin: 0; margin-left: 30px; padding: 0; }
+.small { font-size: small; }
+.indent { margin: 0 0 5px 20px; }
+p.url { font-family: monospace; margin-left: 30px; }
+.center { text-align: center; }
+
+h2 { margin: 40px 0 10px 0 }
+textarea { width: 600px; height: 400px; }
+
+fieldset { margin-bottom: 20px; }
+
+p.about {
+	position: fixed; right: 10px; bottom: 5px; font-size: x-small; 
+}
+a.selected, a:visited.selected { color: red ; }
+div#content p.right a.selected { color: red ; }
+
+div#ajax_info img { float: right; margin-top: -7px; }
+div#ajax_info { position: fixed; width: 20%; border: 1px solid #488; top: 40%; left: 40%; padding: 10px; background: #eef; padding:  1em 10px 1em 10px; z-index: 5; }
+div#greyout { position: fixed; left: 0; top: 0; width: 100%; height: 100%; background: #000; opacity: 0.5; z-index: 4; }
+
+a:visited {
+	color: #008;
+}

@@ -1,0 +1,42 @@
+html, body { padding: 0; margin: 0; font-family: sans-serif; font-size: small; }
+h1 { font-size: medium; margin: 0; }
+#nav { margin: 0; padding: 0; margin-bottom: 1px solid #488; clear: right; margin-bottom: 20px; }
+#nav li { display: inline; font-size: small; }
+#nav li::after { content: ' | '; }
+h2 { display: none; }
+
+label { display: block; }
+label span { display: block; }
+
+div#content table { width: 100%; border-collapse: collapse; }
+div#content th { text-align: left; background: #eef; }
+div#content td, div#content th { border: 1px solid #eee; padding: 3px; }
+table#kurse td + td + td { width: 100px; }
+table#kurse tr td:first-child { width: 20px; }
+table#kurse-uebersicht td:first-child + td { width: 50%; }
+table#kurse-uebersicht td:first-child a { color: #000; }
+table#kurse-uebersicht td:first-child + td + td { width: 200px; }
+
+div#content .right a {
+	color: #000;
+}
+div#content .right {
+	text-align: right;
+	margin: 0;
+}
+
+div#content table input[type=text] { border: none; font-size: medium;
+	padding: 0; margin: 0; }
+
+.bes-left { position: absolute; width: 300px; height: 300px; margin: 0; border: 1px solid #488; }
+.bes-left dt { background: #ddf; display: block; text-weight: bold; font-size: small; padding: 1px 1px 1px 3px; }
+.bes-left dd { margin: 0; padding: 3px; font-size: small; }
+.bes-right { margin: 0; margin-left: 301px; height: 280px; border: 1px solid #488; padding: 10px; }
+.bes-right pre { margin: 0; margin-left: 30px; padding: 0; }
+.small { font-size: small; }
+p.url { font-family: monospace; margin-left: 30px; }
+.bes-bottom { border: 1px solid #488; border-top: none; padding: 3px; }
+
+h2 { margin: 40px 0 10px 0 }
+
+fieldset { margin-bottom: 20px; }
