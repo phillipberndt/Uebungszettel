@@ -35,6 +35,7 @@ INSTALLATION:
 Das Script benötigt zum Laufen
  * PHP, mindestens in Version 5.3. Durch ersetzen der Inlinefunktionen
    durch create_function-Aufrufe läuft das Script auch unter 5.2
+   Dafür gibt es ein Script im tools/ Ordner
  * Es werden die PHP-Erweiterungen PDO und CURL benötigt
    Getestet unterstützte Datenbanken sind MySQL und SQLite
  * Für volle Funktionalität werden die Shellanwendungen
