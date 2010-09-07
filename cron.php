@@ -8,6 +8,7 @@
 	$database->beginTransaction();
 	$stmt = $database->prepare('INSERT INTO data (feed_id, data) VALUES (?, ?)');
 	$new_content = array();
+	$content_ids = array();
 	foreach($database->query('SELECT id, code FROM feeds') as $feed) {
 		$id = $feed['id'];
 		$code = unserialize($feed['code']);
@@ -41,6 +42,7 @@
 			if(!isset($known[$content])) {
 				$stmt->execute(array($id, $content));
 				$new_content[$id][] = $content;
+				$content_ids[$content] = $database->lastInsertId();
 				if(preg_match('#^(http://[^ ]+)( .+)?#i', $content, &$match)) {
 					// URL Datum cachen
 					check_if_url_changed($match[1]);
@@ -68,7 +70,7 @@
 
 	// Newsletter versenden
 	$user_mails = array();
-	foreach($database->query('SELECT f.feed_id, fd.short, u.name, u.settings FROM user_feeds f, users u, feeds fd WHERE u.id = f.user_id AND
+	foreach($database->query('SELECT f.feed_id, fd.short, u.name, u.id, u.settings FROM user_feeds f, users u, feeds fd WHERE u.id = f.user_id AND
 		fd.id = f.feed_id AND u.flags & '.USER_FLAG_WANTSMAIL.' != 0') as $data) {
 		$settings = unserialize($data['settings']);
 		if(is_array($new_content[$data['feed_id']]) && $settings['newsletter']) {
@@ -76,6 +78,12 @@
 			$user_mails[$settings['newsletter']]['short'] = $data['short'];
 			if(!isset($user_mails[$settings->newsletter]['content'])) $user_mails[$settings['newsletter']]['content'] = array();
 			$user_mails[$settings['newsletter']]['content'] = array_merge($user_mails[$settings['newsletter']]['content'], $new_content[$data['feed_id']]);
+			foreach($new_content[$data['feed_id']] as $new_content) {
+				if(!isset($content_ids[$new_content])) continue;
+				$id = $content_ids[$new_content];
+				$database->query('INSERT INTO user_data (user_id, data_id, known) VALUES ('.$data['id'].', '.
+					$id.', 1);');
+			}
 		}
 	}
 	foreach($user_mails as $mail => $data) {
