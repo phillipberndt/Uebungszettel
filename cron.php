@@ -50,11 +50,20 @@
 			}
 			else
 			{
-				// Falls URL geändert, überall wieder auf ungelesen setzen
+				// Falls URL geändert, ..
 				if(preg_match('#^(http://[^ ]+)( .+)?#i', $content, &$match)) {
 					if(check_if_url_changed($match[1])) {
+						// Überall wieder auf ungelesen setzen
 						$database->query('UPDATE user_data SET invisible = 0, known = 0 WHERE
 							data_id = '.$known[$content]);
+						// Und noch einmal per Email versenden
+						if($match[2]) {
+							$up_content = $content . ' (Geändert)';
+						} else {
+							$up_content = $content . ' ' . basename($content) . ' (Geändert)';
+						}
+						$new_content[$id][] = $up_content;
+						$content_ids[$up_content] = $known[$content];
 					}
 				}
 				unset($known[$content]);
@@ -78,11 +87,17 @@
 			$user_mails[$settings['newsletter']]['short'] = $data['short'];
 			if(!isset($user_mails[$settings->newsletter]['content'])) $user_mails[$settings['newsletter']]['content'] = array();
 			$user_mails[$settings['newsletter']]['content'] = array_merge($user_mails[$settings['newsletter']]['content'], $new_content[$data['feed_id']]);
-			foreach($new_content[$data['feed_id']] as $new_content) {
-				if(!isset($content_ids[$new_content])) continue;
-				$id = $content_ids[$new_content];
-				$database->query('INSERT INTO user_data (user_id, data_id, known) VALUES ('.$data['id'].', '.
-					$id.', 1);');
+			foreach($new_content[$data['feed_id']] as $content) {
+				if(!isset($content_ids[$content])) continue;
+				$id = $content_ids[$content];
+				try {
+					$database->query('INSERT INTO user_data (user_id, data_id, known) VALUES ('.$data['id'].', '.
+						$id.', 1);');
+				}
+				catch(Exception $db) {
+					$database->query('UPDATE user_data SET known = 1 WHERE user_id = '.$data['id'].' AND
+						data_id = '.$id);
+				}
 			}
 		}
 	}
