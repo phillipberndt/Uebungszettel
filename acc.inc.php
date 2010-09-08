@@ -128,7 +128,7 @@
 			<label><span>Atom-Feed aktivieren</span> <input type="checkbox" value="1" name="atom_feed" <?php
 				if(user()->atom_feed !== false) echo('checked');
 			?>></label>
-			<p class="small indent">Dein Feed ist unter <a href="/atom.php?u=<?=user()->id?>">atom.php?u=<?=user()->id?></a>
+			<p class="small indent">Dein Feed ist unter <a href="atom.php?u=<?=user()->id?>">atom.php?u=<?=user()->id?></a>
 				verfügbar.</p>
 			<input type="submit" name="settings" value="Einstellungen ändern">
 		</fieldset>
