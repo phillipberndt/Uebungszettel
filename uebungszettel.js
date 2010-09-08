@@ -10,6 +10,17 @@ $(document).ready(function() {
 
 	if(document.location.search == "") {
 		$("#login input:first").focus();
+		$(".tomail").each(function() {
+			var $this = $(this);
+			var addr = $this.text().replace(" auf ", "@");
+			$this.html($("<a href='#'></a>").text($this.text()));
+			$this.find("a").click(function() {
+				var subject = encodeURIComponent("Übungszettel");
+				var body = encodeURIComponent("Hallo,\n\nich habe eine Frage zum Übungszettelservice:\n\n");
+				document.location = "mailto:" + addr + "?subject=" + subject + "&body=" + body;
+				return false;
+			});
+		});
 	}
 	$("td:has(input[type=checkbox])").click(function(e) {
 		if(e.originalTarget != this) return;

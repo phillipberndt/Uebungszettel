@@ -8,7 +8,7 @@
 		<input type="submit" name="action" value="Anmelden">
 		<input type="submit" name="action" value="Registrieren">
 	</div>
-	<p class="info">Feedback? Fragen? Kommentare? → Mail an <a href="mailto:<?=urlencode($support_mail_show)?>"><?=$support_mail_show?></a></p>
+	<p class="info">Feedback? Fragen? Kommentare? → Mail an <span class="tomail"><?=$support_mail_show?></span></p>
 </form>
 <p class="about"><img src="tux.png" style="display: block; float:left; width: 50px; height: 60px; margin-right: 5px; margin-top: -3px" />
 	Übungszettel ist Angebot von <a href="http://www.spline.de">Spline</a>.<br>
