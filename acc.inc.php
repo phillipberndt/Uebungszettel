@@ -23,6 +23,10 @@
 
 		// Passwort ändern
 		if(isset($_POST['change_pw'])) {
+			if(!trim($_POST['new_pass_1'])) {
+				status_message("Bitte gib ein neues Kennwort ein, das nicht nur aus Whitespace besteht!");
+				gotop("index.php?q=acc");
+			}
 			if($_POST['new_pass_1'] != $_POST['new_pass_2']) {
 				status_message("Die neuen Kennwörter stimmen nicht überein.");
 				gotop("index.php?q=acc");
@@ -59,7 +63,7 @@
 		// Einstellungen ändern
 		if(isset($_POST['settings'])) {
 			$flags = &user()->flags;
-			foreach(array('newsletter') as $setting) {
+			foreach(array('newsletter', 'atom_feed') as $setting) {
 				$value = isset($_POST[$setting]) ? trim($_POST[$setting]) : false;
 
 				if($setting == 'newsletter') {
@@ -121,6 +125,11 @@
 			<legend>Einstellungen</legend>
 			<label><span>Newsletter</span> <input type="text" name="newsletter" value="<?=htmlspecialchars(user()->newsletter)?>"></label>
 			<p class="small indent">Ist hier eine Email-Adresse angegeben, werden neue Zettel per Email zugestellt</p>
+			<label><span>Atom-Feed aktivieren</span> <input type="checkbox" value="1" name="atom_feed" <?php
+				if(user()->atom_feed !== false) echo('checked');
+			?>></label>
+			<p class="small indent">Dein Feed ist unter <a href="/atom.php?u=<?=user()->id?>">atom.php?u=<?=user()->id?></a>
+				verfügbar.</p>
 			<input type="submit" name="settings" value="Einstellungen ändern">
 		</fieldset>
 	</form>

@@ -17,7 +17,7 @@
 	</style>
 	<script src="jquery-1.4.2.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="uebungszettel.js" type="text/javascript" charset="utf-8"></script>
-	<?php if(user()->id): ?>
+	<?php if(user()->id && user()->atom_feed !== false): ?>
 	<link rel="alternate" type="application/atom+xml" title="Meine Übungszettel" href="atom.php?u=<?=user()->id?>">
 	<?php endif; ?>
 	<title>Übungszettel</title>

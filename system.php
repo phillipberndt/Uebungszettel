@@ -96,16 +96,19 @@
 	}
 	// }}}
 	// Hilfsfunktionen {{{
-	session_start();
-	function logged_in() {
-		return $_SESSION['logged_in'] == true;
-	}
 	function status_message($text) {
+		// Statusmeldungen werden bei der Seitenausgabe in ein
+		// Div geschrieben.
 		$_SESSION['status_messages'][] = $text;
 	}
 	function gotop($url) {
 		header('Location: '.$url);
 		die();
+	}
+	// Benutzerverwaltung {{{
+	session_start();
+	function logged_in() {
+		return $_SESSION['logged_in'] == true;
 	}
 	function &user() {
 		static $user;
@@ -125,9 +128,18 @@
 		}
 		return $user;
 	}
-	function user_save() {
+	function user_load($key, $value) {
 		global $database;
-		$user = user();
+		$query = $database->prepare('SELECT * FROM users WHERE '.$key.' = ?');
+		$query->execute(array($value));
+		$user = $query->fetch(PDO::FETCH_OBJ);
+		if(!$user) return false;
+		foreach(unserialize($user->settings) as $key => $value) $user->$key = $value;
+		return $user;
+	}
+	function user_save($user = null) {
+		global $database;
+		if(!$user) $user = user();
 		$settings = array();
 		foreach($user as $key => $val) {
 			if(array_search($key, array('id', 'name', 'pass', 'salt', 'level', 'autologin', 'flags', 'settings')) === false) {
@@ -147,7 +159,8 @@
 			$user->id = $database->lastInsertId();
 		}
 	}
-	class tmpfile_manager {
+	// }}}
+	class tmpfile_manager {/*{{{*/
 		private $file;
 		public function __construct() {
 			$this->file = tempnam("/tmp", "tmp");
@@ -158,15 +171,17 @@
 		public function __toString() {
 			return $this->file;
 		}
-	}
-	function admin_log($text) {
+	}/*}}}*/
+	function admin_log($text) {/*{{{*/
+		// Log von Administrator-Aufgaben
+		// Vorallem für PHP-Ausführung wichtig
 		if(!$GLOBALS['admin_log_file']) return;
 		$log_file = fopen($GLOBALS['admin_log_file'], 'a');
 		flock($log_file, LOCK_EX);
 		fwrite($log_file, "[".date('d.m.Y H:i:s')." ".user()->name."] ".$text."\n");
 		fclose($log_file);
-	}
-	function get_mime_type($fileOrInline, $inline = false) {
+	}/*}}}*/
+	function get_mime_type($fileOrInline, $inline = false) {/*{{{*/
 		$type = false;
 		if(!$inline && !file_exists($fileOrInline)) return false;
 		if(class_exists('finfo')) {
@@ -189,8 +204,8 @@
 			in_shell_execution(false);
 		}
 		return $type;
-	}
-	function check_if_url_changed($url) {
+	}/*}}}*/
+	function check_if_url_changed($url) {/*{{{*/
 		// Prüft, ob sich eine URL seit dem letzten Aufruf verändert
 		// hat. Gibt true zurück, wenn ja oder wenn die URL noch nie
 		// aufgerufen wurde.
@@ -226,8 +241,8 @@
 		}
 		$query->execute(array($current_age, $url));
 		return true;
-	}
-	function load_url($url, $fix_encoding = true, $if_modified_since = false) {
+	}/*}}}*/
+	function load_url($url, $fix_encoding = true, $if_modified_since = false) {/*{{{*/
 		$cookie_file = &$GLOBALS['_system_cookie_file'];
 		if(!$cookie_file) $cookie_file = new tmpfile_manager();
 		$curl = curl_init();
@@ -262,8 +277,8 @@
 		if(!$fix_encoding) return $content;
 		return mb_convert_encoding($content, 'UTF-8',
 				mb_detect_encoding($content, 'UTF-8, ISO-8859-1', true));
-	}
-	function format_data($data) {
+	}/*}}}*/
+	function format_data($data) {/*{{{*/
 		if(preg_match('#^(http://[^ ]+)( .+)?#i', $data, &$match)) {
 			$url = $match[1];
 			if(preg_match('/\.(?:pdf|ps)$/i', $url)) {
@@ -278,8 +293,8 @@
 		else {
 			return htmlspecialchars($data);
 		}
-	}
-	function cache_file($url, $file_name = false, $return_id = false, $safeForDeletion = true) {
+	}/*}}}*/
+	function cache_file($url, $file_name = false, $return_id = false, $safeForDeletion = true) {/*{{{*/
 		$cache_id = sha1($url);
 		if(!$safeForDeletion) $cache_id = 'st_'.$cache_id;
 		$cache_file = $GLOBALS['cache_dir'] . '/' . $cache_id;
@@ -295,12 +310,12 @@ $_SERVER["SERVER_NAME"] = "localhost:1235";
 
 		if($return_id) return $cache_id;
 		return $cache_url;
-	}
-	function cache_contents($url) {
+	}/*}}}*/
+	function cache_contents($url) {/*{{{*/
 		$cache_id = cache_file($url, false, true, true);
 		return file_get_contents($GLOBALS['cache_dir'] . $cache_id);
-	}
-	function in_shell_execution($begin) {
+	}/*}}}*/
+	function in_shell_execution($begin) {/*{{{*/
 		// Benutzt, falls möglich, die Semaphore-Implementation von
 		// PHP, um die maximale Anzahl gleichzeitiger Shell-Invocations
 		// zu regulieren
@@ -321,5 +336,5 @@ $_SERVER["SERVER_NAME"] = "localhost:1235";
 			ignore_user_abort(false);
 			sem_release($_active_semaphore);
 		}
-	}
+	}/*}}}*/
 	// }}}

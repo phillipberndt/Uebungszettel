@@ -1,11 +1,18 @@
 <?php
 	require('system.php');
 
-	$user = intval($_GET['u']);
-	$user = $database->query('SELECT * FROM users WHERE id = '.$user)->fetch(PDO::FETCH_OBJ);
+	$user = user_load('id', intval($_GET['u']));
 	if(!$user) {
 		header('Status: 404 Not found');
+		header('Content-Type: text/html; charset=utf-8');
 		echo('<div id="error">Ungültige Benutzer-ID</div>');
+		return;
+	}
+
+	if($user->atom_feed === false) {
+		header('Status: 403 Access denied');
+		header('Content-Type: text/html; charset=utf-8');
+		echo('<div id="error">Dieser Feed wurde deaktiviert.</div>');
 		return;
 	}
 

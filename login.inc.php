@@ -1,26 +1,24 @@
 <?php
 	if(logged_in()) {
-		header('Location: index.php');
-		die();
+		gotop("index.php");
 	}
 
+	// Autologin
 	if(isset($_GET['a']) && !empty($_GET['a'])) {
-		$stmt = $database->prepare('SELECT * FROM users WHERE autologin = ?');
-		$stmt->execute(array($_GET['a']));
-		$row = $stmt->fetch(PDO::FETCH_OBJ);
-		if(!$row) {
+		$user = user_load('autologin', $_GET['a']);
+		if(!$user) {
 			gotop("index.php");
 		}
 		else {
 			$_SESSION['logged_in'] = true;
-			$_SESSION['login'] = $row;
-			foreach(unserialize($row->settings) as $key => $value) $_SESSION['login']->$key = $value;
+			$_SESSION['login'] = $user;
 			gotop('index.php');
 		}
 	}
 
 	$errName = $errPass = '';
 	if(isset($_POST['action'])) {
+		// Info-Text zur Anmeldung
 		if($_POST['action'] == "Weiter") {
 			$_SESSION['confirm'] = true;
 			$_POST = $_SESSION['saved_post'];
@@ -81,10 +79,12 @@
 		$pass = $_POST['pass'];
 
 		if($_POST['action'] == 'Registrieren') {
+			// Anmelden
 			if(empty($name)) {
 				$errName = 'Bitte gib einen Benutzernamen ein.';
 			}
 			else {
+				// Checken, ob der Name schon vergeben ist
 				$name = str_replace(array('<', "\n", '>'), '', $name);
 				$stmt = $database->prepare('SELECT count(*) FROM users WHERE name = ?');
 				$stmt->execute(array($name));
@@ -97,6 +97,7 @@
 			}
 
 			if($errPass == $errName && $errName == "") {
+				// Benutzer erstellen
 				$salt = base_convert(rand(0, 36*36 - 1), 10, 36);
 				$passSha = sha1($salt . $pass);
 				$user = user();
@@ -110,11 +111,11 @@
 		}
 
 		if($_POST['action'] == 'Anmelden') {
-			$stmt = $database->prepare('SELECT * FROM users WHERE name = ?');
-			$stmt->execute(array($name));
-			$row = $stmt->fetch(PDO::FETCH_OBJ);
-			if($row) {
-				if(sha1($row->salt . $pass) != $row->pass) {
+			// Benutzer einloggen
+			$user = user_load("name", $name);
+			if($user) {
+				// Passwortkontrolle
+				if(sha1($user->salt . $pass) != $user->pass) {
 					$errPass = 'Benutzername oder Kennwort sind falsch.';
 				}
 			}
@@ -123,8 +124,7 @@
 			}
 			if($errPass == '') {
 				$_SESSION['logged_in'] = true;
-				$_SESSION['login'] = $row;
-				foreach(unserialize($row->settings) as $key => $value) $_SESSION['login']->$key = $value;
+				$_SESSION['login'] = $user;
 				gotop('index.php');
 			}
 		}
