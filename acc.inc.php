@@ -125,11 +125,11 @@
 			<legend>Einstellungen</legend>
 			<label><span>Newsletter</span> <input type="text" name="newsletter" value="<?=htmlspecialchars(user()->newsletter)?>"></label>
 			<p class="small indent">Ist hier eine Email-Adresse angegeben, werden neue Zettel per Email zugestellt</p>
-			<label><span>Atom-Feed aktivieren</span> <input type="checkbox" value="1" name="atom_feed" <?php
+			<label><span>Atom-Feed</span> <input type="checkbox" value="1" name="atom_feed" <?php
 				if(user()->atom_feed !== false) echo('checked');
 			?>></label>
-			<p class="small indent">Dein Feed ist unter <a href="atom.php?u=<?=user()->id?>">atom.php?u=<?=user()->id?></a>
-				verfügbar.</p>
+			<p class="small indent">Hier kannst Du einstellen, ob Dein Feed aktiviert ist.
+				Dein Feed ist unter <a href="atom.php?u=<?=user()->id?>">atom.php?u=<?=user()->id?></a> verfügbar.</p>
 			<input type="submit" name="settings" value="Einstellungen ändern">
 		</fieldset>
 	</form>
