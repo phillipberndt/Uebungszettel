@@ -1,11 +1,11 @@
 $(document).ready(function() {
 	var ajax_box = function() {
-		var box = $("<div id='ajax_info'>Bitte warten, lade Daten… <img src='ajax-loader.gif'></div><div id='greyout'></div>");
+		var box = $("<div id='ajax_info'>Bitte warten, lade Daten… <img src='images/ajax-loader.gif'></div><div id='greyout'></div>");
 		$("body").append(box);
 		return box;
 	}
 
-	$("body").append($("<img src='ajax-loader.gif' style='position: fixed; top: 0; right: 0; margin: 10px;' alt='Lade Daten vom Server'>").
+	$("body").append($("<img src='images/ajax-loader.gif' style='position: fixed; top: 0; right: 0; margin: 10px;' alt='Lade Daten vom Server'>").
 		ajaxStart(function() { $(this).show(); }).ajaxStop(function() { $(this).hide(); }).ajaxError(function() { $(this).hide(); }).hide());
 
 	if(document.location.search == "" || document.location.search.match(/q=login/)) {

@@ -164,7 +164,7 @@
 	</div>
 	<p class="info">Feedback? Fragen? Kommentare? → Mail an <span class="tomail"><?=$support_mail_show?></span></p>
 </form>
-<p class="about"><img src="tux.png" style="display: block; float:left; width: 50px; height: 60px; margin-right: 5px; margin-top: -3px" />
+<p class="about"><img src="images/tux.png" style="display: block; float:left; width: 50px; height: 60px; margin-right: 5px; margin-top: -3px" />
 	Übungszettel ist Angebot von <a href="http://www.spline.de">Spline</a>.<br>
 	Geschrieben von <a href="http://www.pberndt.com">Phillip Berndt</a>.<br>
 	<?php
