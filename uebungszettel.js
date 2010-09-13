@@ -177,6 +177,7 @@ $(document).ready(function() {
 			});
 		});
 		$("tr.neu td:first-child + td a").click(function() {
+			if($(window).data("exercise-mode")) return true;
 			var match = $(this).closest("tr").find("td:last-child a")[0].toString().match(/d=([0-9]+)/);
 			if(match) {
 				$.get("index.php?r=" + match[1]);
@@ -184,14 +185,18 @@ $(document).ready(function() {
 			}
 		});
 		$("p.right").append(" | ").append($("<a href='#'>PDFs kombinieren</a>").toggle(function() {
+			$(window).data("exercise-mode", true);
 			$(this).addClass("selected");
 			$(".exercise").toggle(function() {
 				$(this).removeClass("selected");
+				return false;
 			}, function() {
 				$(this).addClass("selected");
+				return false;
 			}).addClass("selected");
 			return false;
 		}, function() {
+			$(window).data("exercise-mode", false);
 			$(this).removeClass("selected");
 			if($(".exercise.selected").length > 0) {
 				var form = $("<form method='post' action='combine.php'>");
@@ -201,7 +206,7 @@ $(document).ready(function() {
 				});
 				form.submit();
 			}
-			$(".exercise").removeClass("selected").unbind('toggle');
+			$(".exercise").removeClass("selected").unbind("click");
 			return false;
 		}));
 	}
