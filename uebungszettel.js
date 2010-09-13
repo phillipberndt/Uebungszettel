@@ -8,7 +8,7 @@ $(document).ready(function() {
 	$("body").append($("<img src='ajax-loader.gif' style='position: fixed; top: 0; right: 0; margin: 10px;' alt='Lade Daten vom Server'>").
 		ajaxStart(function() { $(this).show(); }).ajaxStop(function() { $(this).hide(); }).ajaxError(function() { $(this).hide(); }).hide());
 
-	if(document.location.search == "") {
+	if(document.location.search == "" || document.location.search.match(/q=login/)) {
 		$("#login input:first").focus();
 		$(".tomail").each(function() {
 			var $this = $(this);
@@ -19,6 +19,38 @@ $(document).ready(function() {
 				var body = encodeURIComponent("Hallo,\n\nich habe eine Frage zum Übungszettelservice:\n\n");
 				document.location = "mailto:" + addr + "?subject=" + subject + "&body=" + body;
 				return false;
+			});
+		});
+		$("#login input[type=submit]").click(function() { $(this).closest("form").data("action", this.value); });
+		$("#login").submit(function() {
+			var $this = $(this);
+			var has_err = false;
+			$this.parent().find("span.error,span.info").remove();
+			$this.parent().find("input").each(function() {
+				if(this.value == "") {
+					$(this).parent().after("<span class='error'>Bitte gib " +
+						(this.name == "name" ? "einen Benutzernamen" : "ein Passwort") + " ein.</span>");
+					if(!has_err) $(this).focus();
+					has_err = true;
+				}
+			});
+			if(has_err) {
+				if($this.data("action") == "Registrieren") {
+					$this.find("div").first().prepend(
+						"<span class='info'>Um Dich zu registrieren wähle bitte einen Benutzernamen und ein Passwort aus.</span>");
+					$("#login input[type=submit][value=Anmelden]").remove();
+				}
+				return false;
+			}
+		});
+		$("#login input[name=name]").change(function() {
+			var $this = $(this);
+			if($("#login input[type=submit][value=Anmelden]").length > 0) return;
+			$("#login span.error").remove();
+			$.get("index.php?q=login&name_check=" + encodeURIComponent(this.value), null, function(data) {
+				if(data != "") {
+					$this.parent().after("<span class='error'>" + data + "</span>");
+				}
 			});
 		});
 	}

@@ -20,6 +20,7 @@ p.info { margin-top: 50px; font-size: small; padding: 10px; border: 1px solid #d
 p.nomargin { margin-top: 0; }
 #login label + label { margin-bottom: 10px; }
 #login .error { color: red; font-size: x-small; display: block; margin: -2px 13px 5px 0px; text-align: right; }
+#login .info { font-size: x-small; display: block; margin-bottom: 10px; }
 
 div#error { display: block; width: 400px; margin-top: 200px; border: 1px solid #488; padding: 10px; background: #eef;
 	margin-left: auto; margin-right: auto; text-align: center; }

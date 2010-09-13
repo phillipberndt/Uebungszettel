@@ -3,6 +3,9 @@
 		gotop("index.php");
 	}
 
+	// Formzielbehandlung nur bei korrekter URL
+	if($_GET['q'] == "login"):
+
 	// Autologin
 	if(isset($_GET['a']) && !empty($_GET['a'])) {
 		$user = user_load('autologin', $_GET['a']);
@@ -14,6 +17,17 @@
 			$_SESSION['login'] = $user;
 			gotop('index.php');
 		}
+	}
+
+	// Namens-Check für Anmeldung
+	if(isset($_GET['name_check'])) {
+		ob_end_clean();
+		$query = $database->prepare('SELECT COUNT(*) FROM users WHERE name = ?');
+		$query->execute(array($_GET['name_check']));
+		if($query->fetchColumn() != 0) {
+			die("Dieser Benutzername ist bereits vergeben.");
+		}
+		die();
 	}
 
 	$errName = $errPass = '';
@@ -77,8 +91,11 @@
 
 		$name = strtolower(trim($_POST['name']));
 		$pass = $_POST['pass'];
+		$is_register = false;
 
 		if($_POST['action'] == 'Registrieren') {
+			$is_register = true;
+
 			// Anmelden
 			if(empty($name)) {
 				$errName = 'Bitte gib einen Benutzernamen ein.';
@@ -130,14 +147,28 @@
 		}
 	}
 
+	endif; // Formzielbehandlung
+
+	$support_mail_show = str_replace(array('@'), array(' auf '), $support_mail);
+
 ?>
 <form action="index.php?q=login" method="post" id="login" accept-charset="utf-8">
 	<div>
-		<label><span>Benutzername</span><input type="text" name="name" value=""></label>
+		<?php if($is_register) echo("<span class='info'>Um Dich zu registrieren wähle bitte einen Benutzernamen und ein Passwort aus.</span>"); ?>
+		<label><span>Benutzername</span><input type="text" name="name" value="<?=htmlspecialchars($_POST['name'])?>"></label>
 		<?php if($errName) echo('<span class="error">'.$errName.'</span>'); ?>
 		<label><span>Kennwort</span><input type="password" name="pass" value=""></label>
 		<?php if($errPass) echo('<span class="error">'.$errPass.'</span>'); ?>
-		<input type="submit" name="action" value="Anmelden">
+		<?php if(!$is_register) echo('<input type="submit" name="action" value="Anmelden">'); ?>
 		<input type="submit" name="action" value="Registrieren">
 	</div>
+	<p class="info">Feedback? Fragen? Kommentare? → Mail an <span class="tomail"><?=$support_mail_show?></span></p>
 </form>
+<p class="about"><img src="tux.png" style="display: block; float:left; width: 50px; height: 60px; margin-right: 5px; margin-top: -3px" />
+	Übungszettel ist Angebot von <a href="http://www.spline.de">Spline</a>.<br>
+	Geschrieben von <a href="http://www.pberndt.com">Phillip Berndt</a>.<br>
+	<?php
+	echo($database->query('SELECT COUNT(*) FROM users')->fetchColumn() . ' Benutzer haben zusammen ' .
+		($database->query('SELECT SUM( (SELECT COUNT(*) FROM data WHERE data.feed_id = user_feeds.feed_id) ) FROM user_feeds')->fetchColumn() + 0) .
+		' Zettel erhalten.');
+?></p>

@@ -1,24 +1,6 @@
 <?php if(!logged_in()): 
-	$support_mail_show = str_replace(array('@'), array(' auf '), $support_mail);
-?>
-<form action="index.php?q=login" method="post" id="login" accept-charset="utf-8">
-	<div>
-		<label><span>Benutzername</span><input type="text" name="name" value=""></label>
-		<label><span>Kennwort</span><input type="password" name="pass" value=""></label>
-		<input type="submit" name="action" value="Anmelden">
-		<input type="submit" name="action" value="Registrieren">
-	</div>
-	<p class="info">Feedback? Fragen? Kommentare? → Mail an <span class="tomail"><?=$support_mail_show?></span></p>
-</form>
-<p class="about"><img src="tux.png" style="display: block; float:left; width: 50px; height: 60px; margin-right: 5px; margin-top: -3px" />
-	Übungszettel ist Angebot von <a href="http://www.spline.de">Spline</a>.<br>
-	Geschrieben von <a href="http://www.pberndt.com">Phillip Berndt</a>.<br>
-	<?php
-	echo($database->query('SELECT COUNT(*) FROM users')->fetchColumn() . ' Benutzer haben zusammen ' .
-		($database->query('SELECT SUM( (SELECT COUNT(*) FROM data WHERE data.feed_id = user_feeds.feed_id) ) FROM user_feeds')->fetchColumn() + 0) .
-		' Zettel erhalten.');
-?></p>
-<?php else:
+	require("login.inc.php");
+else:
 	$hide_invisible = !(isset($_GET['inv']) && $_GET['inv'] == 1);
 	$only_feed = isset($_GET['f']) && $_GET['f'] ? intval($_GET['f']) : false;
 
