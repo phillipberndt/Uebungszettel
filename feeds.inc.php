@@ -105,6 +105,7 @@
 		if(isset($_POST['submit'])) {
 			$lectures = array();
 			foreach($database->query('SELECT feed_id FROM user_feeds WHERE user_id = '.user()->id) as $lecture) $lectures[$lecture['feed_id']] = 1;
+			$was_empty = empty($lectures);
 
 			// Kurse aus POST, die es bisher nicht gibt, erstellen
 			foreach(array_keys($_POST['lecture']) as $lecture) {
@@ -115,6 +116,11 @@
 
 			// Kurse aus der Datenbank, die es nicht mehr gibt, killen
 			$database->exec('DELETE FROM user_feeds WHERE user_id = '.user()->id.' AND feed_id IN ('.implode(',', array_keys($lectures)).')');
+
+			status_message("Deine Kurse wurden erfolgreich gespeichert.");
+
+			// Zur Startseite, falls das der erste Aufruf war.
+			if($was_empty) gotop("index.php");
 		}
 		// }}}
 		gotop('index.php?q=feeds');
@@ -122,7 +128,7 @@
 ?>
 <div id="content">
 	<h2>Kurse auswählen</h2>
-	<p>Bitte wähle die Kurse aus, die Du abbonieren möchtest.</p>
+	<p>Bitte wähle die Kurse aus, die Du abbonieren möchtest, aus.</p>
 	<form class="feeds" method="post" action="index.php?q=feeds">
 	<table id="kurse">
 		<tr><th>&nbsp;</th><th>Kurs</th><th>Zettel</th><th>&nbsp;</th></tr>

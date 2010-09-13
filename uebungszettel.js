@@ -58,6 +58,7 @@ $(document).ready(function() {
 		if(e.originalTarget != this) return;
 		var cb = $("input[type=checkbox]", this);
 		cb.attr("checked", cb.attr("checked") ? "" : "checked");
+		$(this).closest("form").data("changed", true);
 	});
 	$("a.confirm").each(function() {
 		$(this).click(function() {
@@ -75,6 +76,15 @@ $(document).ready(function() {
 		$this.hide().before(filler);
 	});
 	if(document.location.search.match(/q=feeds/)) {
+		$("td input[type=checkbox]").change(function() {
+			$(this).closest("form").data("changed", true);
+		});
+		$(window).bind("beforeunload", function() {
+			if($("form.feeds").data("changed")) {
+				return "Du verlässt die Seite, ohne Deine Änderungen zu speichern.";
+			}
+		});
+		$("form.feeds").submit(function() { $(this).data("changed", false); });
 		$("form.newcourse").each(function() {
 			$(this).submit(function() {
 				var mform = this;
@@ -274,6 +284,7 @@ $(document).ready(function() {
 				});
 				return false;
 			});
+			$(".buttons.small").css("position", "absolute").css("marginLeft", $(".bes-left").width() + $(".bes-right").width() - $(".buttons.small").width());
 		}
 	}
 	if(document.location.search.match(/q=acc/)) {

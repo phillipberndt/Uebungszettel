@@ -15,6 +15,17 @@
 	$is_owner = $feed['owner'] == user()->id;
 	$can_edit = $is_owner || user()->level >= 1;
 
+	// Kurse bestellen und abbestellen
+	if(isset($_GET['abbo']) && user()->id) {
+		if($_GET['abbo'] == 0) {
+			$database->query('DELETE FROM user_feeds WHERE user_id = '.user()->id.' AND feed_id = '.$feed_id);
+		}
+		else {
+			$database->query('INSERT INTO user_feeds (user_id, feed_id) VALUES ('.user()->id.', '.$feed_id.')');
+		}
+		gotop("index.php?q=details&f=".$feed_id);
+	}
+
 	// Bearbeiten per AJAX
 	if($can_edit && isset($_POST['property'])) {
 		ob_end_clean();
@@ -87,9 +98,10 @@
 	}
 ?>
 <div id="content">
-	<h2>Detailinformationen</h2>
+	<h2>Detailinformationen zum Kurs <em><?=htmlspecialchars($feed['desc'])?></em></h2>
 	<?php if($can_edit): ?>
-	<p class="info nomargin can_edit"><em>Hinweis:</em> Klicke auf eine Eigenschaft, um sie zu bearbeiten.</p>
+	<p class="info nomargin can_edit"><em>Hinweis:</em> Klicke auf eine Eigenschaft, um sie zu bearbeiten. <noscript>Dafür benötigst Du
+		Javascript!</noscript></p>
 	<?php endif; ?>
 	<div class="bes">
 	<dl class="bes-left">
@@ -111,6 +123,7 @@
 		?></dd>
 	</dl>
 	<div class="bes-right">
+		<p class="fun">Technische Funktionsweise</p>
 		<?php
 			if(isset($code['code'])) {
 				echo('<p>Führt PHP-Code aus:</p><div id="edit-code" class="code editable">');
@@ -128,17 +141,31 @@
 	</div>
 	</div>
 	<?php if($can_edit): ?>
-	<p class="small right">
+	<p class="small buttons">
 		<?php if(user()->level >= 1): ?>
 		<a href="index.php?q=details&f=<?=$feed_id?>&action=visibility">Sichtbarkeit umschalten</a> | 
 		<?php endif; ?>
 		<a href="index.php?q=details&f=<?=$feed_id?>&action=delete" class="confirm">Feed löschen</a>
 	</p>
 	<?php endif; ?>
+	<?php if(user()->id): ?>
+	<p class="abbo small">
+	<?php
+		$user_uses_feed = $database->query('SELECT COUNT(*) FROM user_feeds WHERE feed_id = '.$feed_id.' AND user_id = '.user()->id)->fetchColumn();
+		if($user_uses_feed) {
+			echo('Du abbonierst diesen Kurs. <a href="index.php?q=details&amp;f='.$feed_id.'&amp;abbo=0">Klicke hier, um ihn abzubestellen.</a>');
+		}
+		else {
+			echo('Du abbonierst diesen Kurs nicht. <a href="index.php?q=details&amp;f='.$feed_id.'&amp;abbo=1">Klicke hier, um ihn zu bestellen.</a>');
+		}
+	?>
+	</p>
+	<?php endif; ?>
 
 	<h3>Aggregierte Aufgaben</h3>
+	<?php if($can_edit): ?>
 	<p class="info nomargin"><em>Hinweis:</em> Diese Liste wird regelmäßig und <em>nicht</em> mit jeder Änderung oben umgehend aktualisiert.</p>
-	<?php
+	<?php endif;
 		$feeds = $database->query('SELECT data FROM data WHERE feed_id = '.$feed_id.' ORDER BY id ASC');
 		$feed = $feeds->fetch();
 		if($feed) {
