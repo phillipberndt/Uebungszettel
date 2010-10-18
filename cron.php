@@ -123,7 +123,9 @@
 			}
 			$text .= "\r\n";
 		}
-		$text .= "\r\nGruß,\r\nDein Übungszettelservice\r\n\r\nPs. Wenn Du diese Email unbeabsichtigt bekommst, antworte auf sie zum abbestellen dieses Dienstes.";
-		$message = "--" . $boundary . "\nContent-Type: text/plain;charset=UTF-8\n\n" . $text . $attachments;
+		$text .= "\r\nGruß,\r\nDein Übungszettelservice\r\n\r\nPs. Wenn Du diese Email unbeabsichtigt bekommst, schreibe uns " .
+			"eine Antwort. Wir bestellen diesen Dienst dann für Dich ab.";
+		$message = "--" . $boundary . "\r\nContent-Type: text/plain;charset=UTF-8\r\n" .
+			"Content-Transfer-Encoding: 8bit\r\n\r\n" . $text . $attachments . "\r\n--" . $boundary . "--";
 		mail($data['name'] . ' <'. $mail . '>', 'Neue =?utf-8?Q?=C3=9Cbungszettel?=', $message, $headers);
 	}
