@@ -1,5 +1,5 @@
 <?php
-	if(!logged_in()) gotop("index.php");
+	force_login();
 
 	if(!empty($_POST)) {
 		// PHP Code; nur für Admins {{{

@@ -9,7 +9,7 @@ $(document).ready(function() {
 		ajaxStart(function() { $(this).show(); }).ajaxStop(function() { $(this).hide(); }).ajaxError(function() { $(this).hide(); }).hide());
 
 	if(document.location.search == "" || document.location.search.match(/q=login/)) {
-		$("#login input:first").focus();
+		$("#login input[type=text]:first").focus();
 		$(".tomail").each(function() {
 			var $this = $(this);
 			var addr = $this.text().replace(" auf ", "@");
@@ -26,7 +26,7 @@ $(document).ready(function() {
 			var $this = $(this);
 			var has_err = false;
 			$this.parent().find("span.error,span.info").remove();
-			$this.parent().find("input").each(function() {
+			$this.parent().find("input[type=text]").each(function() {
 				if(this.value == "") {
 					$(this).parent().after("<span class='error'>Bitte gib " +
 						(this.name == "name" ? "einen Benutzernamen" : "ein Passwort") + " ein.</span>");

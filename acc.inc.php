@@ -1,5 +1,5 @@
 <?php
-	if(user()->id == 0) gotop("index.php");
+	force_login();
 
 	if(!empty($_POST) && sha1(user()->salt . $_POST['old_pass']) == user()->pass) {
 		// Account löschen

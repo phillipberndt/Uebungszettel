@@ -1,7 +1,5 @@
 <?php
-	if(logged_in()) {
-		gotop("index.php");
-	}
+	if(logged_in()) gotop("index.php");
 
 	// Formzielbehandlung nur bei korrekter URL
 	if($_GET['q'] == "login"):
@@ -154,6 +152,7 @@
 ?>
 <form action="index.php?q=login" method="post" id="login" accept-charset="utf-8">
 	<div>
+		<input type="hidden" name="destination" value="<?=htmlspecialchars($_REQUEST['destination'])?>">
 		<?php if($is_register) echo("<span class='info'>Um Dich zu registrieren wähle bitte einen Benutzernamen und ein Passwort aus.</span>"); ?>
 		<label><span>Benutzername</span><input type="text" name="name" value="<?=htmlspecialchars($_POST['name'])?>"></label>
 		<?php if($errName) echo('<span class="error">'.$errName.'</span>'); ?>

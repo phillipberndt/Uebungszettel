@@ -102,6 +102,9 @@
 		$_SESSION['status_messages'][] = $text;
 	}
 	function gotop($url) {
+		if(isset($_REQUEST['destination']) && $_REQUEST['destination'] && !preg_match('#^[a-z]+:#i', $_REQUEST['destination'])) {
+			$url = $_REQUEST['destination'];
+		}
 		header('Location: '.$url);
 		die();
 	}
@@ -109,6 +112,9 @@
 	session_start();
 	function logged_in() {
 		return $_SESSION['logged_in'] == true;
+	}
+	function force_login() {
+		if(!logged_in()) gotop("index.php?destination=" . urlencode($_SERVER['REQUEST_URI']));
 	}
 	function &user() {
 		static $user;

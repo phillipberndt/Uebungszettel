@@ -1,4 +1,6 @@
 <?php
+	force_login();
+
 	if($_POST['suggest']) {
 		$stmt = $database->prepare('INSERT INTO suggestions (text) VALUES (?)');
 		$stmt->execute(array($_POST['suggest']));
