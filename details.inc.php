@@ -1,4 +1,9 @@
 <?php
+	// Funktion zum entfernen von Authentifizierungsinformationen aus URLs
+	function remove_authentication_from_urls($data) {
+		return preg_replace('#(http|ftp)://([^:/]+?):[^/]*?[^\\\\]@(\S+)#i', '$1://$2@$3', $data);
+	}
+
 	// Daten laden
 	$feed_id = intval($_GET['f']);
 	$stmt = $database->prepare('SELECT * FROM feeds WHERE id = ?');
@@ -126,12 +131,18 @@
 		<p class="fun">Technische Funktionsweise</p>
 		<?php
 			if(isset($code['code'])) {
+				if(!$can_edit) {
+					$code['url'] = remove_authentication_from_urls($code['code']);
+				}
 				echo('<p>Führt PHP-Code aus:</p><div id="edit-code" class="code editable">');
 				echo(preg_replace('/&lt;\?php/', '', str_replace(array("&nbsp;", "<br />"),
 					array(" ", "<br />\n"), highlight_string("<?php ".$code['code'], true))));
 				echo('</div>');
 			}
 			else {
+				if(!$can_edit) {
+					$code['url'] = remove_authentication_from_urls($code['url']);
+				}
 				echo('<p>Sucht in der URL</p><p id="edit-url" class="editable url"><a href="'.htmlspecialchars($code['url']).'">'.
 					htmlspecialchars($code['url']).'</a></p><p>
 					nach dem regulären Ausdruck</p><pre class="editable" id="edit-search">'.htmlspecialchars($code['search']).
