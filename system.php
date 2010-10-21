@@ -109,12 +109,28 @@
 		die();
 	}
 	// Benutzerverwaltung {{{
+	function user_levels() {
+		return array(
+			0 => 'Benutzer',
+			1 => 'Moderator',
+			2 => 'Administrator',
+		);
+	}
 	session_start();
 	function logged_in() {
 		return $_SESSION['logged_in'] == true;
 	}
 	function force_login() {
 		if(!logged_in()) gotop("index.php?destination=" . urlencode($_SERVER['REQUEST_URI']));
+	}
+	function force_level($level) {
+		force_login();
+		if(user()->level < $level) {
+			header('HTTP/1.1 403 Access denied');
+			echo('<div id="error">Deine Berechtigungen erlauben Dir nicht, diese Seite zu sehen</div>');
+			return false;
+		}
+		return true;
 	}
 	function &user() {
 		static $user;

@@ -29,6 +29,9 @@
 		<?php if(logged_in()): ?>
 		<li><a href="index.php?q=feeds">Meine Kurse</a></li>
 		<li><a href="index.php?q=acc">Mein Account</a></li>
+		<?php if(user()->level >= 2): ?>
+		<li><a href="index.php?q=admin">Administration</a></li>
+		<?php endif; ?>
 		<li><a href="index.php?q=logout">Logout</a></li>
 		<?php endif; ?>
 	</ul>
@@ -47,7 +50,7 @@
 			require(basename($q) . '.inc.php');
 		}
 		else {
-			header('Status: 404 Not found');
+			header('HTTP/1.1 404 Not found');
 			?>
 			<div id="error">
 				Die angegebene Seite wurde nicht gefunden.
