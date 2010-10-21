@@ -301,7 +301,7 @@
 				mb_detect_encoding($content, 'UTF-8, ISO-8859-1', true));
 	}/*}}}*/
 	function format_data($data) {/*{{{*/
-		if(preg_match('#^(http://[^ ]+)( .+)?#i', $data, &$match)) {
+		if(preg_match('#^(http://[^ ]+)( .+)?$#is', $data, &$match)) {
 			$url = $match[1];
 			if(preg_match('/\.(?:pdf|ps)$/i', $url)) {
 				// Mobile Device PDF: Das können wir als JPG ausliefern!
