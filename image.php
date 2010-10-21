@@ -11,12 +11,12 @@
 
 	set_time_limit(0);
 	if(!isset($_GET['d'])) {
-		header('Status: 404 Not found');
+		header('HTTP/1.1 404 Not found');
 		die("<h1>File not found</h1>");
 	}
 	$image = $_GET['d'];
 	if(!preg_match('#^http://#i', $image)) {
-		header('Status: 404 Not found');
+		header('HTTP/1.1 404 Not found');
 		die("<h1>File not found</h1>");
 	}
 	if(preg_match('#\.([^\.]+)$#', $image, $extension)) {
@@ -51,7 +51,7 @@
 
 	if(isset($_GET['p'])) {
 		if($_SERVER["HTTP_IF_MODIFIED_SINCE"]) {
-			header('Status: 304 Not modified');
+			header('HTTP/1.1 304 Not modified');
 		}
 		header('Content-type: image/png');
 		readfile($cache_file);

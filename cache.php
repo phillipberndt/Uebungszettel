@@ -5,7 +5,7 @@
 	$file_name = $_GET['filename'];
 
 	if(!file_exists($cache_file)) {
-		header("Status: 404 Not found");
+		header("HTTP/1.1 404 Not found");
 		die();
 	}
 

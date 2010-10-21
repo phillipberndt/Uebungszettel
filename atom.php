@@ -3,14 +3,14 @@
 
 	$user = user_load('id', intval($_GET['u']));
 	if(!$user) {
-		header('Status: 404 Not found');
+		header('HTTP/1.1 404 Not found');
 		header('Content-Type: text/html; charset=utf-8');
 		echo('<div id="error">Ungültige Benutzer-ID</div>');
 		return;
 	}
 
 	if($user->atom_feed === false) {
-		header('Status: 403 Access denied');
+		header('HTTP/1.1 403 Access denied');
 		header('Content-Type: text/html; charset=utf-8');
 		echo('<div id="error">Dieser Feed wurde deaktiviert.</div>');
 		return;

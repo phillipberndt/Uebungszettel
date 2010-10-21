@@ -14,7 +14,7 @@
 	$code = unserialize($feed['code']);
 
 	if(!$feed) {
-		header('Status: 404 Not found');
+		header('HTTP/1.1 404 Not found');
 		?><div id="error">Ein Feed mit dieser ID existiert nicht.</div><?php
 		return;
 	}
