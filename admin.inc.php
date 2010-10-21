@@ -7,11 +7,9 @@
 			$user = user_load('id', $id);
 			if(!$user) continue;
 			if($change['delete']) {
-				$database->beginTransaction();
 				$database->exec('DELETE FROM user_data WHERE user_id = '.$id);
 				$database->exec('DELETE FROM user_feeds WHERE user_id = '.$id);
 				$database->exec('DELETE FROM users WHERE id = '.$id);
-				$database->commit();
 				status_message("Benutzer " . htmlspecialchars($user->name) . " gelöscht");
 				admin_log("Benutzer " . htmlspecialchars($user->name) . " gelöscht");
 				continue;

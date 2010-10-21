@@ -9,11 +9,9 @@
 				gotop("index.php?q=acc");
 			}
 			else {
-				$database->beginTransaction();
 				$database->exec('DELETE FROM user_data WHERE user_id = '.user()->id);
 				$database->exec('DELETE FROM user_feeds WHERE user_id = '.user()->id);
 				$database->exec('DELETE FROM users WHERE id = '.user()->id);
-				$database->commit();
 				session_destroy();
 				session_start();
 				status_message("Dein Account wurde gelöscht.");

@@ -94,12 +94,10 @@
 		}
 
 		if($_GET['action'] == "delete") {
-			$database->beginTransaction();
 			$database->exec('DELETE FROM feeds WHERE id = '.$feed_id);
 			$database->exec('DELETE FROM user_data WHERE data_id IN (SELECT id FROM data WHERE feed_id = '.$feed_id.')');
 			$database->exec('DELETE FROM user_feeds WHERE feed_id = '.$feed_id);
 			$database->exec('DELETE FROM data WHERE feed_id = '.$feed_id);
-			$database->commit();
 			gotop("index.php?q=feeds");
 		}
 	}
