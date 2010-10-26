@@ -320,7 +320,6 @@
 		$cache_id = sha1($url);
 		if(!$safeForDeletion) $cache_id = 'st_'.$cache_id;
 		$cache_file = $GLOBALS['cache_dir'] . '/' . $cache_id;
-$_SERVER["SERVER_NAME"] = "localhost:1235";
 		$cache_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['SERVER_NAME'] . dirname($_SERVER['REQUEST_URI']) .
 			'cache.php?cache_id=' . $cache_id . '&filename=' . ($file_name === false ? $cache_id : $file_name);
 
