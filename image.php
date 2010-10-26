@@ -15,7 +15,7 @@
 		die("<h1>File not found</h1>");
 	}
 	$image = $_GET['d'];
-	if(!preg_match('#^http://#i', $image)) {
+	if(!preg_match('#^https?://#i', $image)) {
 		header('HTTP/1.1 404 Not found');
 		die("<h1>File not found</h1>");
 	}

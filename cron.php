@@ -43,7 +43,7 @@
 				$stmt->execute(array($id, $content));
 				$new_content[$id][] = $content;
 				$content_ids[$content] = $database->lastInsertId();
-				if(preg_match('#^(http://[^ ]+)( .+)?#i', $content, &$match)) {
+				if(preg_match('#^(https?://[^ ]+)( .+)?#i', $content, &$match)) {
 					// URL Datum cachen
 					check_if_url_changed($match[1]);
 				}
@@ -51,7 +51,7 @@
 			else
 			{
 				// Falls URL geändert, ..
-				if(preg_match('#^(http://[^ ]+)( .+)?#i', $content, &$match)) {
+				if(preg_match('#^(https?://[^ ]+)( .+)?#i', $content, &$match)) {
 					if(check_if_url_changed($match[1])) {
 						// Überall wieder auf ungelesen setzen
 						$database->query('UPDATE user_data SET invisible = 0, known = 0 WHERE
@@ -110,7 +110,7 @@
 		$attachments = "\r\n";
 		foreach($data['content'] as $uebung) {
 			$text .= ' · '.$data['short'].': '.$uebung;
-			if(preg_match('#^(http://[^ ]+)( .+)?#i', $uebung, &$match)) {
+			if(preg_match('#^(https?://[^ ]+)( .+)?#i', $uebung, &$match)) {
 				$text .= ' (Siehe Attachment)';
 				$file_contents = cache_contents($match[1]);
 				$file_name = trim($match[2]) ? trim($match[2]) : basename($match[1]);

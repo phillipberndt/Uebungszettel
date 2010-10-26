@@ -35,7 +35,7 @@
 			// Einen Testdurchlauf machen
 			$old_reporthing = ini_set('display_errors', 0);
 			$error = '';
-			if(!preg_match('#^http://#i', $_POST['url'])) {
+			if(!preg_match('#^https?://#i', $_POST['url'])) {
 				$error = 'URL ungültig.';
 			}
 			else if(

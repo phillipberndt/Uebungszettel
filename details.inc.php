@@ -59,7 +59,7 @@
 		}
 
 		if(array_search($property, array('url', 'search', 'exercise')) !== false) {
-			if($property == 'url'    &! preg_match('#^http://#i', $value)) {
+			if($property == 'url'    &! preg_match('#^https?://#i', $value)) {
 				die(htmlspecialchars($code[$property]));
 			}
 			$oldvalue = $code[$property];
