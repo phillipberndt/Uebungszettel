@@ -2,7 +2,12 @@
 	require('system.php');
 
 	$urls = $_POST['d'];
-	$execute = 'pdftk ';
+	if(is_dir('pdftk')) {
+		$execute = 'LD_LIBRARY_PREFIX=pdftk pdftk/pdftk ';
+	}
+	else {
+		$execute = 'pdftk ';
+	}
 	$final_cache_id = '';
 	foreach($urls as $url) {
 		if(preg_match('/cache_id=([^&]+)/', $url, &$match)) {
