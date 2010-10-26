@@ -3,7 +3,7 @@
 
 	$urls = $_POST['d'];
 	if(is_dir('pdftk')) {
-		$execute = 'LD_LIBRARY_PREFIX=pdftk pdftk/pdftk ';
+		$execute = 'LD_LIBRARY_PATH=pdftk pdftk/pdftk ';
 	}
 	else {
 		$execute = 'pdftk ';
