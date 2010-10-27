@@ -326,7 +326,12 @@
 		$cache_exists = file_exists($cache_file);
 		$content = load_url($url, false, $cache_exists ? filemtime($cache_file) : false);
 		if($content && $content !== true) {
-			file_put_contents($cache_file, $content);
+			// Nur den Cache neu schreiben, wenn sich tatsächlich etwas verändert hat
+			// Dadurch verhindern wir, dass Zettel immer wieder als „Neu“ zählen, weil
+			// ein Webserver schlampig konfiguriert ist.
+			if(!file_exists($cache_file) || sha1_file($cache_file) != sha1($content)) {
+				file_put_contents($cache_file, $content);
+			}
 		}
 
 		if($return_id) return $cache_id;

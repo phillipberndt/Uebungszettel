@@ -18,20 +18,24 @@
 				$userFn = create_function('', $code['code']);
 				$contents = $userFn();
 			}
-			catch(Exception $ignore) {}
+			catch(Exception $ignore) {
+				continue;
+			}
 		}
 		else {
 			try {
 				$file = load_url($code['url']);
 			}
-			catch(Exception $ignore) {}
+			catch(Exception $ignore) {
+				continue;
+			}
 			$file = html_entity_decode($file, ENT_COMPAT, "utf-8");
 			preg_match_all($code['search'], $file, &$matches,  PREG_SET_ORDER);
 			$contents = array();
 			foreach($matches as $match) {
 				$contents[] = preg_replace_callback('/\$([0-9]+)/', function($vmatch) use ($match) {
 					return $match[$vmatch[1]];
-					}, $code['exercise']);
+				}, $code['exercise']);
 			}
 		}
 
