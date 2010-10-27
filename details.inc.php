@@ -175,9 +175,9 @@
 
 	<h3>Aggregierte Aufgaben</h3>
 	<?php if($can_edit): ?>
-	<p class="info nomargin"><em>Hinweis:</em> Diese Liste wird regelmäßig und <em>nicht</em> mit jeder Änderung oben umgehend aktualisiert.</p>
+	<p class="info nomargin"><em>Hinweis:</em> Es kann ein wenig dauern, bis diese Liste die letzten Änderungen berücksichtigt.</p>
 	<?php endif;
-		$feeds = $database->query('SELECT data FROM data WHERE feed_id = '.$feed_id.' ORDER BY id ASC');
+		$feeds = $database->query('SELECT data FROM data WHERE feed_id = '.$feed_id.' ORDER BY id DESC');
 		$feed = $feeds->fetch();
 		if($feed) {
 			echo('<ol><li>'.format_data($feed['data']).'</li>');

@@ -74,7 +74,8 @@ else:
 					data
 				WHERE feed_id IN (SELECT feed_id FROM user_feeds WHERE user_id = '.user()->id.')'.
 				($only_feed !== false ? ' AND feed_id = '.$only_feed : '').
-				($hide_invisible ? ' GROUP BY id HAVING (invisible IS NULL OR invisible != 1)' : ''));
+				($hide_invisible ? ' GROUP BY id HAVING (invisible IS NULL OR invisible != 1)' : '').
+				'ORDER BY id DESC');
 			
 			$outputted = false;
 			foreach($exercises as $exercise) {
