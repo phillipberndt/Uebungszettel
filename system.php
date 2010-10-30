@@ -64,7 +64,7 @@
 			$database->exec('CREATE TABLE feeds         (id INTEGER PRIMARY KEY AUTOINCREMENT, owner INT, desc VARCHAR(120), short VARCHAR(120),
 				code LONGTEXT, public INT DEFAULT 0);');
 			$database->exec('CREATE TABLE data          (id INTEGER PRIMARY KEY AUTOINCREMENT, feed_id INTEGER,
-				data MEDIUMTEXT)');
+				data MEDIUMTEXT, timestamp INT(11))');
 			$database->exec('CREATE INDEX fid ON data       (feed_id);');
 			$database->exec('CREATE TABLE user_data         (data_id INTEGER, user_id INTEGER, comment MEDIUMTEXT DEFAULT "", invisible INTEGER DEFAULT 0, known INTEGER DEFAULT 0);');
 			$database->exec('CREATE UNIQUE INDEX did_uid ON user_data (data_id, user_id);');

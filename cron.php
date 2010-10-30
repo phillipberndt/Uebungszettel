@@ -6,7 +6,7 @@
 
 	// Zettel updaten
 	$database->beginTransaction();
-	$stmt = $database->prepare('INSERT INTO data (feed_id, data) VALUES (?, ?)');
+	$stmt = $database->prepare('INSERT INTO data (feed_id, data, timestamp) VALUES (?, ?, ?)');
 	$new_content = array();
 	$content_ids = array();
 	foreach($database->query('SELECT id, code FROM feeds') as $feed) {
@@ -44,7 +44,7 @@
 
 		if(is_array($contents)) foreach($contents as $content) {
 			if(!isset($known[$content])) {
-				$stmt->execute(array($id, $content));
+				$stmt->execute(array($id, $content, time()));
 				$new_content[$id][] = $content;
 				$content_ids[$content] = $database->lastInsertId();
 				if(preg_match('#^(https?://[^ ]+)( .+)?#i', $content, &$match)) {
@@ -60,6 +60,8 @@
 						// Überall wieder auf ungelesen setzen
 						$database->query('UPDATE user_data SET invisible = 0, known = 0 WHERE
 							data_id = '.$known[$content]);
+						// Timestamp updaten
+						$database->query('UPDATE data SET timestamp = '.time().' WHERE id = '.$known[$content]);
 						// Und noch einmal per Email versenden
 						if($match[2]) {
 							$up_content = $content . ' (Geändert)';
