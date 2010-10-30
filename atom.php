@@ -25,6 +25,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="de">
 		<id><?=$base_url?>uebungszettel-<?=$user->id?></id>
 		<title>Aktuelle Übungszettel für <?=htmlspecialchars($user->name)?></title>
+		<updated><?=date('c')?></updated>
+		<link rel="self" href="http://<?=$_SERVER['SERVER_NAME']?>/atom.php?u=<?=$user->id?>" />
+		<link rel="alternate" href="/" />
+		<author><name>Übungszettelagregator</name></author>
 		
 		<?php
 
@@ -33,7 +37,7 @@
 
 		$exercises = $database->query('
 			SELECT
-				id, data, feed_id,
+				id, data, feed_id, timestamp,
 				(SELECT comment FROM user_data WHERE user_id = '.$user->id.' AND data_id = id) AS comment,
 				(SELECT invisible FROM user_data WHERE user_id = '.$user->id.' AND data_id = id) AS invisible
 			FROM
@@ -45,11 +49,17 @@
 		?>
 			
 		<entry>
+		<updated><?=date('c', $exercise['timestamp'])?></updated>
 		<id><?=$base_url?>uebungszettel-<?=$user->id?>uebung-<?=$exercise['id']?></id>
 		<title><?=htmlspecialchars($descs[$exercise['feed_id']])?> - <?=strip_tags(format_data($exercise['data']))?></title>
 		<summary type="html">
 		<?=htmlspecialchars(format_data($exercise['data']))?>
 		</summary>
+		<?php if(preg_match('#^(https?://\S+)(.*)#i', $exercise['data'], &$url)): ?>
+			<link title="<?=htmlspecialchars(trim($url[2]))?>" href="<?=htmlspecialchars($url[1])?>" rel="alternate" />
+		<?php else: ?>
+			<content type="text"><?=htmlspecialchars($exercise['data'])?></content>
+		<?php endif; ?>
 		</entry>
 
 		<?php endforeach; ?>
