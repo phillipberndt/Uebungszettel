@@ -77,7 +77,10 @@ textarea { width: 600px; height: 400px; }
 fieldset { margin-bottom: 20px; }
 
 p.about {
-	position: fixed; right: 10px; bottom: 5px; font-size: x-small; 
+	position: fixed; right: 10px; bottom: 5px; font-size: x-small; z-index: -1;
+}
+p.about img {
+	display: block; float:left; width: 50px; height: 60px; margin-right: 5px; margin-top: -3px;
 }
 a.selected, a:visited.selected { color: red ; }
 div#content p.right a.selected { color: red ; }

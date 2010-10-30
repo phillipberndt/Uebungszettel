@@ -161,9 +161,10 @@
 		<?php if(!$is_register) echo('<input type="submit" name="action" value="Anmelden">'); ?>
 		<input type="submit" name="action" value="Registrieren">
 	</div>
+<?php if(!is_mobile()): ?>
 	<p class="info">Feedback? Fragen? Kommentare? → Mail an <span class="tomail"><?=$support_mail_show?></span></p>
 </form>
-<p class="about"><img src="images/tux.png" style="display: block; float:left; width: 50px; height: 60px; margin-right: 5px; margin-top: -3px" />
+<p class="about"><img src="images/tux.png" />
 	<a href="http://github.com/phillipberndt/Uebungszettel">Übungszettel</a> ist Angebot von <a href="http://www.spline.de">Spline</a>.<br>
 	Geschrieben von <a href="http://www.pberndt.com">Phillip Berndt</a>.<br>
 	<?php
@@ -171,3 +172,6 @@
 		($database->query('SELECT SUM( (SELECT COUNT(*) FROM data WHERE data.feed_id = user_feeds.feed_id) ) FROM user_feeds')->fetchColumn() + 0) .
 		' Zettel erhalten.');
 ?></p>
+<?php else: ?>
+</form>
+<?php endif; ?>

@@ -300,14 +300,16 @@
 		return mb_convert_encoding($content, 'UTF-8',
 				mb_detect_encoding($content, 'UTF-8, ISO-8859-1', true));
 	}/*}}}*/
+	function is_mobile() {/*{{{*/
+		if(preg_match('/SymbianOS|J2ME|Mobile|iPhone|iPad|iPod|android|opera mini|blackberry|windows ce/i', $_SERVER['HTTP_USER_AGENT'])) return true;
+		return false;
+	}/*}}}*/
 	function format_data($data) {/*{{{*/
 		if(preg_match('#^(https?://[^ ]+)( .+)?$#is', $data, &$match)) {
 			$url = $match[1];
-			if(preg_match('/\.(?:pdf|ps)$/i', $url)) {
-				// Mobile Device PDF: Das können wir als JPG ausliefern!
-				if(preg_match('/SymbianOS|J2ME|Mobile|iPhone/i', $_SERVER['HTTP_USER_AGENT'])) {
-					$url = 'image.php?d='.htmlspecialchars(urlencode($url));
-				}
+			// Mobile Device PDF: Das können wir als JPG ausliefern!
+			if(preg_match('/\.(?:pdf|ps)$/i', $url) && is_mobile()) {
+				$url = 'image.php?d='.htmlspecialchars(urlencode($url));
 			}
 
 			return '<a class="exercise" href="'.htmlspecialchars($url).'">'.htmlspecialchars($match[2] ? $match[2] : basename($match[1])).'</a>';

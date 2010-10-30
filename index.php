@@ -9,12 +9,17 @@
 <html>
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<?php // Diesen Check per PHP zu machen ist leider nötig, da einige Handys nicht wissen, dass sie Handys sind o_O
+	      if(is_mobile()): 
+	?>
+	<style type="text/css">
+		@import url('style.handheld.css');
+	</style>
+	<?php else: ?>
 	<style type="text/css" media="screen">
 		@import url('style.css');
 	</style>
-	<style type="text/css" media="handheld">
-		@import url('style.handheld.css');
-	</style>
+	<?php endif; ?>
 	<script src="jquery-1.4.2.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="uebungszettel.js" type="text/javascript" charset="utf-8"></script>
 	<?php if(user()->id && user()->atom_feed !== false): ?>
