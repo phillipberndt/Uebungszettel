@@ -9,7 +9,7 @@
 		die();
 	}
 
-	header('Content-disposition: attachment; filename="' . addcslashes($file_name, '"') . '"');
+	header('Content-disposition: inline; filename="' . addcslashes($file_name, '"') . '"');
 	header('Last-Modified: '.date('r', filemtime($cache_file)));
 	foreach(array(
 		'pdf' => 'application/pdf',
