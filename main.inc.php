@@ -82,7 +82,7 @@ else:
 				$outputted = true;
 				$formatted_data = format_data($exercise['data']);
 				$classes = ($formatted_data != $data && !$exercise['known']) ? ' neu' : '';
-				echo('<tr class='.$classes.'><td><a href="index.php?inv=' . ($hide_invisible ? 0 : 1 ) . '&amp;f=' . $exercise['feed_id'] . '">'.
+				echo('<tr class="'.$classes.'"><td><a href="index.php?inv=' . ($hide_invisible ? 0 : 1 ) . '&amp;f=' . $exercise['feed_id'] . '">'.
 					htmlspecialchars($descs[$exercise['feed_id']]).'</a></td><td>'.
 					$formatted_data.'</td><td class="editable-note" id="edit-'.$exercise['id'].'">'.
 						htmlspecialchars($exercise['comment']).'</td><td>');

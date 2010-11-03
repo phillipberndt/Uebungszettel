@@ -8,7 +8,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta charset="utf-8">
 	<?php // Diesen Check per PHP zu machen ist leider nötig, da einige Handys nicht wissen, dass sie Handys sind o_O
 	      if(is_mobile()): 
 	?>
@@ -28,19 +28,24 @@
 	<title>Übungszettel</title>
 </head>
 <body>
-	<h1>Übungszettel</h1>
-	<ul id="nav">
-		<li><a href="index.php">Übersicht</a></li>
-		<?php if(logged_in()): ?>
-		<li><a href="index.php?q=feeds">Meine Kurse</a></li>
-		<li><a href="index.php?q=acc">Mein Account</a></li>
-		<?php if(user()->level >= 2): ?>
-		<li><a href="index.php?q=admin">Administration</a></li>
-		<?php endif; ?>
-		<li><a href="index.php?q=logout">Logout</a></li>
-		<?php endif; ?>
-	</ul>
+	<header>
+		<h1>Übungszettel</h1>
+	</header>
+	<nav>
+		<ul id="nav">
+			<li><a href="index.php">Übersicht</a></li>
+			<?php if(logged_in()): ?>
+			<li><a href="index.php?q=feeds">Meine Kurse</a></li>
+			<li><a href="index.php?q=acc">Mein Account</a></li>
+			<?php if(user()->level >= 2): ?>
+			<li><a href="index.php?q=admin">Administration</a></li>
+			<?php endif; ?>
+			<li><a href="index.php?q=logout">Logout</a></li>
+			<?php endif; ?>
+		</ul>
+	</nav>
 
+	<section>
 	<?php
 		if(isset($_SESSION['status_messages']) && $_SESSION['status_messages']):
 		?>
@@ -63,5 +68,6 @@
 			<?php
 		}
 	?>
+	</section>
 </body>
 </html>
