@@ -1,10 +1,19 @@
 <?php
 	if(logged_in()) gotop("index.php");
 
+	// Bei direktem Hit auf die Domain Weiterleiten auf diese Seite, weil nur hier
+	// das Autologin-Cookie kommt
+	if($_SERVER['REQUEST_URI'] == '/' && !$_POST) {
+		gotop('index.php?q=login');
+	}
+
 	// Formzielbehandlung nur bei korrekter URL
 	if($_GET['q'] == "login"):
 
 	// Autologin
+	if(isset($_COOKIE['autologin']) && !empty($_COOKIE['autologin']) && !isset($_GET['a'])) {
+		$_GET['a'] = $_COOKIE['autologin'];
+	}
 	if(isset($_GET['a']) && !empty($_GET['a'])) {
 		$user = user_load('autologin', $_GET['a']);
 		if(!$user) {

@@ -58,6 +58,17 @@
 			gotop("index.php?q=acc");
 		}
 
+		// Autologin Cookie
+		if(isset($_POST['autologin_cookie'])) {
+			setcookie('autologin', user()->autologin, time() + 15552000, 
+				(dirname($_SERVER['REQUEST_URI']) == '/' ? '/' : dirname($_SERVER['REQUEST_URI']) . '/') . 'index.php?q=login',
+				null,
+				false,
+				true);
+			status_message("Cookie gespeichert. Logge Dich explizit aus, um es wieder zu löschen.");
+			gotop("index.php?q=acc");
+		}
+
 		// Einstellungen ändern
 		if(isset($_POST['settings'])) {
 			$flags = &user()->flags;
@@ -116,8 +127,13 @@
 			<p class="center"><?=$autologin_link?></p>
 
 			<input type="submit" name="autologin_del" value="Autologin löschen">
-			<?php endif; ?>
+			<input type="submit" name="autologin" value="Autologin neu erzeugen">
+			<p>Du kannst Deinen Autologin auch in einem Cookie speichern. Dieses wird dann verwendet, um Dich
+				automatisch beim Besuch der Seite einzuloggen. Loggst Du Dich manuell aus, wird das Cookie wieder gelöscht.</p>
+			<input type="submit" name="autologin_cookie" value="Autologin als Cookie speichern">
+			<?php else: ?>
 			<input type="submit" name="autologin" value="Neuen Autologin anlegen">
+			<?php endif; ?>
 		</fieldset>
 		<fieldset>
 			<legend>Einstellungen</legend>
