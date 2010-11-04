@@ -2,27 +2,47 @@
 	if(logged_in()) gotop("index.php");
 
 	// Bei direktem Hit auf die Domain Weiterleiten auf diese Seite, weil nur hier
-	// das Autologin-Cookie kommt
-	if($_SERVER['REQUEST_URI'] == '/' && !$_POST) {
+	// das Autologin-Cookie ankommt
+	if(($_SERVER['REQUEST_URI'] == '/' || $_SERVER['REQUEST_URI'] == '/index.php') && !$_POST) {
 		gotop('index.php?q=login');
 	}
 
 	// Formzielbehandlung nur bei korrekter URL
 	if($_GET['q'] == "login"):
 
-	// Autologin
-	if(isset($_COOKIE['autologin']) && !empty($_COOKIE['autologin']) && !isset($_GET['a'])) {
-		$_GET['a'] = $_COOKIE['autologin'];
-	}
-	if(isset($_GET['a']) && !empty($_GET['a'])) {
-		$user = user_load('autologin', $_GET['a']);
-		if(!$user) {
-			gotop("index.php");
-		}
-		else {
-			$_SESSION['logged_in'] = true;
-			$_SESSION['login'] = $user;
-			gotop('index.php');
+	// Per Autologin einloggen
+	if(isset($_COOKIE['autologin']) && strpos($_COOKIE['autologin'], '-') !== false) {
+		list($autologin, $token) = explode('-', $_COOKIE['autologin'], 2);
+		$query = $database->prepare('SELECT token, user_id FROM user_autologin WHERE id = ?');
+		$query->execute(array($autologin));
+		$result = $query->fetch(PDO::FETCH_OBJ);
+
+		if($result) {
+			if($result->token != $token) {
+				// Hier liegt ein Sicherheitsproblem vor!
+				status_message("Dein Login-Cookie wurde zwischenzeitlich von einem anderen Standort aus verwendet." .
+					" Du wurdest aus Sicherheitsgründen ausgeloggt.");
+				$query = $database->prepare('DELETE FROM user_autologin WHERE id = ?');
+				$query->execute(array($autologin));
+				gotop("index.php?q=login");
+			}
+			// Neues Sicherheitstoken erzeugen
+			$token = sha1($token . '-' . microtime() . '-' . rand());
+			$query = $database->prepare('UPDATE user_autologin SET token = ? WHERE id = ?');
+			$query->execute(array($token, $autologin));
+			setcookie('autologin', $autologin . '-' . $token, time() + 15552000, 
+				(dirname($_SERVER['REQUEST_URI']) == '/' ? '/' : dirname($_SERVER['REQUEST_URI']) . '/') . 'index.php?q=login',
+				null, false, true);
+			// Benutzer einloggen
+			$user = user_load('id', $result->user_id);
+			if(!$user) {
+				gotop("index.php");
+			}
+			else {
+				$_SESSION['logged_in'] = true;
+				$_SESSION['login'] = $user;
+				gotop('index.php');
+			}
 		}
 	}
 
@@ -147,6 +167,16 @@
 				$errPass = 'Benutzername oder Kennwort sind falsch.';
 			}
 			if($errPass == '') {
+				// Autologin-Cookie anlegen
+				$autologin = sha1($user->salt . $secure_autologin_token . time() . $user->id . $_SERVER['REMOTE_ADDR']);
+				$token = sha1($autologin . '-' . microtime() . '-' . rand());
+				$database->query('INSERT INTO user_autologin (id, token, user_id) VALUES("' . $autologin . '",
+					"' . $token . '", ' . $user->id . ');');
+				setcookie('autologin', $autologin . '-' . $token, time() + 15552000, 
+					(dirname($_SERVER['REQUEST_URI']) == '/' ? '/' : dirname($_SERVER['REQUEST_URI']) . '/') . 'index.php?q=login',
+					null, false, true);
+
+				// User ist nun eingeloggt. Zur Übersicht.
 				$_SESSION['logged_in'] = true;
 				$_SESSION['login'] = $user;
 				gotop('index.php');

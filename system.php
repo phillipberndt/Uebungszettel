@@ -7,6 +7,7 @@
 	$max_concurrent_toolkit_invokations = 5;
 	$allowed_cache_file_size = 1024 * 1024 * 2;
 	$support_mail = 'uebungen@lists.spline.inf.fu-berlin.de';
+	$secure_autologin_token = '';
 	$allowed_cache_types = array(
 		'application/pdf',
 		'image/png',
@@ -18,6 +19,11 @@
 		'text/plain',
 		'application/xhtml+xml'
 	);
+
+	// Zusätzliche Config-Datei ermöglichen
+	if(file_exists('config.php')) {
+		require('config.php');
+	}
 
 	// Flags für User, gespeichert in user()->flags
 	define('USER_FLAG_WANTSMAIL', 1);
@@ -58,9 +64,11 @@
 		$database->beginTransaction();
 		if($database->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite') {
 			$database->exec('CREATE TABLE users         (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(30),
-				pass VARCHAR(40), salt VARCHAR(2) DEFAULT "", level INT DEFAULT 0, autologin VARCHAR(40), flags INTEGER DEFAULT 0, 
-				settings LONGTEXT DEFAULT "a:0:{}");');
-			$database->exec('CREATE INDEX uauto ON users (autologin);');
+				pass VARCHAR(40), salt VARCHAR(2) DEFAULT "", level INT DEFAULT 0, flags INTEGER DEFAULT 0, 
+				settings LONGTEXT DEFAULT "a:0:{}");'); 
+			$database->exec('CREATE TABLE user_autologin (id VARCHAR(40), token VARCHAR(40), user_id INTEGER)');
+			$database->exec('CREATE INDEX uauto ON user_autologin (id)');
+			$database->exec('CREATE INDEX user ON user_autologin (user_id)');
 			$database->exec('CREATE TABLE feeds         (id INTEGER PRIMARY KEY AUTOINCREMENT, owner INT, desc VARCHAR(120), short VARCHAR(120),
 				code LONGTEXT, public INT DEFAULT 0);');
 			$database->exec('CREATE TABLE data          (id INTEGER PRIMARY KEY AUTOINCREMENT, feed_id INTEGER,
@@ -75,12 +83,14 @@
 		}
 		else {
 			$database->exec('CREATE TABLE users         (id INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(30),
-				pass VARCHAR(40), salt VARCHAR(2) DEFAULT "", level INT DEFAULT 0, autologin VARCHAR(40), flags INTEGER DEFAULT 0, settings LONGTEXT);');
-			$database->exec('CREATE INDEX uauto ON users (autologin);');
+				pass VARCHAR(40), salt VARCHAR(2) DEFAULT "", level INT DEFAULT 0, flags INTEGER DEFAULT 0, settings LONGTEXT);');
+			$database->exec('CREATE TABLE user_autologin (id VARCHAR(40), token VARCHAR(40), user_id INTEGER)');
+			$database->exec('CREATE INDEX uauto ON user_autologin (id)');
+			$database->exec('CREATE INDEX user ON user_autologin (user_id)');
 			$database->exec('CREATE TABLE feeds         (id INTEGER PRIMARY KEY AUTO_INCREMENT, owner INTEGER, `desc` VARCHAR(120), short VARCHAR(120),
 				code LONGTEXT, public INTEGER DEFAULT 0);');
 			$database->exec('CREATE TABLE data          (id INTEGER PRIMARY KEY AUTO_INCREMENT, feed_id INTEGER,
-				data MEDIUMTEXT)');
+				data MEDIUMTEXT, timestamp INT(11))');
 			$database->exec('CREATE INDEX fid ON data       (feed_id);');
 			$database->exec('CREATE TABLE user_data         (data_id INTEGER, user_id INTEGER, comment MEDIUMTEXT DEFAULT "", invisible INTEGER DEFAULT 0, known INTEGER DEFAULT 0);');
 			$database->exec('CREATE UNIQUE INDEX did_uid ON user_data (data_id, user_id);');
@@ -142,7 +152,6 @@
 				$user = new stdclass();
 				$user->id = 0;
 				$user->settings = array();
-				$user->autologin = null;
 				$user->flags = 0;
 				$user->name = "Gast";
 				$user->level = 0;
@@ -164,20 +173,20 @@
 		if(!$user) $user = user();
 		$settings = array();
 		foreach($user as $key => $val) {
-			if(array_search($key, array('id', 'name', 'pass', 'salt', 'level', 'autologin', 'flags', 'settings')) === false) {
+			if(array_search($key, array('id', 'name', 'pass', 'salt', 'level', 'flags', 'settings')) === false) {
 				$settings[$key] = $val;
 			}
 		}
 		if(user()->id) {
-			$stmt = $database->prepare('UPDATE users SET name = ?, pass = ?, salt = ?, level = ?, autologin = ?, flags = ?, 
+			$stmt = $database->prepare('UPDATE users SET name = ?, pass = ?, salt = ?, level = ?, flags = ?, 
 				settings = ? WHERE id = ?');
-			$stmt->execute(array($user->name, $user->pass, $user->salt, $user->level, $user->autologin, $user->flags, serialize($settings),
+			$stmt->execute(array($user->name, $user->pass, $user->salt, $user->level, $user->flags, serialize($settings),
 				$user->id));
 		}
 		else {
 			$user = user();
-			$stmt = $database->prepare('INSERT INTO users (name, pass, salt, level, autologin, flags, settings) VALUES (?, ?, ?, ?, ?, ?, ?)');
-			$stmt->execute(array($user->name, $user->pass, $user->salt, $user->level, $user->autologin, $user->flags, serialize($settings)));
+			$stmt = $database->prepare('INSERT INTO users (name, pass, salt, level, flags, settings) VALUES (?, ?, ?, ?, ?, ?)');
+			$stmt->execute(array($user->name, $user->pass, $user->salt, $user->level, $user->flags, serialize($settings)));
 			$user->id = $database->lastInsertId();
 		}
 	}

@@ -12,8 +12,12 @@
 				$database->exec('DELETE FROM user_data WHERE user_id = '.user()->id);
 				$database->exec('DELETE FROM user_feeds WHERE user_id = '.user()->id);
 				$database->exec('DELETE FROM users WHERE id = '.user()->id);
+				$database->exec('DELETE FROM user_autologin WHERE user_id = '.user()->id);
 				session_destroy();
 				session_start();
+				setcookie('autologin', '', time() - 3600, 
+						(dirname($_SERVER['REQUEST_URI']) == '/' ? '/' : dirname($_SERVER['REQUEST_URI']) . '/') . 'index.php?q=login',
+						null, false, true);
 				status_message("Dein Account wurde gelöscht.");
 				gotop("index.php");
 			}
@@ -37,36 +41,6 @@
 				status_message("Dein Kennwort wurde geändert.");
 				gotop("index.php");
 			}
-		}
-
-		// Autologin erstellen
-		if(isset($_POST['autologin'])) {
-			$autologin_id = sha1(rand().microtime().user()->salt);
-			user()->autologin = $autologin_id;
-			user_save();
-			$autologin_url = 'http'.(isset($_SERVER['HTTPS']) ? 's' : '').'://'.$_SERVER['SERVER_NAME'].
-				substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')).'?q=login&amp;a='.user()->autologin;
-			status_message("Deine Auto-Login URL <a href='".$autologin_url."'>wurde eingerichtet</a>");
-			gotop('index.php?q=acc');
-		}
-
-		// Autologin löschen
-		if(isset($_POST['autologin_del'])) {
-			user()->autologin = null;
-			user_save();
-			status_message("Deine Auto-Login URL wure gelöscht.");
-			gotop("index.php?q=acc");
-		}
-
-		// Autologin Cookie
-		if(isset($_POST['autologin_cookie'])) {
-			setcookie('autologin', user()->autologin, time() + 15552000, 
-				(dirname($_SERVER['REQUEST_URI']) == '/' ? '/' : dirname($_SERVER['REQUEST_URI']) . '/') . 'index.php?q=login',
-				null,
-				false,
-				true);
-			status_message("Cookie gespeichert. Logge Dich explizit aus, um es wieder zu löschen.");
-			gotop("index.php?q=acc");
 		}
 
 		// Einstellungen ändern
@@ -112,28 +86,6 @@
 				Kurse bleiben bestehen!</p>
 			<label><span>Account löschen</span><input type="checkbox" name="del_confirm" value="1"></label>	
 			<input type="submit" name="del_account" value="Account löschen">
-		</fieldset>
-		<fieldset>
-			<legend>Auto-Login</legend>
-			<p>Um Dich nicht bei jedem Besuch anmelden zu müssen, kannst Du eine Auto-Login URL generieren
-				lassen, die Dich automatisch einloggt. Diese kannst Du dann als Bookmark speichern.
-				Generierst Du eine neue URL, so wird jede alte automatisch ungültig.</p>
-			<?php if(user()->autologin): 
-				$autologin_url = 'http'.(isset($_SERVER['HTTPS']) ? 's' : '').'://'.$_SERVER['SERVER_NAME'].
-					substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')).'?q=login&amp;a='.user()->autologin;
-				$autologin_link = '<a href="'.$autologin_url.'">'.$autologin_url.'</a>';
-			?>
-			<p>Deine aktuelle Autologin-URL lautet</p>
-			<p class="center"><?=$autologin_link?></p>
-
-			<input type="submit" name="autologin_del" value="Autologin löschen">
-			<input type="submit" name="autologin" value="Autologin neu erzeugen">
-			<p>Du kannst Deinen Autologin auch in einem Cookie speichern. Dieses wird dann verwendet, um Dich
-				automatisch beim Besuch der Seite einzuloggen. Loggst Du Dich manuell aus, wird das Cookie wieder gelöscht.</p>
-			<input type="submit" name="autologin_cookie" value="Autologin als Cookie speichern">
-			<?php else: ?>
-			<input type="submit" name="autologin" value="Neuen Autologin anlegen">
-			<?php endif; ?>
 		</fieldset>
 		<fieldset>
 			<legend>Einstellungen</legend>

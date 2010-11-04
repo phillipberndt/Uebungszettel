@@ -1,11 +1,8 @@
 <?php
-	session_destroy();
-	if(isset($_COOKIE['autologin'])) {
-		setcookie('autologin', '', time() - 3600, 
+	$database->query('DELETE FROM user_autologin WHERE user_id = ' . user()->id);
+	setcookie('autologin', '', time() - 3600, 
 			(dirname($_SERVER['REQUEST_URI']) == '/' ? '/' : dirname($_SERVER['REQUEST_URI']) . '/') . 'index.php?q=login',
-			null,
-			false,
-			true);
-	}
+			null, false, true);
+	session_destroy();
 	gotop("index.php");
 ?>
