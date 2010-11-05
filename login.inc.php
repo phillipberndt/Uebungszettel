@@ -3,7 +3,7 @@
 
 	// Bei direktem Hit auf die Domain Weiterleiten auf diese Seite, weil nur hier
 	// das Autologin-Cookie ankommt
-	if(basename($_SERVER['REQUEST_URI']) != 'index.php?q=login' && !$_POST) {
+	if(substr(basename($_SERVER['REQUEST_URI']), 0, 17) != 'index.php?q=login' && !$_POST) {
 		gotop('index.php?q=login');
 	}
 
