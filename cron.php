@@ -109,6 +109,7 @@
 			'&s=' . sha1($secure_token);
 
 		curl_setopt($sub, CURLOPT_URL, $sub_url);
+		curl_setopt($sub, CURLOPT_TIMEOUT, 160);
 		curl_setopt($sub, CURLOPT_RETURNTRANSFER, 1);
 		curl_multi_add_handle($curl, $sub);
 	}
