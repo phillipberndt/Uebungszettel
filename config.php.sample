@@ -31,6 +31,10 @@
 		'application/xhtml+xml'
 	);
 
+	// Das Script verwendet eine Semaphore, um Toolkit-Ausführungen zu kanalisieren
+	// Wie viele gleichzeitige Ausführungen sind erlaubt?
+	$max_concurrent_toolkit_invokations = 10;
+
 
 	// Ist diese Variable gesetzt, so wird eine Logdatei über alle Administrator-
 	// aktionen erstellt

@@ -344,7 +344,7 @@
 
 		global $_active_semaphore;
 		if(!$_active_semaphore) {
-			$id = ftok(__FILE__, 'u');
+			$id = ftok(__FILE__, 'v');
 			$_active_semaphore = sem_get($id, $GLOBALS['max_concurrent_toolkit_invokations'], 0666, 1);
 		}
 
