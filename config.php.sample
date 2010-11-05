@@ -1,0 +1,44 @@
+<?php
+	// vim:ft=php
+
+	// Datenbankverbindung. Dieses Script verwendet PDO, dessen Syntax
+	// ist demnach zu verwenden. z.B. für MySQL:
+	//  $database_conn = array('mysql:host=localhost;dbname=zettel', "root", "");
+	// Vorkonfiguriert ist SQLite:
+	$database_conn = array('sqlite:'.getcwd().'/database.sqlite', null, null);
+
+	// Beim ersten Start muss die Datenbank initialisiert werden. Dafür hier
+	// true eintragen:
+	$init_database = false;
+
+	// Das Verzeichnis, in dem der Cache angelegt werden soll. Muss nicht im Document
+	// Root liegen
+	$cache_dir = getcwd().'/cache/';
+	
+	// Maximale Dateigröße im Cache
+	$allowed_cache_file_size = 1024 * 1024 * 2;
+
+	// Erlaubte MIME-Dateitypen im Cache
+	$allowed_cache_types = array(
+		'application/pdf',
+		'image/png',
+		'image/jpg',
+		'image/jpeg',
+		'image/gif',
+		'application/postscript',
+		'text/html',
+		'text/plain',
+		'application/xhtml+xml'
+	);
+
+
+	// Ist diese Variable gesetzt, so wird eine Logdatei über alle Administrator-
+	// aktionen erstellt
+	$admin_log_file = getcwd().'/cache/adminlog.log';
+
+	// Support-Email (wird auf der Login-Seite verlinkt)
+	$support_mail = 'uebungen@lists.spline.inf.fu-berlin.de';
+
+	// Hier kann ein zufälliger String eingetragen werden, der verwendet wird um den Autologin
+	// zusätzlich abzusichern.
+	$secure_autologin_token = '';

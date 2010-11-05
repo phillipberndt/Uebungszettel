@@ -1,29 +1,11 @@
 <?php
-	$database_conn = array('sqlite:'.getcwd().'/database.sqlite', null, null);
-	#$database_conn = array('mysql:host=localhost;dbname=zettel', "root", "");
-	$init_database = false;
-	$cache_dir = getcwd().'/cache/';
-	$admin_log_file = getcwd().'/cache/adminlog.log';
-	$max_concurrent_toolkit_invokations = 5;
-	$allowed_cache_file_size = 1024 * 1024 * 2;
-	$support_mail = 'uebungen@lists.spline.inf.fu-berlin.de';
-	$secure_autologin_token = '';
-	$allowed_cache_types = array(
-		'application/pdf',
-		'image/png',
-		'image/jpg',
-		'image/jpeg',
-		'image/gif',
-		'application/postscript',
-		'text/html',
-		'text/plain',
-		'application/xhtml+xml'
-	);
-
-	// Zusätzliche Config-Datei ermöglichen
-	if(file_exists('config.php')) {
-		require('config.php');
+	// Konfiguration laden
+	if(!file_exists('config.php')) {
+		die('<!DOCTYPE HTML><head><meta charset="utf-8"><title>Fehler</title></head>
+			<body><h1>Konfiguration fehlt</h1><p>Bitte lege eine Konfigurationsdatei <em>config.php</em> an. Hierzu
+			kannst Du die Vorlage aus <em>config.php.sample</em> verwenden.</p></body>');
 	}
+	require('config.php');
 
 	// Flags für User, gespeichert in user()->flags
 	define('USER_FLAG_WANTSMAIL', 1);
