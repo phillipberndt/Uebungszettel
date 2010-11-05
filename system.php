@@ -33,11 +33,12 @@
 		$database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	}
 	catch(Exception $error) {
-		?><h1>Datenbankfehler</h1>
+		?><!DOCTYPE HTML><head><title>Fehler</title><meta charset="utf-8"></head><body><h1>Datenbankfehler</h1>
 		<p>Eine Datenbankverbindung konnte nicht hergestellt werden. Fehler:
 			<em><?=htmlspecialchars($error->getMessage())?></em>
 		</p>
 		<p>Bitte kontaktiere den Support!</p>
+		</body>
 		<?php
 		die();
 	}
