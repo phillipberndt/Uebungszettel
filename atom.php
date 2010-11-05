@@ -8,11 +8,12 @@
 		echo('<div id="error">Ungültige Benutzer-ID</div>');
 		return;
 	}
+	$atom_token = substr(sha1($user->id . $user->salt . $user->name), 0, 4);
 
-	if($user->atom_feed === false) {
+	if($user->atom_feed === false || !isset($_GET['t']) || $_GET['t'] != $atom_token) {
 		header('HTTP/1.1 403 Access denied');
 		header('Content-Type: text/html; charset=utf-8');
-		echo('<div id="error">Dieser Feed wurde deaktiviert.</div>');
+		echo('<div id="error">Entweder wurde dieser Feed deaktiviert oder der Link ist inkorrekt.</div>');
 		return;
 	}
 

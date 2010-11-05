@@ -95,7 +95,11 @@
 				if(user()->atom_feed !== false) echo('checked');
 			?>></label>
 			<p class="small indent">Hier kannst Du einstellen, ob Dein Feed aktiviert ist.
-				Dein Feed ist unter <a href="atom.php?u=<?=user()->id?>">atom.php?u=<?=user()->id?></a> verfügbar.</p>
+				<?php
+					$atom_token = substr(sha1(user()->id . user()->salt . user()->name), 0, 4);
+				?>
+				Dein Feed ist unter <a href="atom.php?u=<?=user()->id?>&amp;t=<?=$atom_token?>">atom.php?u=<?=user()->id?>&amp;t=<?=$atom_token?></a>
+					verfügbar.</p>
 			<input type="submit" name="settings" value="Einstellungen ändern">
 		</fieldset>
 	</form>

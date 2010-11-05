@@ -83,12 +83,9 @@
 				Die Seite speichert von Dir Deinen Loginnamen, einen (gesalteten SHA1-)Hash Deines Passwortes sowie
 				welche Kurse Du abboniert hast, welche Übungszettel Du bereits bearbeitet und welche
 				Notizen Du hinterlegt hast. Du kannst Deinen Account jederzeit kündigen und all das
-				wird umgehend gelöscht. Da ich (der Programmierer der Seite) die Privatsphäre bei
-				Übungszetteln nicht als wichtig ansehe, hat zwecks Bequemlichkeit beim abbonieren
-				in RSS-Readern <em>jeder</em> Zugriff auf das Atom-Feed
-				Deiner ausstehenden Übungszettel. Außerdem verwendet die Seite eine statische
-				Autologin-URL, die, wenn sie in falsche Hände gerät, jedem Zugriff auf Deinen Account
-				gibt. Der Autologin ist allerdings deaktivierbar!
+				wird umgehend gelöscht. Beim Login wird ein Autologin-Cookie für Dich gespeichert, dass Dich
+				beim nächsten Besuch automatisch wieder einloggt. Loggst Du Dich manuell aus, werden
+				alle Deine Autologin-Cookies automatisch deaktiviert.
 			</p>
 			<p>
 				Du hast auf dieser Seite die Möglichkeit, neue Kurse zu speichern. Diese Kurse werden

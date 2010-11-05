@@ -22,8 +22,10 @@
 	<?php endif; ?>
 	<script src="jquery-1.4.2.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="uebungszettel.js" type="text/javascript" charset="utf-8"></script>
-	<?php if(user()->id && user()->atom_feed !== false): ?>
-	<link rel="alternate" type="application/atom+xml" title="Meine Übungszettel" href="atom.php?u=<?=user()->id?>">
+	<?php if(user()->id && user()->atom_feed !== false):
+		$atom_token = substr(sha1(user()->id . user()->salt . user()->name), 0, 4);
+	?>
+	<link rel="alternate" type="application/atom+xml" title="Meine Übungszettel" href="atom.php?u=<?=user()->id?>&amp;t=<?=$atom_token?>">
 	<?php endif; ?>
 	<title>Übungszettel</title>
 </head>
