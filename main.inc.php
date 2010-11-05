@@ -103,24 +103,24 @@ else:
 		<?php endif; ?>
 	</p>
 
-	<?php if(user()->level >= 2) {
+	<?php if(user()->level >= 1):
 		if(isset($_GET['delsug'])) {
 			$database->query('DELETE FROM suggestions WHERE id = '.intval($_GET['delsug']));
 			gotop("index.php");
 		}
 		$suggestions = $database->query('SELECT * FROM suggestions')->fetchAll();
 		if($suggestions):
-	?>
-	<h3>Vorschläge</h3>
-	<p>Hier findest Du Vorschläge anderer Benutzer für neue Kurse</p>
-	<ul>
-		<?php
-			foreach($suggestions as $suggestion) {
-				echo('<li>'.$suggestion['text'].' (<a class="confirm" href="index.php?delsug='.$suggestion['id'].'">Erledigt</a>)</li>');
-			}
 		?>
-	</ul>
-	<?php endif;
-		} ?>
+		<h3>Vorschläge</h3>
+		<p>Hier findest Du Vorschläge anderer Benutzer für neue Kurse</p>
+		<ul>
+			<?php
+				foreach($suggestions as $suggestion) {
+					echo('<li>'.$suggestion['text'].' (<a class="confirm" href="index.php?delsug='.$suggestion['id'].'">Erledigt</a>)</li>');
+				}
+			?>
+		</ul>
+		<?php endif;
+	endif; ?>
 </div>
 <?php endif; ?>
