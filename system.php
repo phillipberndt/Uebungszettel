@@ -148,7 +148,10 @@
 		$query->execute(array($value));
 		$user = $query->fetch(PDO::FETCH_OBJ);
 		if(!$user) return false;
-		foreach(unserialize($user->settings) as $key => $value) $user->$key = $value;
+		$settings_array = unserialize($user->settings);
+		if(is_array($settings_array)) {
+			foreach($settings_array as $key => $value) $user->$key = $value;
+		}
 		return $user;
 	}
 	function user_save($user = null) {
