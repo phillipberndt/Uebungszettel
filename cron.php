@@ -1,15 +1,25 @@
 <?php
 	require('system.php');
-	set_time_limit(180);
 	error_reporting(0);
-	ignore_user_abort();
 
-	// Zettel updaten
-	$database->beginTransaction();
-	$stmt = $database->prepare('INSERT INTO data (feed_id, data, timestamp) VALUES (?, ?, ?)');
+	// Das Cron-Script funktioniert asynchron. Für jeden Feed wird eine Unterabfrage
+	// erzeugt, die den Feed verarbeitet. Die Ausgabe wird dann in ein zentrales Array
+	// eingepflegt und ganz am Ende werden die Mails versendet.
+
+	header('Content-Type: text/plain; charset=UTF-8');
 	$new_content = array();
 	$content_ids = array();
-	foreach($database->query('SELECT id, code FROM feeds') as $feed) {
+
+	if(isset($_GET['f'])) {
+		// Dieser Code verarbeitet NUR ein Feed, nämlich das aus $_GET['f'].
+		// Unten wird diese Seite rekursiv aufgerufen für alle Feeds
+
+		// Sicherheitstoken muss stimmen
+		if($_GET['s'] != sha1($secure_token)) die(serialize(array(array(), array())));
+
+		// Ein bestimmtes Feed verarbeiten
+		$feed = $database->query('SELECT id, code FROM feeds WHERE id = '.intval($_GET['f']))->fetch();
+		$stmt = $database->prepare('INSERT INTO data (feed_id, data, timestamp) VALUES (?, ?, ?)');
 		$id = $feed['id'];
 		$code = unserialize($feed['code']);
 
@@ -80,8 +90,41 @@
 			$database->exec('DELETE FROM user_data WHERE data_id IN ('. implode(",", $known) . ');');
 			$database->exec('DELETE FROM data WHERE id IN ('. implode(",", $known) . ');');
 		}
+
+		die(serialize(array($new_content, $content_ids)));
 	}
-	$database->commit();
+
+	// Im allgemeinen Fall Abbrüche ignorieren
+	set_time_limit(180);
+	ignore_user_abort();
+
+	// Alle Feeds in Unterabfragen verarbeiten
+	$curl = curl_multi_init();
+	foreach($database->query('SELECT id FROM feeds') as $feed) {
+		$sub = curl_init();
+		$sub_url = 'http://' . $_SERVER['SERVER_NAME'] . preg_replace('#\?.+$#', '', $_SERVER['REQUEST_URI']) . '?f=' . $feed['id'] .
+			'&s=' . sha1($secure_token);
+
+		curl_setopt($sub, CURLOPT_URL, $sub_url);
+		curl_setopt($sub, CURLOPT_RETURNTRANSFER, 1);
+		curl_multi_add_handle($curl, $sub);
+	}
+	$running = true;
+	while($running) {
+		curl_multi_exec($curl, $running);
+		curl_multi_select($curl);
+	}
+	while($transfer = curl_multi_info_read($curl)) {
+		if($transfer['result'] == CURLE_OK) {
+			$output = curl_multi_getcontent($transfer['handle']);
+			list($add_new_content, $add_content_ids) = unserialize($output);
+			$new_content = array_merge_recursive($new_content, $add_new_content);
+			$content_ids = array_merge_recursive($content_ids, $add_content_ids);
+		}
+		else {
+			echo "Subrequest failed.\n";
+		}
+	}
 
 	// Newsletter versenden
 	$user_mails = array();

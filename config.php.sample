@@ -39,6 +39,6 @@
 	// Support-Email (wird auf der Login-Seite verlinkt)
 	$support_mail = 'uebungen@lists.spline.inf.fu-berlin.de';
 
-	// Hier kann ein zufälliger String eingetragen werden, der verwendet wird um den Autologin
-	// zusätzlich abzusichern.
-	$secure_autologin_token = '';
+	// Hier kann ein zufälliger String eingetragen werden, der verwendet wird um verschiedene
+	// Hashfunktionen zusätzlich abzusichern.
+	$secure_token = '';
