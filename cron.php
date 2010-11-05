@@ -11,6 +11,9 @@
 	$content_ids = array();
 
 	if(isset($_GET['f'])) {
+		// Maximal eine Minute Zeit geben, dann abbrechen
+		set_time_limit(60);
+
 		// Dieser Code verarbeitet NUR ein Feed, nämlich das aus $_GET['f'].
 		// Unten wird diese Seite rekursiv aufgerufen für alle Feeds
 
@@ -118,11 +121,18 @@
 		if($transfer['result'] == CURLE_OK) {
 			$output = curl_multi_getcontent($transfer['handle']);
 			list($add_new_content, $add_content_ids) = unserialize($output);
-			$new_content = array_merge_recursive($new_content, $add_new_content);
-			$content_ids = array_merge_recursive($content_ids, $add_content_ids);
+			if(!is_array($add_new_content) || !is_array($add_content_ids)) {
+				preg_match('#f=([0-9]+)#', curl_getinfo($transfer['handle'], CURLINFO_EFFECTIVE_URL), $feed);
+				echo "Subrequest failed for feed " . $feed[1] . ".\n";
+			}
+			else {
+				$new_content = array_merge_recursive($new_content, $add_new_content);
+				$content_ids = array_merge_recursive($content_ids, $add_content_ids);
+			}
 		}
 		else {
-			echo "Subrequest failed.\n";
+			preg_match('#f=([0-9]+)#', curl_getinfo($transfer['handle'], CURLINFO_EFFECTIVE_URL), $feed);
+			echo "Subrequest failed for feed " . $feed[1] . ".\n";
 		}
 	}
 
