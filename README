@@ -43,7 +43,6 @@ Das Script benötigt zum Laufen
     * pdftk
    benötigt.
  * Schreibrechte auf den Ordner ./cache/
-In der system.php können oben die Konfigurationseinstellungen geändert werden.
-Via der Variablen $init_database kann die Datenbank automatisch initialisiert
-werden. Dabei ist im Fall von SQLite zu bedenken, dass neben der Datenbankdatei
+Die Datei config.php.sample sollte nach config.php kopiert und angepasst werden.
+Dabei ist im Fall von SQLite zu bedenken, dass neben der Datenbankdatei
 auch das aktuelle Verzeichnis Schreibrechte benötigt.
