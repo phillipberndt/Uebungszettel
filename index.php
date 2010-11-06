@@ -20,7 +20,7 @@
 		@import url('style.css');
 	</style>
 	<?php endif; ?>
-	<script src="jquery-1.4.2.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="jquery-1.4.3.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="uebungszettel.js" type="text/javascript" charset="utf-8"></script>
 	<?php if(user()->id && user()->atom_feed !== false):
 		$atom_token = substr(sha1(user()->id . user()->salt . user()->name), 0, 4);

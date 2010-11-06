@@ -68,12 +68,13 @@ $(document).ready(function() {
 	$("div.collapse").each(function() {
 		var heading = $("h2", this).text();
 		var $this = $(this);
-		var filler = $("<br>&raquo; <a href=''></a>").text(heading).click(function() {
+		var filler = $("<a href='#'>Inhalt anzeigen</a>").insertBefore($this).click(function() {
 			$this.fadeIn();
 			filler.remove();
 			return false;
-		});
-		$this.hide().before(filler);
+		}).text(heading);
+		filler.prepend("<br>&raquo; ");
+		$this.hide();
 	});
 	if(document.location.search.match(/q=feeds/)) {
 		$("td input[type=checkbox]").change(function() {
