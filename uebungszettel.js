@@ -106,6 +106,11 @@ $(document).ready(function() {
 				});
 				$.post("index.php?q=feeds", query + "preview=1", function(r) {
 					var mwnd = window.open("", "Vorschau", "width=350,height=600");
+					if(!mwnd || (window.opera && !mwnd.opera)) {
+						alert("Bitte deaktiviere Deinen Popupblocker um die Vorschau zu sehen.");
+						box.remove();
+						return false;
+					}
 					mwnd.document.write("<style> * { font-family: sans-serif; }</style><h1>Vorschau</h1>");
 					if(r.indexOf("Fehler") != 0) {
 						mwnd.document.write("<p>Mit Deinen Suchparametern wird folgendes gefunden:</p>");
@@ -275,6 +280,11 @@ $(document).ready(function() {
 				});
 				$.post("index.php?q=feeds", query + "preview=1", function(r) {
 					var mwnd = window.open("", "Vorschau", "width=350,height=600");
+					if(!mwnd || (window.opera && !mwnd.opera)) {
+						alert("Bitte deaktiviere Deinen Popupblocker um die Vorschau zu sehen.");
+						box.remove();
+						return false;
+					}
 					mwnd.document.write("<style> * { font-family: sans-serif; }</style><h1>Vorschau</h1>");
 					if(r.indexOf("Fehler") != 0) {
 						mwnd.document.write("<p>Mit Deinen Suchparametern wird folgendes gefunden:</p>");

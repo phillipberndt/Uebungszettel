@@ -92,3 +92,12 @@ div#greyout { position: fixed; left: 0; top: 0; width: 100%; height: 100%; backg
 a:visited {
 	color: #008;
 }
+
+dl.exp dt { font-style: italic; position: absolute; }
+dl.exp dt:after { content: ":" }
+dl.exp dd { min-height: 1em; margin-left: 200px; margin-bottom: 5px; }
+
+h3 { margin: 20px 0 10px 0; }
+
+
+ol.big > li { margin-bottom: 20px; }
