@@ -44,7 +44,7 @@
 			FROM
 				data
 			WHERE feed_id IN (SELECT feed_id FROM user_feeds WHERE user_id = '.$user->id.')
-			AND (invisible IS NULL OR invisible != 1)');
+			HAVING (invisible IS NULL OR invisible != 1)');
 		foreach($exercises as $exercise):
 
 		?>
