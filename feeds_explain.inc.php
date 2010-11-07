@@ -144,7 +144,7 @@
 			<p style="text-align: center; font-family: monospace">#^(Blatt [0-9]+)[^&lt;]+&lt;a href="[^"]+(funkth[0-9]+\.pdf)#m</p>
 			<p>Die Syntax entspricht dabei der von <a href="http://de3.php.net/manual/de/book.pcre.php">PCRE</a>. Am Anfang und Ende
 				müssen Begrenzerzeichen stehen, ich habe hier <var>#</var> verwendet.</p>
-			<p>Dieser Ausdruck kann natürlich beliebig kompliziert werden. Es gibt aber auch fälle, in denen man an dieser Stelle feststellt,
+			<p>Dieser Ausdruck kann natürlich beliebig kompliziert werden. Es gibt aber auch Fälle, in denen man an dieser Stelle feststellt,
 				dass die Zettel nicht mit einem einzelnen Ausdruck erfassbar sind. In dem Fall hilft Dir <a href="index.php?q=suggest">die
 					Vorschlagenfunktion</a> weiter, denn wir haben die Möglichkeit, PHP-Code zum finden der Zettel zu verwenden.</p>
 			<p>In dem regulären Ausdruck habe ich an zwei Stellen Teile durch Klammern gruppiert: Den Dateinamen und die Beschreibung. Beide
@@ -187,10 +187,10 @@
 		um ein Feed zu definieren, benutze  <a href="index.php?q=suggest">die Vorschlagenfunktion</a>.</p>
 	<p>Über „Neue Kurse hinzufügen (PHP)“ kann ein Feed definiert werden, das PHP-Code verwendet. In die große Textarea muss
 		dafür PHP-Code direkt eingetragen werden. Er sollte per <code>return</code> ein Array von Übungen (entsprechend dem
-		„Übung“-Feld der normalen Eingabe) zurückgeben. Dabei stehen folgende Hilfsfunktionen zur Verfügung):</p>
+		„Übung“-Feld der normalen Eingabe) zurückgeben. Dabei stehen folgende Hilfsfunktionen zur Verfügung:</p>
 	<dl class="exp">
 		<dt>load_url</dt>
-		<dd>Lädt eine übergebene URL und gibt ihren Inhalt als UTF-8 zurück</dd>
+		<dd>Lädt eine übergebene URL und gibt ihren Inhalt kodiert in UTF-8 zurück</dd>
 		<dt>cache_file</dt>
 		<dd>Cached eine übergebene URL und gibt eine URL zurück, der auf diesem Server liegt. Praktisch
 			für Seiten, die das herunterladen von Zetteln nur via einem Formular o.Ä. erlauben.
