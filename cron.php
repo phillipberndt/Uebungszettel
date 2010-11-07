@@ -18,7 +18,7 @@
 		// Unten wird diese Seite rekursiv aufgerufen für alle Feeds
 
 		// Sicherheitstoken muss stimmen
-		if($_GET['s'] != sha1($secure_token)) die(serialize(array(array(), array())));
+		if($_GET['s'] != sha1($secure_token . $_GET['t']) || $_GET['t'] > time() || $_GET['t'] < time() - 30) die(serialize(array(array(), array())));
 
 		// Ein bestimmtes Feed verarbeiten
 		$feed = $database->query('SELECT id, code FROM feeds WHERE id = '.intval($_GET['f']))->fetch();
@@ -105,8 +105,9 @@
 	$curl = curl_multi_init();
 	foreach($database->query('SELECT id FROM feeds') as $feed) {
 		$sub = curl_init();
+		$time = time();
 		$sub_url = 'http://' . $_SERVER['SERVER_NAME'] . preg_replace('#\?.+$#', '', $_SERVER['REQUEST_URI']) . '?f=' . $feed['id'] .
-			'&s=' . sha1($secure_token);
+			'&s=' . sha1($secure_token . $time) . "&t=" . $time;
 
 		curl_setopt($sub, CURLOPT_URL, $sub_url);
 		curl_setopt($sub, CURLOPT_TIMEOUT, 160);
@@ -127,7 +128,9 @@
 				echo "Subrequest failed for feed " . $feed[1] . ".\n";
 			}
 			else {
-				$new_content = array_merge_recursive($new_content, $add_new_content);
+				foreach($add_new_content as $key => $val) {
+					$new_content[$key] = isset($new_content[$key]) ? array_merge($new_content[$key], $val) : $val;
+				}
 				$content_ids = array_merge_recursive($content_ids, $add_content_ids);
 			}
 		}
@@ -144,10 +147,10 @@
 		$settings = unserialize($data['settings']);
 		if(is_array($new_content[$data['feed_id']]) && $settings['newsletter']) {
 			$user_mails[$settings['newsletter']]['name'] = $data['name'];
-			$user_mails[$settings['newsletter']]['short'] = $data['short'];
-			if(!isset($user_mails[$settings->newsletter]['content'])) $user_mails[$settings['newsletter']]['content'] = array();
-			$user_mails[$settings['newsletter']]['content'] = array_merge($user_mails[$settings['newsletter']]['content'], $new_content[$data['feed_id']]);
+			if(!isset($user_mails[$settings['newsletter']]['content'])) $user_mails[$settings['newsletter']]['content'] = array();
 			foreach($new_content[$data['feed_id']] as $content) {
+				$user_mails[$settings['newsletter']]['content'][] = array($data['short'], $content);
+
 				if(!isset($content_ids[$content])) continue;
 				$id = $content_ids[$content];
 				try {
@@ -168,8 +171,9 @@
 			"Reply-To: ".$support_mail."\r\n";
 		$text = 'Hallo '.$data['name'].",\r\n\r\nfür Dich stehen neue Übungszettel bereit:\r\n";
 		$attachments = "\r\n";
-		foreach($data['content'] as $uebung) {
-			$text .= ' · '.$data['short'].': '.$uebung;
+		foreach($data['content'] as $content) {
+			$short = $content[0]; $uebung = $content[1];
+			$text .= ' · '.$short.': '.$uebung;
 			if(preg_match('#^(https?://[^ ]+)( .+)?#i', $uebung, &$match)) {
 				$text .= ' (Siehe Attachment)';
 				$file_contents = cache_contents($match[1]);
