@@ -101,6 +101,12 @@
 	set_time_limit(180);
 	ignore_user_abort();
 
+	// Sicherheitstoken checken
+	if(isset($cron_token) && !empty($cron_token) && $_GET['t'] != $cron_token) {
+		sleep(10);
+		die();
+	}
+
 	// Alle Feeds in Unterabfragen verarbeiten
 	$curl = curl_multi_init();
 	foreach($database->query('SELECT id FROM feeds') as $feed) {
