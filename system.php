@@ -114,7 +114,7 @@
 		return $_SESSION['logged_in'] == true;
 	}
 	function force_login() {
-		if(!logged_in()) gotop("index.php?destination=" . urlencode($_SERVER['REQUEST_URI']));
+		if(!logged_in()) gotop("index.php?q=login&destination=" . urlencode($_SERVER['REQUEST_URI']));
 	}
 	function force_level($level) {
 		force_login();
