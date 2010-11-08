@@ -57,19 +57,33 @@
 
 		if(is_array($contents)) foreach($contents as $content) {
 			if(!isset($known[$content])) {
+				if(preg_match('#^(https?://[^ ]+)( .+)?#i', $content, &$match)) {
+					// URL Datum cachen
+					try {
+						check_if_url_changed($match[1]);
+					}
+					catch(Exception $ignore) {
+						// Datei existiert nicht. In dem Fall Zettel auch nicht speichern.
+						continue;
+					}
+				}
 				$stmt->execute(array($id, $content, time()));
 				$new_content[$id][] = $content;
 				$content_ids[$content] = $database->lastInsertId();
-				if(preg_match('#^(https?://[^ ]+)( .+)?#i', $content, &$match)) {
-					// URL Datum cachen
-					check_if_url_changed($match[1]);
-				}
 			}
 			else
 			{
 				// Falls URL geändert, ..
 				if(preg_match('#^(https?://[^ ]+)( .+)?#i', $content, &$match)) {
-					if(check_if_url_changed($match[1])) {
+					try {
+						$url_check = check_if_url_changed($match[1]);
+					}
+					catch(Exception $except) {
+						// Datei existiert nicht mehr. In diesem Fall die Datei löschen
+						// (Was wir erledigen, indem wir sie nicht unset'en
+						continue;
+					}
+					if($url_check) {
 						// Überall wieder auf ungelesen setzen
 						$database->query('UPDATE user_data SET invisible = 0, known = 0 WHERE
 							data_id = '.$known[$content]);
