@@ -57,10 +57,11 @@
 
 		if(is_array($contents)) foreach($contents as $content) {
 			if(!isset($known[$content])) {
-				if(preg_match('#^(https?://[^ ]+)( .+)?#i', $content, &$match)) {
+				list($url, $text) = split_data($content);
+				if($url) {
 					// URL Datum cachen
 					try {
-						check_if_url_changed($match[1]);
+						check_if_url_changed($url);
 					}
 					catch(Exception $ignore) {
 						// Datei existiert nicht. In dem Fall Zettel auch nicht speichern.
@@ -74,9 +75,10 @@
 			else
 			{
 				// Falls URL geändert, ..
-				if(preg_match('#^(https?://[^ ]+)( .+)?#i', $content, &$match)) {
+				list($url, $text) = split_data($content);
+				if($url) {
 					try {
-						$url_check = check_if_url_changed($match[1]);
+						$url_check = check_if_url_changed($url);
 					}
 					catch(Exception $except) {
 						// Datei existiert nicht mehr. In diesem Fall die Datei löschen
@@ -192,12 +194,13 @@
 		$text = 'Hallo '.$data['name'].",\r\n\r\nfür Dich stehen neue Übungszettel bereit:\r\n";
 		$attachments = "\r\n";
 		foreach($data['content'] as $content) {
-			$short = $content[0]; $uebung = $content[1];
-			$text .= ' · '.$short.': '.$uebung;
-			if(preg_match('#^(https?://[^ ]+)( .+)?#i', $uebung, &$match)) {
+			$short = $content[0]; $sheet = $content[1];
+			$text .= ' · '.$short.': '.$sheet;
+			list($sheet_url, $sheet_text) = split_data($sheet);
+			if($sheet_url) {
 				$text .= ' (Siehe Attachment)';
-				$file_contents = cache_contents($match[1]);
-				$file_name = trim($match[2]) ? trim($match[2]) : basename($match[1]);
+				$file_contents = cache_contents($sheet_url);
+				$file_name = $sheet_text ? $sheet_text : basename($sheet_url);
 				$mime_type = get_mime_type($file_contents, true);
 				$attachments .= "--".$boundary."\r\n".
 					"Content-Type: ".$mime_type."; name=\"" . addslashes($file_name) . "\"\r\n" .

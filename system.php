@@ -222,7 +222,7 @@
 		}
 		return $type;
 	}/*}}}*/
-	function check_if_url_changed($url) {/*{{{*/
+	function check_if_url_changed($url, $store_update = true) {/*{{{*/
 		// Prüft, ob sich eine URL seit dem letzten Aufruf verändert
 		// hat. Gibt true zurück, wenn ja oder wenn die URL noch nie
 		// aufgerufen wurde.
@@ -243,7 +243,7 @@
 		curl_setopt($curl, CURLOPT_NOBODY, 1);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 		$headers = curl_exec($curl);
-		if(curl_getinfo($curl, CURLINFO_HTTP_CODE) >= 400) {
+		if(curl_getinfo($curl, CURLINFO_HTTP_CODE) >= 400 || curl_errno($curl) != 0) {
 			throw new Exception("Die URL konnte nicht geladen werden");
 		}
 		$current_age = curl_getinfo($curl, CURLINFO_FILETIME);
@@ -253,6 +253,7 @@
 
 		if($current_age == -1) return true;
 		if($db_age && $db_age == $current_age) return false;
+		if(!$store_update) return true;
 		if($db_age) {
 			$query = $database->prepare('UPDATE url_age_cache SET age = ? WHERE url = ?');
 		}
@@ -280,7 +281,7 @@
 		if($if_modified_since !== false) {
 			if(curl_getinfo($curl, CURLINFO_HTTP_CODE) == 304) return true; // Not modified
 		}
-		if(curl_getinfo($curl, CURLINFO_HTTP_CODE) >= 400 || !$content) {
+		if(curl_getinfo($curl, CURLINFO_HTTP_CODE) >= 400 || curl_errno($curl) != 0 || !$content) {
 			throw new Exception("Die URL konnte nicht geladen werden");
 		}
 		curl_close($curl);
@@ -302,18 +303,27 @@
 		if(preg_match('/SymbianOS|J2ME|Mobile|iPhone|iPad|iPod|android|opera mini|blackberry|windows ce/i', $_SERVER['HTTP_USER_AGENT'])) return true;
 		return false;
 	}/*}}}*/
-	function format_data($data) {/*{{{*/
+	function split_data($data) {/*{{{*/
+		// Eine Übung aufteilen in URL und Text
 		if(preg_match('#^(https?://[^ ]+)( .+)?$#is', $data, &$match)) {
-			$url = $match[1];
+			return array($match[1], trim($match[2]));
+		}
+		else {
+			return array('', $data);
+		}
+	}/*}}}*/
+	function format_data($data) {/*{{{*/
+		list($url, $text) = split_data($data);
+		if($url) {
 			// Mobile Device PDF: Das können wir als JPG ausliefern!
 			if(preg_match('/\.(?:pdf|ps)$/i', $url) && is_mobile()) {
 				$url = 'image.php?d='.htmlspecialchars(urlencode($url));
 			}
 
-			return '<a class="exercise" href="'.htmlspecialchars($url).'">'.htmlspecialchars($match[2] ? $match[2] : basename($match[1])).'</a>';
+			return '<a class="exercise" href="'.htmlspecialchars($url).'">'.htmlspecialchars($text ? $text : basename($url)).'</a>';
 		}
 		else {
-			return htmlspecialchars($data);
+			return htmlspecialchars($text);
 		}
 	}/*}}}*/
 	function cache_file($url, $file_name = false, $return_id = false, $safeForDeletion = true) {/*{{{*/

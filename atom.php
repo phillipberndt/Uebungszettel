@@ -56,10 +56,13 @@
 		<summary type="html">
 		<?=htmlspecialchars(format_data($exercise['data']))?>
 		</summary>
-		<?php if(preg_match('#^(https?://\S+)(.*)#i', $exercise['data'], &$url)): ?>
-			<link title="<?=htmlspecialchars(trim($url[2]))?>" href="<?=htmlspecialchars($url[1])?>" rel="alternate" />
+		<?php
+			list($url, $text) = split_data($exercise['data']);
+			if($url):
+		?>
+			<link title="<?=htmlspecialchars(trim($text))?>" href="<?=htmlspecialchars($url)?>" rel="alternate" />
 		<?php else: ?>
-			<content type="text"><?=htmlspecialchars($exercise['data'])?></content>
+			<content type="text"><?=htmlspecialchars($text)?></content>
 		<?php endif; ?>
 		</entry>
 

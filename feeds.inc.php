@@ -9,7 +9,20 @@
 				ob_end_clean();
 				$userFn = create_function('', $_POST['code']);
 				admin_log("Testet Code:\n| " . str_replace("\n", "\n| ", $_POST['code']));
-				foreach($userFn() as $item) echo('<li>'.format_data($item).'</li>');
+				foreach($userFn() as $item) {
+					$sheet_out = format_data($item);
+					list($url, $text) = split_data($item);
+					if($url) {
+						// Prüfen, ob die URL existiert
+						try {
+							check_if_url_changed($url, false);
+						}
+						catch(Exception $ignore) {
+							$sheet_out .= ' (Die Datei wurde nicht gefunden)';
+						}
+					}
+					echo('<li>'.$sheet_out.'</li>');
+				}
 				die();
 			}
 
@@ -59,11 +72,21 @@
 				else {
 					$output = '';
 					foreach($matches as $match) {
-						$output .= '<li>'.format_data(
-							preg_replace_callback('/\$([0-9]+)/', function($vmatch) use ($match) {
+						$sheet = preg_replace_callback('/\$([0-9]+)/', function($vmatch) use ($match) {
 								return $match[$vmatch[1]];
-							}, $_POST['exercise'])
-						).'</li>';
+							}, $_POST['exercise']);
+						list($sheet_url, $sheet_text) = split_data($sheet);
+						$sheet_out = format_data($sheet);
+						if($sheet_url) {
+							// Prüfen, ob die URL existiert
+							try {
+								check_if_url_changed($sheet_url, false);
+							}
+							catch(Exception $ignore) {
+								$sheet_out .= ' (Die Datei wurde nicht gefunden)';
+							}
+						}
+						$output .= '<li>'.$sheet_out.'</li>';
 					}
 				}
 			}
