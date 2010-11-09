@@ -29,9 +29,6 @@
 	$hash = sha1('img-'.$image);
 	$cache_file = 'cache/'.$hash;
 
-	header('Expires: '.gmdate("D, d M Y H:i:s", time() + 3600).' GMT');
-	header("Last-Modified: ".gmdate('D, d M Y H:i:s', filemtime($file)).' GMT');
-
 	$cache_exists = file_exists($cache_file);
 	try {
 		$data = load_url($image, false, $cache_exists ? filemtime($cache_file) : false);
@@ -49,10 +46,17 @@
 		in_shell_execution(false);
 	}
 
-	if(isset($_GET['p'])) {
-		if($_SERVER["HTTP_IF_MODIFIED_SINCE"]) {
+	header("Last-Modified: ".gmdate('r', filemtime($cache_file)).' GMT');
+	header('Expires: '.gmdate('r', time() + 3600).' GMT');
+	if($_SERVER["HTTP_IF_MODIFIED_SINCE"]) {
+		$time = strtotime(preg_replace('/;.*$/', '', $_SERVER['HTTP_IF_MODIFIED_SINCE']));
+		if($time >= filemtime($cache_file)) {
 			header('HTTP/1.1 304 Not modified');
+			die();
 		}
+	}
+
+	if(isset($_GET['p'])) {
 		header('Content-type: image/png');
 		readfile($cache_file);
 	}

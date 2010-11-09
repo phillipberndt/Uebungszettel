@@ -11,6 +11,14 @@
 
 	header('Content-disposition: inline; filename="' . addcslashes($file_name, '"') . '"');
 	header('Last-Modified: '.date('r', filemtime($cache_file)));
+	if($_SERVER["HTTP_IF_MODIFIED_SINCE"]) {
+		$time = strtotime(preg_replace('/;.*$/', '', $_SERVER['HTTP_IF_MODIFIED_SINCE']));
+		if($time >= filemtime($cache_file)) {
+			header('HTTP/1.1 304 Not modified');
+			die();
+		}
+	}
+
 	foreach(array(
 		'pdf' => 'application/pdf',
 		'png' => 'image/png',
