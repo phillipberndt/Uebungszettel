@@ -203,9 +203,10 @@
 				$file_name = $sheet_text ? $sheet_text : basename($sheet_url);
 				$mime_type = get_mime_type($file_contents, true);
 				$attachments .= "--".$boundary."\r\n".
-					"Content-Type: ".$mime_type."; name=\"" . addslashes($file_name) . "\"\r\n" .
+					"Content-Type: ".$mime_type."; name*=UTF-8''" . urlencode($file_name) . "\r\n" .
 					"Content-Transfer-Encoding: base64\r\n" .
-					"Content-Disposition: attachment\r\n\r\n" . chunk_split(base64_encode($file_contents)) . "\r\n\r\n";
+					"Content-Disposition: attachment; filename*=UTF-8''" . urlencode($file_name) . "\r\n\r\n" .
+					chunk_split(base64_encode($file_contents)) . "\r\n\r\n";
 				unset($file_contents);
 			}
 			$text .= "\r\n";
