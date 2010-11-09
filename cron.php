@@ -92,7 +92,7 @@
 						// Timestamp updaten
 						$database->query('UPDATE data SET timestamp = '.time().' WHERE id = '.$known[$content]);
 						// Und noch einmal per Email versenden
-						if($match[2]) {
+						if($text) {
 							$up_content = $content . ' (Geändert)';
 						} else {
 							$up_content = $content . ' ' . basename($content) . ' (Geändert)';
