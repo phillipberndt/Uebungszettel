@@ -39,7 +39,7 @@ table#kurse-uebersicht td:first-child a { color: #000; }
 table#kurse-uebersicht td:first-child + td + td { width: 200px; }
 table#kurse-uebersicht td:first-child + td + td + td { width: 10px; }
 table#kurse-uebersicht tr.neu td:first-child + td { background: url('images/new.png') no-repeat right center; }
-table#kurse tr.private td { background: #fafafa; }
+table#kurse tr.private td { background: #ddd; }
 .editable-note { cursor: text; }
 
 div#content .right a, div#content .buttons a, div#content .abbo a {
