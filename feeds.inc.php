@@ -188,7 +188,7 @@
 	<h2>Neue Kurse hinzufügen</h2>
 	<p>Falls Du Erfahrungen mit regulären Ausdrücken hast, wirf einen Blick auf <a href="index.php?q=feeds_explain">die Anleitung zum
 		Eintragen von Kursen</a>. Sollte Dir die Anleitung nicht weiterhelfen, kannst Du uns <a href="index.php?q=suggest">Kurse vorschlagen</a>,
-		die wir dann für Dich eintragen werden.</a>
+		die wir dann für Dich eintragen werden.</p>
 	<form class="feeds newcourse" method="post" action="index.php?q=feeds">
 	<label><span>Beschreibung</span><input type="text" name="desc" value=""></label>
 	<label><span>Kürzel</span><input type="text" name="short" value=""></label>
