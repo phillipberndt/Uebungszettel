@@ -50,3 +50,7 @@
 	// Mit diesem Sicherheitstoken kann Cron vor Zugriff von außen geschützt werden. Cron wird
 	// dann nur ausgeführt, falls ?t=<token> gesetzt ist
 	$cron_token = '';
+
+	// Soll Cron detaillierte Debug-Informationen ausgeben? (Zur Fehlerbehandlung durch den
+	// Administrator)
+	$cron_debug = true;

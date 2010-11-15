@@ -1,6 +1,9 @@
 <?php
 	require('system.php');
-	error_reporting(0);
+	$cron_debug = isset($cron_debug) ? (bool)$cron_debug : false;
+	if(!$cron_debug) {
+		error_reporting(0);
+	}
 
 	// Das Cron-Script funktioniert asynchron. Für jeden Feed wird eine Unterabfrage
 	// erzeugt, die den Feed verarbeitet. Die Ausgabe wird dann in ein zentrales Array
@@ -11,6 +14,11 @@
 	$content_ids = array();
 
 	if(isset($_GET['f'])) {
+		// Fehlermeldungen an dieser Stelle sind gewollt
+		if($cron_debug) {
+			error_reporting(E_ALL ^ E_NOTICE);
+		}
+
 		// Maximal eine Minute Zeit geben, dann abbrechen
 		set_time_limit(60);
 
@@ -31,16 +39,22 @@
 				$userFn = create_function('', $code['code']);
 				$contents = $userFn();
 			}
-			catch(Exception $ignore) {
-				continue;
+			catch(Exception $exception) {
+				if($cron_debug) {
+					echo $exception->getMessage() . "\n";
+				}
+				die();
 			}
 		}
 		else {
 			try {
 				$file = load_url($code['url']);
 			}
-			catch(Exception $ignore) {
-				continue;
+			catch(Exception $exception) {
+				if($cron_debug) {
+					echo $exception->getMessage() . "\n";
+				}
+				die();
 			}
 			$file = html_entity_decode($file, ENT_COMPAT, "utf-8");
 			preg_match_all($code['search'], $file, &$matches,  PREG_SET_ORDER);
@@ -147,7 +161,9 @@
 			list($add_new_content, $add_content_ids) = unserialize($output);
 			if(!is_array($add_new_content) || !is_array($add_content_ids)) {
 				preg_match('#f=([0-9]+)#', curl_getinfo($transfer['handle'], CURLINFO_EFFECTIVE_URL), $feed);
-				echo "Subrequest failed for feed " . $feed[1] . ".\n";
+				if($cron_debug) {
+					echo "Subrequest failed for feed " . $feed[1] . ":\n  " . str_replace("\n", "\n  ", $output) . "\n";
+				}
 			}
 			else {
 				foreach($add_new_content as $key => $val) {
@@ -158,7 +174,9 @@
 		}
 		else {
 			preg_match('#f=([0-9]+)#', curl_getinfo($transfer['handle'], CURLINFO_EFFECTIVE_URL), $feed);
-			echo "Subrequest failed for feed " . $feed[1] . ".\n";
+			if($cron_debug) {
+				echo "Subrequest failed for feed " . $feed[1] . ", HTTP-request failed.\n";
+			}
 		}
 	}
 
