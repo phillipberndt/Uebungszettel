@@ -82,7 +82,8 @@
 			$database->exec('CREATE TABLE suggestions       (id INTEGER PRIMARY KEY AUTO_INCREMENT, text MEDIUMTEXT);');
 			$database->exec('CREATE TABLE url_age_cache     (url MEDIUMTEXT, age INTEGER)');
 		}
-		$database->exec('INSERT INTO users (id, name, pass, level) VALUES (1, "admin", "d033e22ae348aeb5660fc2140aec35850c4da997", 2);'); 
+		$salt = base_convert(rand(0, 36*36 - 1), 10, 36);
+		$database->exec('INSERT INTO users (id, name, pass, level, salt) VALUES (1, "admin", "d033e22ae348aeb5660fc2140aec35850c4da997", 2, "' . $salt . '");'); 
 		$database->commit();
 		$database = null;
 		die("Datenbank angelegt. Der Standardbenutzer ist admin mit Passwort admin.");
