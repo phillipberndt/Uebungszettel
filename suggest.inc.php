@@ -2,8 +2,8 @@
 	force_login();
 
 	if($_POST['suggest']) {
-		$stmt = $database->prepare('INSERT INTO suggestions (text) VALUES (?)');
-		$stmt->execute(array($_POST['suggest']));
+		$stmt = $database->prepare('INSERT INTO suggestions (text, user_id) VALUES (?, ?)');
+		$stmt->execute(array($_POST['suggest'], user()->id));
 		status_message('Danke für Deinen Vorschlag!');
 		gotop('index.php?q=feeds');
 	}

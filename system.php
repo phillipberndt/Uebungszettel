@@ -61,7 +61,7 @@
 			$database->exec('CREATE UNIQUE INDEX did_uid ON user_data (data_id, user_id);');
 			$database->exec('CREATE TABLE user_feeds        (user_id INTEGER, feed_id INTEGER);');
 			$database->exec('CREATE INDEX uid ON user_feeds (user_id);');
-			$database->exec('CREATE TABLE suggestions       (id INTEGER PRIMARY KEY AUTOINCREMENT, text MEDIUMTEXT);');
+			$database->exec('CREATE TABLE suggestions       (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, text MEDIUMTEXT);');
 			$database->exec('CREATE TABLE url_age_cache     (url MEDIUMTEXT, age INTEGER)');
 		}
 		else {
@@ -79,7 +79,7 @@
 			$database->exec('CREATE UNIQUE INDEX did_uid ON user_data (data_id, user_id);');
 			$database->exec('CREATE TABLE user_feeds        (user_id INTEGER, feed_id INTEGER);');
 			$database->exec('CREATE INDEX uid ON user_feeds (user_id);');
-			$database->exec('CREATE TABLE suggestions       (id INTEGER PRIMARY KEY AUTO_INCREMENT, text MEDIUMTEXT);');
+			$database->exec('CREATE TABLE suggestions       (id INTEGER PRIMARY KEY AUTO_INCREMENT, user_id INTEGER, text MEDIUMTEXT);');
 			$database->exec('CREATE TABLE url_age_cache     (url MEDIUMTEXT, age INTEGER)');
 		}
 		$salt = base_convert(rand(0, 36*36 - 1), 10, 36);
@@ -90,10 +90,27 @@
 	}
 	// }}}
 	// Hilfsfunktionen {{{
-	function status_message($text) {
+	function status_message($text, $user = null) {
 		// Statusmeldungen werden bei der Seitenausgabe in ein
 		// Div geschrieben.
-		$_SESSION['status_messages'][] = $text;
+		if($user === null) {
+			$_SESSION['status_messages'][] = $text;
+		}
+		else {
+			$store_user = false;
+			if(!is_object($user)) {
+				$store_user = true;
+				$user = user_load('id', $user);
+				if(!$user) return;
+			}
+			if(!isset($user->saved_status_messages)) {
+				$user->saved_status_messages = array();
+			}
+			$user->saved_status_messages[] = $text;
+			if($store_user) {
+				user_save($user);
+			}
+		}
 	}
 	function gotop($url) {
 		if(isset($_REQUEST['destination']) && $_REQUEST['destination'] && !preg_match('#^[a-z]+:#i', $_REQUEST['destination'])) {

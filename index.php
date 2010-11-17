@@ -49,13 +49,24 @@
 
 	<section>
 	<?php
+		if(logged_in() && isset(user()->saved_status_messages)) {
+			if(is_array($_SESSION['status_messages'])) {
+				$_SESSION['status_messages'] = array_merge($_SESSION['status_messages'], user()->saved_status_messages);
+			}
+			else {
+				$_SESSION['status_messages'] = user()->saved_status_messages;
+			}
+			unset(user()->saved_status_messages);
+			user_save();
+		}
+
 		if(isset($_SESSION['status_messages']) && $_SESSION['status_messages']):
 		?>
 			<ul id="status">
 			<?php foreach($_SESSION['status_messages'] as $message) echo('<li>'.$message.'</li>'); ?>
 			</ul>
 		<?php
-		$_SESSION['status_messages'] = array();
+		$displayed_status_messages = count($_SESSION['status_messages']);
 		endif;
 
 		if(file_exists(basename($q) . '.inc.php')) {
@@ -68,6 +79,10 @@
 				Die angegebene Seite wurde nicht gefunden.
 			</div>
 			<?php
+		}
+
+		if(isset($displayed_status_messages)) {
+			$_SESSION['status_messages'] = array_slice($_SESSION['status_messages'], $displayed_status_messages);
 		}
 	?>
 	</section>
