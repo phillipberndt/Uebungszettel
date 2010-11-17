@@ -35,6 +35,13 @@
 	// Wie viele gleichzeitige Ausführungen sind erlaubt?
 	$max_concurrent_toolkit_invokations = 10;
 
+	// Registrierung auf bestimmte IP-Bereiche beschränken
+	$restrict_registration = array(
+		//'Freie Universität Berlin' => '160.45.0.0/16',
+		//'Technische Universität Berlin' => '130.149.0.0/16',
+		//'Humboldt Universität Berlin' => '141.20.0.0/16',
+		//'Heimnetz' => '192.168.0.1/24',
+	);
 
 	// Ist diese Variable gesetzt, so wird eine Logdatei über alle Administrator-
 	// aktionen erstellt

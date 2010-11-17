@@ -66,6 +66,40 @@
 			unset($_SESSION['saved_post']);
 		}
 		if(!isset($_SESSION['confirm']) && $_POST['action'] == 'Registrieren') {
+			// Registrierung auf IP-Bereiche einschränken
+			if(isset($restrict_registration) && $restrict_registration) {
+				$register_ok = false;
+				$client_ip = ip2long($_SERVER['REMOTE_ADDR']);
+				foreach($restrict_registration as $ip_range) {
+					list($ip, $sub) = explode('/', $ip_range);
+					$mask = bindec(str_repeat('1', $sub) . str_repeat('0', 32 - $sub));
+					if(long2ip(ip2long($ip) & $mask) == long2ip($client_ip & $mask)) {
+						$register_ok = true;
+						break;
+					}
+				}
+				if(!$register_ok):
+				?><div id="content">
+				<h2>Von hier aus kannst Du Dich leider nicht registrieren..</h2>
+				<p>Die Registrierung bei diesem Dienst ist nur eingeschränkt auf Rechner aus bestimmten Netzwerken möglich.
+					Das ist notwendig, damit wir Dir auch Übungen von Veranstaltungen ausliefern zu dürfen, deren Homepages
+					vor externen Zugriffen gesichert sind.</p>
+				<p>Bitte benutze zum Registrieren einen PC aus einem der folgenden Netzwerke:</p>
+				<ul>
+					<?php foreach(array_keys($restrict_registration) as $key): ?>
+					<li><?=$key?></li>
+					<?php endforeach; ?>
+				</ul>
+				<p>Du kannst auch ein VPN oder einen SSH-Tunnel verwenden, um Dich von zu Hause aus anzumelden.
+					Wie das geht, steht auf der Webseite Deines Instituts!</p>
+				<p>Nachdem Du Dich registriert hast, kannst Du von überall aus auf Deinen Account zugreifen.</p>
+				</div>
+				<?php
+				return;
+				endif;
+			}
+
+			// Willkommens-Text anzeigen
 			$_SESSION['saved_post'] = $_POST;
 			?><div id="content">
 			<h2>Übungszettel</h2>
