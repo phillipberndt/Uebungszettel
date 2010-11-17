@@ -36,6 +36,7 @@
 			else {
 				user()->pass = sha1(user()->salt . $_POST['new_pass_1']);
 				user_save();
+				$database->query('DELETE FROM user_autologin WHERE user_id = ' . user()->id);
 				session_destroy();
 				session_start();
 				status_message("Dein Kennwort wurde geändert.");
