@@ -177,12 +177,12 @@
 	<?php if($can_edit): ?>
 	<p class="info nomargin"><em>Hinweis:</em> Es kann ein wenig dauern, bis diese Liste die letzten Änderungen berücksichtigt.</p>
 	<?php endif;
-		$feeds = $database->query('SELECT data FROM data WHERE feed_id = '.$feed_id.' ORDER BY id ASC');
+		$feeds = $database->query('SELECT data, id FROM data WHERE feed_id = '.$feed_id.' ORDER BY id ASC');
 		$feed = $feeds->fetch();
 		if($feed) {
-			echo('<ol><li>'.format_data($feed['data']).'</li>');
+			echo('<ol><li>'.format_data($feed['data'], $feed['id']).'</li>');
 			foreach($feeds as $feed) {
-				echo('<li>'.format_data($feed['data']).'</li>');
+				echo('<li>'.format_data($feed['data'], $feed['id']).'</li>');
 			}
 			echo('</ol>');
 		}

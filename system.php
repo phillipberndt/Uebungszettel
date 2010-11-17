@@ -127,6 +127,9 @@
 			2 => 'Administrator',
 		);
 	}
+	session_set_cookie_params(session_cache_expire(),
+		(dirname($_SERVER['REQUEST_URI']) == '/' ? '/' : dirname($_SERVER['REQUEST_URI']) . '/') . 'index.php',
+		null, false, true);
 	session_start();
 	function logged_in() {
 		return $_SESSION['logged_in'] == true;
@@ -330,15 +333,20 @@
 			return array('', $data);
 		}
 	}/*}}}*/
-	function format_data($data) {/*{{{*/
+	function format_data($data, $id = null) {/*{{{*/
 		list($url, $text) = split_data($data);
 		if($url) {
 			// Mobile Device PDF: Das können wir als JPG ausliefern!
-			if(preg_match('/\.(?:pdf|ps)$/i', $url) && is_mobile()) {
-				$url = 'image.php?d='.htmlspecialchars(urlencode($url));
+			if($id && preg_match('/\.(?:pdf|ps)$/i', $url) && is_mobile()) {
+				$url = 'image.php?data_id='.htmlspecialchars($id);
 			}
 
-			return '<a class="exercise" href="'.htmlspecialchars($url).'">'.htmlspecialchars($text ? $text : basename($url)).'</a>';
+			if($id && $GLOBALS['cache_everything']) {
+				return '<a class="exercise" href="cache.php?data_id=' . htmlspecialchars($id) . '">'.htmlspecialchars($text ? $text : basename($url)).'</a>';
+			}
+			else {
+				return '<a class="exercise" href="'.htmlspecialchars($url).'">'.htmlspecialchars($text ? $text : basename($url)).'</a>';
+			}
 		}
 		else {
 			return htmlspecialchars($text);

@@ -1,20 +1,21 @@
 <?php
+	// Obwohl system.php eingebunden wird sind wir nicht eingeloggt, da das Session-Cookie
+	// aus Sicherheitsgründen auf /index.php beschränkt ist!
 	require("system.php");
-	if(user()->id == 0) {
-		status_message("Dieser Dienst steht nur eingeloggten Usern zur Verfügung");
-		gotop("index.php");
-	}
 	if(system("which convert 2>&1 > /dev/null") != 0) {
 		status_message("Dieser Dienst steht nur zur Verfügung, wenn ImageMagick auf dem Serversystem installiert ist");
 		gotop("index.php");
 	}
 
 	set_time_limit(0);
-	if(!isset($_GET['d'])) {
+	if(!isset($_GET['data_id'])) {
 		header('HTTP/1.1 404 Not found');
 		die("<h1>File not found</h1>");
 	}
-	$image = $_GET['d'];
+
+	$data = $database->query('SELECT data FROM data WHERE id = ' . intval($_GET['data_id']))->fetchColumn();
+	list($image, $text) = split_data($data);
+
 	if(!preg_match('#^https?://#i', $image)) {
 		header('HTTP/1.1 404 Not found');
 		die("<h1>File not found</h1>");
@@ -34,8 +35,9 @@
 		$data = load_url($image, false, $cache_exists ? filemtime($cache_file) : false);
 	}
 	catch(Exception $e) {
-		status_message("Dieser Dienst funktioniert nur mit PDF-Dateien");
-		gotop("index.php");
+		// Geht anscheinend nicht - dann leiten wir halt weiter.
+		header('Location: ' . $image);
+		die();
 	}
 	if($data && $data !== true) {
 		// Cache neu bauen!
@@ -61,5 +63,5 @@
 		readfile($cache_file);
 	}
 	else {
-		die("<!DOCTYPE html><html><body><img src='image.php?p=1&amp;d=".urlencode($image)."' /></body></html>");
+		die("<!DOCTYPE html><html><body><img src='image.php?p=1&amp;data_id=".urlencode($_GET['data_id'])."' /></body></html>");
 	}

@@ -52,9 +52,9 @@
 		<entry>
 		<updated><?=date('c', $exercise['timestamp'])?></updated>
 		<id><?=$base_url?>uebungszettel-<?=$user->id?>uebung-<?=$exercise['id']?></id>
-		<title><?=htmlspecialchars($descs[$exercise['feed_id']])?> - <?=strip_tags(format_data($exercise['data']))?></title>
+		<title><?=htmlspecialchars($descs[$exercise['feed_id']])?> - <?=strip_tags(format_data($exercise['data'], $exercise['id']))?></title>
 		<summary type="html">
-		<?=htmlspecialchars(format_data($exercise['data']))?>
+		<?=htmlspecialchars(format_data($exercise['data'], $exercise['id']))?>
 		</summary>
 		<?php
 			list($url, $text) = split_data($exercise['data']);
