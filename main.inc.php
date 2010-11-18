@@ -63,7 +63,7 @@ else:
 		if($update_timestamp < time() - 3600):
 		?>
 		<p class="info nomargin"><strong>Achtung:</strong> Die Übungsaufgaben sind nicht aktuell. Ein Feed konnte seit <?php
-				$time = time() - $feed['update_timestamp'];
+				$time = time() - $update_timestamp;
 				$days = floor($time / 86400);
 				$time %= 86400;
 				if($days) echo $days . ' Tage(n), ';
