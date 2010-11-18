@@ -4,14 +4,14 @@
 	// Bei direktem Hit auf die Domain Weiterleiten auf diese Seite, weil nur hier
 	// das Autologin-Cookie ankommt
 	if(!preg_match('#index.php\?q=login$#', $_SERVER['REQUEST_URI']) && !$_POST) {
-		if(isset($_GET['destination'])) {
-			$_SESSION['destination'] = $_GET['destination'];
-			unset($_GET['destination']);
+		if(isset($_REQUEST['destination'])) {
+			$_SESSION['destination'] = $_REQUEST['destination'];
+			unset($_REQUEST['destination']);
 		}
 		gotop('index.php?q=login');
 	}
 	if(isset($_SESSION['destination'])) {
-			$_GET['destination'] = $_SESSION['destination'];
+			$_REQUEST['destination'] = $_SESSION['destination'];
 			unset($_SESSION['destination']);
 	}
 
