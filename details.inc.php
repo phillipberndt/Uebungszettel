@@ -174,7 +174,16 @@
 	<?php endif; ?>
 
 	<h3>Aggregierte Aufgaben</h3>
-	<?php if($can_edit): ?>
+	<?php if($feed['update_timestamp'] && $feed['update_timestamp'] < time() - 3600): ?>
+	<p class="info nomargin"><strong>Achtung:</strong> Die Übungsaufgaben zu diesem Kurs konnten seit <?php
+			$time = time() - $feed['update_timestamp'];
+			$days = floor($time / 86400);
+			$time %= 86400;
+			if($days) echo $days . ' Tage(n), ';
+			echo gmdate('H:i:s', $time);
+		?> Stunden nicht geladen werden!</p>
+	<?php endif; ?>
+	<?php if($can_edit && !$feed['update_timestamp']): ?>
 	<p class="info nomargin"><em>Hinweis:</em> Es kann ein wenig dauern, bis diese Liste die letzten Änderungen berücksichtigt.</p>
 	<?php endif;
 		$feeds = $database->query('SELECT data, id FROM data WHERE feed_id = '.$feed_id.' ORDER BY id ASC');

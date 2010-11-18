@@ -56,6 +56,22 @@ else:
 ?>
 <div id="content">
 	<h2>Übersicht</h2>
+	<?php
+		// Gibt es Kurse, deren Update im Verzug ist?
+		$update_timestamp = $database->query('SELECT min(update_timestamp) FROM feeds WHERE id IN
+			(SELECT feed_id FROM user_feeds WHERE user_id = ' . user()->id . ')')->fetchColumn();
+		if($update_timestamp < time() - 3600):
+		?>
+		<p class="info nomargin"><strong>Achtung:</strong> Die Übungsaufgaben sind nicht aktuell. Ein Feed konnte seit <?php
+				$time = time() - $feed['update_timestamp'];
+				$days = floor($time / 86400);
+				$time %= 86400;
+				if($days) echo $days . ' Tage(n), ';
+				echo gmdate('H:i:s', $time);
+			?> Stunden nicht geladen werden!</p>
+		<?php
+		endif;
+	?>
 	<table id="kurse-uebersicht">
 		<tr><th>Kurs</th><th>Zettel</th><th>Notiz</th><th>&nbsp;</th></tr>
 		<?php

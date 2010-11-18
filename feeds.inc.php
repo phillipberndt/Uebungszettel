@@ -157,7 +157,7 @@
 		<tr><th>&nbsp;</th><th>Kurs</th><th>Zettel</th><th>&nbsp;</th></tr>
 		<?php
 			$has_course = false;
-			$query = 'SELECT id, `desc`, public, 
+			$query = 'SELECT id, `desc`, public, update_timestamp, 
 			(SELECT COUNT(*) FROM user_feeds WHERE feed_id = feeds.id AND user_id = '.user()->id.') AS checked,
 			(SELECT COUNT(*) FROM data WHERE feed_id = feeds.id) AS count
 			FROM feeds
@@ -165,8 +165,9 @@
 			ORDER BY `desc` ASC';
 			foreach($database->query($query) as $course) {
 					$has_course = true;
-					echo('<tr'.($course['public'] ? '' : ' class="private"').
-						'><td><input type="checkbox" name="lecture['.$course['id'].']" value="1" '.
+					$classes = ($course['public'] ? '' : 'private') . ' ' .
+						($course['update_timestamp'] < time() - 3600 ? 'outdated' : '');
+					echo('<tr class="course ' . $classes . '"><td><input type="checkbox" name="lecture['.$course['id'].']" value="1" '.
 						($course['checked'] ? 'checked' : '').'></td><td>'.
 						htmlspecialchars($course['desc']).
 						'</td><td>'.$course['count'].'</td><td><a href="index.php?q=details&amp;f='.$course['id'].'">Details</a></td></tr>');

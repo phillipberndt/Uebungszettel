@@ -156,13 +156,21 @@
 		curl_multi_select($curl);
 	}
 	while($transfer = curl_multi_info_read($curl)) {
+		$feed_id = preg_match('#f=([0-9]+)#', curl_getinfo($transfer['handle'], CURLINFO_EFFECTIVE_URL), $feed);
+		if(!$feed_id) {
+			if($cron_debug) {
+				echo "Unrequested URL detected: " . curl_getinfo($transfer['handle'], CURLINFO_EFFECTIVE_URL) . "\n";
+			}
+			continue;
+		}
+		$feed_id = intval($feed[1]);
+
 		if($transfer['result'] == CURLE_OK) {
 			$output = curl_multi_getcontent($transfer['handle']);
 			list($add_new_content, $add_content_ids) = unserialize($output);
 			if(!is_array($add_new_content) || !is_array($add_content_ids)) {
-				preg_match('#f=([0-9]+)#', curl_getinfo($transfer['handle'], CURLINFO_EFFECTIVE_URL), $feed);
 				if($cron_debug) {
-					echo "Subrequest failed for feed " . $feed[1] . ":\n  " . str_replace("\n", "\n  ", $output) . "\n";
+					echo "Subrequest failed for feed " . $feed_id . ":\n  " . str_replace("\n", "\n  ", $output) . "\n";
 				}
 			}
 			else {
@@ -170,12 +178,14 @@
 					$new_content[$key] = isset($new_content[$key]) ? array_merge($new_content[$key], $val) : $val;
 				}
 				$content_ids = array_merge_recursive($content_ids, $add_content_ids);
+
+				// In die Tabelle eintragen, dass ein Update stattgefunden hat
+				$database->query('UPDATE feeds SET update_timestamp = ' . time() . ' WHERE id = ' . $feed_id);
 			}
 		}
 		else {
-			preg_match('#f=([0-9]+)#', curl_getinfo($transfer['handle'], CURLINFO_EFFECTIVE_URL), $feed);
 			if($cron_debug) {
-				echo "Subrequest failed for feed " . $feed[1] . ", HTTP-request failed.\n";
+				echo "Subrequest failed for feed " . $feed_id . ", HTTP-request failed.\n";
 			}
 		}
 	}
