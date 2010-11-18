@@ -166,7 +166,7 @@
 			foreach($database->query($query) as $course) {
 					$has_course = true;
 					$classes = ($course['public'] ? '' : 'private') . ' ' .
-						($course['update_timestamp'] < time() - 3600 ? 'outdated' : '');
+						($course['update_timestamp'] && $course['update_timestamp'] < time() - 3600 ? 'outdated' : '');
 					echo('<tr class="course ' . $classes . '"><td><input type="checkbox" name="lecture['.$course['id'].']" value="1" '.
 						($course['checked'] ? 'checked' : '').'></td><td>'.
 						htmlspecialchars($course['desc']).
