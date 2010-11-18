@@ -128,7 +128,7 @@
 		);
 	}
 	session_set_cookie_params(session_cache_expire(),
-		(dirname($_SERVER['REQUEST_URI']) == '/' ? '/' : dirname($_SERVER['REQUEST_URI']) . '/') . 'index.php',
+		(dirname($_SERVER['REQUEST_URI']) == '/' ? '/' : dirname($_SERVER['REQUEST_URI']) . '/'),
 		null, false, true);
 	session_start();
 	function logged_in() {
