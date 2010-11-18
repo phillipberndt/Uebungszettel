@@ -1,7 +1,9 @@
 <?php
 	require('system.php');
 
-	$urls = $_POST['d'];
+	$data_ids = array_map(intval, $_POST['d']);
+	$combine = $database->query('SELECT data FROM data WHERE id IN (' . implode(', ', $data_ids) . ')');
+
 	if(is_dir('pdftk')) {
 		$execute = 'LD_LIBRARY_PATH=pdftk pdftk/pdftk ';
 	}
@@ -9,7 +11,10 @@
 		$execute = 'pdftk ';
 	}
 	$final_cache_id = '';
-	foreach($urls as $url) {
+	foreach($combine as $data) {
+		list($url, $title) = split_data($data['data']);
+		if(!$url) continue;
+
 		if(preg_match('/cache_id=([^&]+)/', $url, &$match)) {
 			$cache_id = basename($match[1]);
 		}

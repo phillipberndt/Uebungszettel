@@ -208,7 +208,8 @@ $(document).ready(function() {
 				var form = $("<form method='post' action='combine.php'>");
 				$("body").append(form);
 				$(".exercise.selected").each(function() {
-					form.append($("<input type='hidden' name='d[]'>").val(this.href));
+					var data_id = $(this).closest("tr").attr("id").match(/data-([0-9]+)/)[1];
+					form.append($("<input type='hidden' name='d[]'>").val(data_id));
 				});
 				form.submit();
 			}
