@@ -67,11 +67,34 @@
 		}
 
 		$known = array();
-		foreach($database->query('SELECT data, id FROM data WHERE feed_id = '.$id)->fetchAll() as $data) $known[$data[0]] = $data[1];
+		$known_urls = array();
+		foreach($database->query('SELECT data, id FROM data WHERE feed_id = '.$id)->fetchAll() as $data) {
+			list($url, $text) = split_data($data[0]);
+			if($url) {
+				$known_urls[$url] = $data[1];
+			}
+			$known[$data[0]] = $data[1];
+		}
 
 		if(is_array($contents)) foreach($contents as $content) {
+			list($url, $text) = split_data($content);
+
+			// Ist die URL schon bekannt, der genaue Content aber nicht?
+			if(!isset($known[$content]) && $url && isset($known_urls[$url])) {
+				// Ja! D.h. die Feed-Definition wurde verändert. In dem Fall nur den Text
+				// ändern, damit die gelesen/ungelesen Zustände und Notizen erhalten bleiben.
+				$id = $known_urls[$url];
+				$statement = $database->prepare('UPDATE data SET data = ? WHERE id = ?');
+				$statement->execute(array($content, $id));
+				$old_entry = array_search($id, $known);
+				if($old_entry !== false) unset($known[$old_entry]);
+				$known[$content] = $id;
+
+				// Der else-Block unten wird - beabsichtigt - trotzdem ausgeführt!
+			}
+
+			// Sonst schauen, ob der Inhalt wörtlich gespeichert ist:
 			if(!isset($known[$content])) {
-				list($url, $text) = split_data($content);
 				if($url) {
 					// URL Datum cachen
 					try {
@@ -89,7 +112,6 @@
 			else
 			{
 				// Falls URL geändert, ..
-				list($url, $text) = split_data($content);
 				if($url) {
 					try {
 						$url_check = check_if_url_changed($url);
