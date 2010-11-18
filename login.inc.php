@@ -1,20 +1,6 @@
 <?php
 	if(logged_in()) gotop("index.php");
 
-	// Bei direktem Hit auf die Domain Weiterleiten auf diese Seite, weil nur hier
-	// das Autologin-Cookie ankommt
-	if(!preg_match('#index.php\?q=login$#', $_SERVER['REQUEST_URI']) && !$_POST) {
-		if(isset($_REQUEST['destination'])) {
-			$_SESSION['destination'] = $_REQUEST['destination'];
-			unset($_REQUEST['destination']);
-		}
-		gotop('index.php?q=login');
-	}
-	if(isset($_SESSION['destination'])) {
-			$_REQUEST['destination'] = $_SESSION['destination'];
-			unset($_SESSION['destination']);
-	}
-
 	// Formzielbehandlung nur bei korrekter URL
 	if($_GET['q'] == "login"):
 
@@ -39,7 +25,7 @@
 			$query = $database->prepare('UPDATE user_autologin SET token = ? WHERE id = ?');
 			$query->execute(array($token, $autologin));
 			setcookie('autologin', $autologin . '-' . $token, time() + 15552000, 
-				(dirname($_SERVER['REQUEST_URI']) == '/' ? '/' : dirname($_SERVER['REQUEST_URI']) . '/') . 'index.php?q=login',
+				(dirname($_SERVER['REQUEST_URI']) == '/' ? '/' : dirname($_SERVER['REQUEST_URI']) . '/'),
 				null, false, true);
 			// Benutzer einloggen
 			$user = user_load('id', $result->user_id);
@@ -212,7 +198,7 @@
 				$database->query('INSERT INTO user_autologin (id, token, user_id) VALUES("' . $autologin . '",
 					"' . $token . '", ' . $user->id . ');');
 				setcookie('autologin', $autologin . '-' . $token, time() + 15552000, 
-					(dirname($_SERVER['REQUEST_URI']) == '/' ? '/' : dirname($_SERVER['REQUEST_URI']) . '/') . 'index.php?q=login',
+					(dirname($_SERVER['REQUEST_URI']) == '/' ? '/' : dirname($_SERVER['REQUEST_URI']) . '/'),
 					null, false, true);
 
 				// User ist nun eingeloggt. Zur Übersicht.

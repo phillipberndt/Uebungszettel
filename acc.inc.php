@@ -16,7 +16,7 @@
 				session_destroy();
 				session_start();
 				setcookie('autologin', '', time() - 3600, 
-						(dirname($_SERVER['REQUEST_URI']) == '/' ? '/' : dirname($_SERVER['REQUEST_URI']) . '/') . 'index.php?q=login',
+						(dirname($_SERVER['REQUEST_URI']) == '/' ? '/' : dirname($_SERVER['REQUEST_URI']) . '/'),
 						null, false, true);
 				status_message("Dein Account wurde gelöscht.");
 				gotop("index.php");
