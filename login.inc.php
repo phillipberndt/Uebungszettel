@@ -1,9 +1,6 @@
 <?php
 	if(logged_in()) gotop("index.php");
 
-	// Formzielbehandlung nur bei korrekter URL
-	if($_GET['q'] == "login"):
-
 	// Per Autologin einloggen
 	if(isset($_COOKIE['autologin']) && strpos($_COOKIE['autologin'], '-') !== false) {
 		list($autologin, $token) = explode('-', $_COOKIE['autologin'], 2);
@@ -39,6 +36,9 @@
 			}
 		}
 	}
+
+	// Formzielbehandlung nur bei korrekter URL
+	if($_GET['q'] == "login"):
 
 	// Namens-Check für Anmeldung
 	if(isset($_GET['name_check'])) {
