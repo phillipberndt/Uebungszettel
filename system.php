@@ -29,7 +29,8 @@
 	// }}}
 	// Datenbankverbindung herstellen {{{
 	try {
-		$database = new PDO($database_conn[0], $database_conn[1], $database_conn[2]);
+		$driver_options = array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8');
+		$database = new PDO($database_conn[0], $database_conn[1], $database_conn[2], $driver_options);
 		$database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	}
 	catch(Exception $error) {
@@ -66,21 +67,21 @@
 		}
 		else {
 			$database->exec('CREATE TABLE users         (id INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(30),
-				pass VARCHAR(40), salt VARCHAR(2) DEFAULT "", level INT DEFAULT 0, flags INTEGER DEFAULT 0, settings LONGTEXT);');
-			$database->exec('CREATE TABLE user_autologin (id VARCHAR(40), token VARCHAR(40), user_id INTEGER)');
+				pass VARCHAR(40), salt VARCHAR(2) DEFAULT "", level INT DEFAULT 0, flags INTEGER DEFAULT 0, settings LONGTEXT) DEFAULT CHARSET=utf8;');
+			$database->exec('CREATE TABLE user_autologin (id VARCHAR(40), token VARCHAR(40), user_id INTEGER) DEFAULT CHARSET=utf8');
 			$database->exec('CREATE INDEX uauto ON user_autologin (id)');
 			$database->exec('CREATE INDEX user ON user_autologin (user_id)');
 			$database->exec('CREATE TABLE feeds         (id INTEGER PRIMARY KEY AUTO_INCREMENT, owner INTEGER, `desc` VARCHAR(120), short VARCHAR(120),
-				code LONGTEXT, public INTEGER DEFAULT 0, update_timestamp INT);');
+				code LONGTEXT, public INTEGER DEFAULT 0, update_timestamp INT) DEFAULT CHARSET=utf8;');
 			$database->exec('CREATE TABLE data          (id INTEGER PRIMARY KEY AUTO_INCREMENT, feed_id INTEGER,
-				data MEDIUMTEXT, timestamp INT(11))');
+				data MEDIUMTEXT, timestamp INT(11)) DEFAULT CHARSET=utf8');
 			$database->exec('CREATE INDEX fid ON data       (feed_id);');
-			$database->exec('CREATE TABLE user_data         (data_id INTEGER, user_id INTEGER, comment MEDIUMTEXT DEFAULT "", invisible INTEGER DEFAULT 0, known INTEGER DEFAULT 0);');
+			$database->exec('CREATE TABLE user_data         (data_id INTEGER, user_id INTEGER, comment MEDIUMTEXT DEFAULT "", invisible INTEGER DEFAULT 0, known INTEGER DEFAULT 0) DEFAULT CHARSET=utf8;');
 			$database->exec('CREATE UNIQUE INDEX did_uid ON user_data (data_id, user_id);');
-			$database->exec('CREATE TABLE user_feeds        (user_id INTEGER, feed_id INTEGER);');
+			$database->exec('CREATE TABLE user_feeds        (user_id INTEGER, feed_id INTEGER) DEFAULT CHARSET=utf8;');
 			$database->exec('CREATE INDEX uid ON user_feeds (user_id);');
-			$database->exec('CREATE TABLE suggestions       (id INTEGER PRIMARY KEY AUTO_INCREMENT, user_id INTEGER, text MEDIUMTEXT);');
-			$database->exec('CREATE TABLE url_age_cache     (url MEDIUMTEXT, age INTEGER)');
+			$database->exec('CREATE TABLE suggestions       (id INTEGER PRIMARY KEY AUTO_INCREMENT, user_id INTEGER, text MEDIUMTEXT) DEFAULT CHARSET=utf8;');
+			$database->exec('CREATE TABLE url_age_cache     (url MEDIUMTEXT, age INTEGER) DEFAULT CHARSET=utf8');
 		}
 		$salt = base_convert(rand(0, 36*36 - 1), 10, 36);
 		$database->exec('INSERT INTO users (id, name, pass, level, salt) VALUES (1, "admin", "d033e22ae348aeb5660fc2140aec35850c4da997", 2, "' . $salt . '");'); 
