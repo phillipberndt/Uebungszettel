@@ -151,7 +151,7 @@
 ?>
 <div id="content">
 	<h2>Kurse auswählen</h2>
-	<p>Bitte wähle die Kurse aus, die Du abbonieren möchtest, aus.</p>
+	<p>Bitte wähle die Kurse aus, die Du abbonieren möchtest.</p>
 	<form class="feeds" method="post" action="index.php?q=feeds">
 	<table id="kurse">
 		<tr><th>&nbsp;</th><th>Kurs</th><th>Zettel</th><th>&nbsp;</th></tr>
