@@ -263,7 +263,7 @@
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 		$headers = curl_exec($curl);
 		if(curl_getinfo($curl, CURLINFO_HTTP_CODE) >= 400 || curl_errno($curl) != 0) {
-			throw new Exception("Die URL konnte nicht geladen werden");
+			throw new Exception("Die URL konnte nicht geladen werden: " . curl_error($curl));
 		}
 		$current_age = curl_getinfo($curl, CURLINFO_FILETIME);
 		if($current_age == -1 && preg_match('#^Last-Modified: (.+)#mi', $headers, &$matches)) {
@@ -301,7 +301,7 @@
 			if(curl_getinfo($curl, CURLINFO_HTTP_CODE) == 304) return true; // Not modified
 		}
 		if(curl_getinfo($curl, CURLINFO_HTTP_CODE) >= 400 || curl_errno($curl) != 0 || !$content) {
-			throw new Exception("Die URL konnte nicht geladen werden");
+			throw new Exception("Die URL konnte nicht geladen werden: " . curl_error($curl));
 		}
 		curl_close($curl);
 
