@@ -20,7 +20,7 @@
 	}
 
 	$is_owner = $feed['owner'] == user()->id;
-	$can_edit = $is_owner || user()->level >= 1;
+	$can_edit = ($is_owner || user()->level >= 1) && (!isset($code['code']) || user()->level >= 2);
 
 	// Kurse bestellen und abbestellen
 	if(isset($_GET['abbo']) && user()->id) {
