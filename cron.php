@@ -68,12 +68,16 @@
 
 		$known = array();
 		$known_urls = array();
-		foreach($database->query('SELECT data, id FROM data WHERE feed_id = '.$id)->fetchAll() as $data) {
+		$known_inactive = array();
+		foreach($database->query('SELECT data, id, timestamp FROM data WHERE feed_id = '.$id)->fetchAll() as $data) {
 			list($url, $text) = split_data($data[0]);
 			if($url) {
 				$known_urls[$url] = $data[1];
 			}
 			$known[$data[0]] = $data[1];
+			if($data[2] == null) {
+				$known_inactive[$data[1]] = true;
+			}
 		}
 
 		if(is_array($contents)) foreach($contents as $content) {
@@ -111,13 +115,15 @@
 			}
 			else
 			{
+				$id = $known[$content];
+
 				// Falls URL geändert, ..
 				if($url) {
 					try {
 						$url_check = check_if_url_changed($url);
 					}
 					catch(Exception $except) {
-						// Datei existiert nicht mehr. In diesem Fall die Datei löschen
+						// Datei existiert nicht mehr. In diesem Fall die Datei deaktivieren
 						// (Was wir erledigen, indem wir sie nicht unset'en
 						continue;
 					}
@@ -126,7 +132,7 @@
 						$database->query('UPDATE user_data SET invisible = 0, known = 0 WHERE
 							data_id = '.$known[$content]);
 						// Timestamp updaten
-						$database->query('UPDATE data SET timestamp = '.time().' WHERE id = '.$known[$content]);
+						$database->query('UPDATE data SET timestamp = '.time().' WHERE id = '.$id);
 						// Und noch einmal per Email versenden
 						if($text) {
 							$up_content = $content . ' (Geändert)';
@@ -134,16 +140,26 @@
 							$up_content = $content . ' ' . basename($content) . ' (Geändert)';
 						}
 						$new_content[$id][] = $up_content;
-						$content_ids[$up_content] = $known[$content];
+						$content_ids[$up_content] = $id;
 					}
 				}
+
+				// Falls die Definition inaktiv war, wieder aktiv schalten
+				if(isset($known_inactive[$id])) {
+					$database->query('UPDATE data SET timestamp = '.time().' WHERE id = '.$id);
+				}
+
 				unset($known[$content]);
 			}
 		}
 
 		if($known) {
-			$database->exec('DELETE FROM user_data WHERE data_id IN ('. implode(",", $known) . ');');
-			$database->exec('DELETE FROM data WHERE id IN ('. implode(",", $known) . ');');
+			// Das entfernen von bekannten, nicht mehr gefundenen Zetteln hat sich als problematisch
+			// herausgestellt, da häufiger Zettel versehentlich als neu eingestuft werden (weil gelöscht
+			// und dann wieder eingestellt)
+			// Daher anderes Prinzip: Wir setzen den timestamp auf null, sodass das Feld inaktiv wird.
+			// Wird es später wieder gefunden, setzen wir ihn wieder auf time() 
+			$database->exec('UPDATE data SET timestamp = NULL WHERE id IN ('. implode(",", $known) . ');');
 		}
 
 		die(serialize(array($new_content, $content_ids)));

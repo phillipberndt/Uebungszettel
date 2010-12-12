@@ -186,7 +186,7 @@
 	<?php if($can_edit && !$feed['update_timestamp']): ?>
 	<p class="info nomargin"><em>Hinweis:</em> Es kann ein wenig dauern, bis diese Liste die letzten Änderungen berücksichtigt.</p>
 	<?php endif;
-		$feeds = $database->query('SELECT data, id FROM data WHERE feed_id = '.$feed_id.' ORDER BY id ASC');
+		$feeds = $database->query('SELECT data, id FROM data WHERE feed_id = '.$feed_id.' AND timestamp IS NOT NULL ORDER BY id ASC');
 		$feed = $feeds->fetch();
 		if($feed) {
 			echo('<ol><li>'.format_data($feed['data'], $feed['id']).'</li>');
