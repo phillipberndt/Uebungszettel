@@ -52,7 +52,7 @@
 	}
 
 	$errName = $errPass = '';
-	if(isset($_POST['action'])) {
+	if(isset($_REQUEST['action'])) { // Request statt Post ist Absicht!
 		if($_POST['action'] != 'Anmelden') {
 			// D.h. wir sind bei der Registrierung
 
@@ -83,6 +83,7 @@
 					foreach($restrict_registration_mail_allow as $regex) $valid |= preg_match($regex, $_POST['register_mail']);
 					if(!$valid) {
 						status_message("Diese Email-Adresse ist leider nicht erlaubt");
+						gotop("index.php?q=login&action=Registrieren");
 					}
 					else {
 						$headers = "Content-Type: text/plain;charset=UTF-8\r\n".
