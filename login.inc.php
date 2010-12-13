@@ -230,7 +230,7 @@
 </form>
 <footer>
 	<p class="about"><img src="images/tux.png" />
-		<a href="http://github.com/phillipberndt/Uebungszettel">Übungszettel</a> ist Angebot von <a href="http://www.spline.de">Spline</a>.<br>
+		<a href="http://github.com/phillipberndt/Uebungszettel">Übungszettel</a> ist ein Angebot von <a href="http://www.spline.de">Spline</a>.<br>
 		Geschrieben von <a href="http://www.pberndt.com">Phillip Berndt</a>.<br>
 		<?php
 		echo($database->query('SELECT COUNT(*) FROM users')->fetchColumn() . ' Benutzer haben zusammen ' .
