@@ -171,7 +171,11 @@
 		if(!$user) return false;
 		$settings_array = unserialize($user->settings);
 		if(is_array($settings_array)) {
-			foreach($settings_array as $key => $value) $user->$key = $value;
+			foreach($settings_array as $key => $value) {
+				if(!isset($user->$key)) {
+					$user->$key = $value;
+				}
+			}
 		}
 		return $user;
 	}
