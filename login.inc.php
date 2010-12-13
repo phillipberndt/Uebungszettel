@@ -88,7 +88,7 @@
 						$headers = "Content-Type: text/plain;charset=UTF-8\r\n".
 							"Content-Transfer-Encoding: 8bit\r\n".
 							"From: =?utf-8?Q?=C3=9Cbungen?= <noreply@" . $_SERVER['SERVER_NAME'] . ">\r\n".
-							"Reply-To: ".$support_mail."\r\n\r\n";
+							"Reply-To: ".$support_mail;
 						$directory = dirname($_SERVER['REQUEST_URI']); if(substr($directory, -1) != '/') $directory .= '/';
 						$time = time();
 						$token = $time . "-" . substr(md5($time . "register" . $secure_token), 0, 5);
