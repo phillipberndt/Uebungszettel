@@ -31,7 +31,7 @@
 		// Ein bestimmtes Feed verarbeiten
 		$feed = $database->query('SELECT id, code FROM feeds WHERE id = '.intval($_GET['f']))->fetch();
 		$stmt = $database->prepare('INSERT INTO data (feed_id, data, timestamp) VALUES (?, ?, ?)');
-		$id = $feed['id'];
+		$feed_id = $feed['id'];
 		$code = unserialize($feed['code']);
 
 		if(isset($code['code'])) {
@@ -69,7 +69,7 @@
 		$known = array();
 		$known_urls = array();
 		$known_inactive = array();
-		foreach($database->query('SELECT data, id, timestamp FROM data WHERE feed_id = '.$id)->fetchAll() as $data) {
+		foreach($database->query('SELECT data, id, timestamp FROM data WHERE feed_id = '.$feed_id)->fetchAll() as $data) {
 			list($url, $text) = split_data($data[0]);
 			if($url) {
 				$known_urls[$url] = $data[1];
@@ -109,8 +109,8 @@
 						continue;
 					}
 				}
-				$stmt->execute(array($id, $content, time()));
-				$new_content[$id][] = $content;
+				$stmt->execute(array($feed_id, $content, time()));
+				$new_content[$feed_id][] = $content;
 				$content_ids[$content] = $database->lastInsertId();
 			}
 			else
@@ -139,7 +139,7 @@
 						} else {
 							$up_content = $content . ' ' . basename($content) . ' (Geändert)';
 						}
-						$new_content[$id][] = $up_content;
+						$new_content[$feed_id][] = $up_content;
 						$content_ids[$up_content] = $id;
 					}
 				}
