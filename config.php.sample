@@ -43,6 +43,12 @@
 		//'Heimnetz' => '192.168.0.1/24',
 	);
 
+	// Dann aber doch Registrierung via bestimmter Mail-Adressen erlauben
+	// (Das sind reguläre Ausdrücke)
+	$restrict_registration_mail_allow = array(
+		//'#[@.][fth]u-berlin\.de$#i',
+	);
+
 	// Sollen generell alle HTTP-Links gecached werden?
 	// Das Cachen von Dateien ist nicht ganz unproblematisch - der Zugang zu den
 	// Cookies wird zwar beschränkt, trotzdem sind Angriffe via AJAX, bzw. auf Frames

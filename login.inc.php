@@ -53,13 +53,9 @@
 
 	$errName = $errPass = '';
 	if(isset($_POST['action'])) {
-		// Info-Text zur Anmeldung
-		if($_POST['action'] == "Weiter") {
-			$_SESSION['confirm'] = true;
-			$_POST = $_SESSION['saved_post'];
-			unset($_SESSION['saved_post']);
-		}
-		if(!isset($_SESSION['confirm']) && $_POST['action'] == 'Registrieren') {
+		if($_POST['action'] != 'Anmelden') {
+			// D.h. wir sind bei der Registrierung
+
 			// Registrierung auf IP-Bereiche einschränken
 			if(isset($restrict_registration) && $restrict_registration) {
 				$register_ok = false;
@@ -72,7 +68,47 @@
 						break;
 					}
 				}
-				if(!$register_ok):
+
+				if(!$register_ok && isset($_POST['token'])) {
+					// Registrierungslink validieren
+					list($time, $hash) = explode('-', $_POST['token'], 2);
+					if($time > time() - 3600 * 24 * 2 && substr(md5($time . "register" . $secure_token), 0, 5) == $hash) {
+						$register_ok = true;
+					}
+				}
+
+				if(!$register_ok && isset($_POST['register_mail']) && $restrict_registration_mail_allow) {
+					// Registrierungsmail zusenden
+					$valid = false;
+					foreach($restrict_registration_mail_allow as $regex) $valid |= preg_match($regex, $_POST['register_mail']);
+					if(!$valid) {
+						status_message("Diese Email-Adresse ist leider nicht erlaubt");
+					}
+					else {
+						$headers = "Content-Type: text/plain;charset=UTF-8\r\n".
+							"Content-Transfer-Encoding: 8bit\r\n".
+							"From: =?utf-8?Q?=C3=9Cbungen?= <noreply@" . $_SERVER['SERVER_NAME'] . ">\r\n".
+							"Reply-To: ".$support_mail."\r\n\r\n";
+						$directory = dirname($_SERVER['REQUEST_URI']); if(substr($directory, -1) != '/') $directory .= '/';
+						$time = time();
+						$token = $time . "-" . substr(md5($time . "register" . $secure_token), 0, 5);
+						$link = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['SERVER_NAME'] . $directory . 'index.php?q=login&token=' . $token;
+
+						$message = "Hallo,\r\n\r\n" .
+							"Du erhälst Diese Mail, weil Du einen Registrierungslink für den Übungszettelaggregator\r\n" .
+							"angefordert hast. Bitte klicke auf folgenden Link, um Dich anzumelden:\r\n\r\n" .
+							" " . $link . "\r\n\r\n" .
+							"Dieser Link wird zwei Tage lang gültig sein. Solltest Du diesen Link nicht angefordert haben,\r\n" .
+							"kannst Du diese Mail einfach ignorieren.\r\n\r\nGruß,\r\nDein Übungszettelservice";
+
+						mail($_POST['register_mail'], '=?utf-8?Q?=C3=9Cbungszetteldienst?= Registrierung', $message, $headers);
+
+						status_message("Die Registrierungsmail wurde versandt und sollte bald bei Dir eintreffen.");
+						gotop("login");
+					}
+				}
+
+				if(!$register_ok && !$restrict_registration_mail_allow):
 				?><div id="content">
 				<h2>Von hier aus kannst Du Dich leider nicht registrieren..</h2>
 				<p>Die Registrierung bei diesem Dienst ist nur eingeschränkt auf Rechner aus bestimmten Netzwerken möglich.
@@ -91,8 +127,43 @@
 				<?php
 				return;
 				endif;
-			}
 
+				if(!$register_ok && $restrict_registration_mail_allow):
+				?><div id="content">
+				<h2>Bitte bestätige Deine Institutsangehörigkeit</h2>
+				<p>Du meldest Dich von außerhalb Deines Universitätsnetzwerkes an. Um Dir auch Übungen von Veranstaltungen
+					ausliefern zu dürfen, deren Homepages vor externen Zugriffen gesichert sind, müssen wir überprüfen, ob
+					Du Institutsangehöriger bist.</p>
+				<p>Bitte gib Deine Email-Adresse an einer der folgenden Universitäten an:</p>
+				<ul>
+					<?php foreach(array_keys($restrict_registration) as $key): ?>
+					<li><?=$key?></li>
+					<?php endforeach; ?>
+				</ul>
+				<p>Wir senden Dir einen speziellen Link zu, über den Du Dich registrieren kannst. Dein Account wird nicht
+					mit der Email-Adresse verknüpft und die Adresse wird von uns auch nicht gespeichert.</p>
+
+				<h3>Login-Link anfordern</h3>
+				<form method="post">
+					<p>
+						<label><span>Email</span> <input type="text" name="register_mail" /></label>
+					</p>
+					<input type="submit" name="action" value="Anmeldelink zusenden" />
+				</form>
+				</div>
+				<?php
+				return;
+				endif;
+			}
+		}
+
+		// Info-Text zur Anmeldung
+		if($_POST['action'] == "Weiter") {
+			$_SESSION['confirm'] = true;
+			$_POST = $_SESSION['saved_post'];
+			unset($_SESSION['saved_post']);
+		}
+		if(!isset($_SESSION['confirm']) && $_POST['action'] == 'Registrieren') {
 			// Willkommens-Text anzeigen
 			$_SESSION['saved_post'] = $_POST;
 			?><div id="content">
@@ -136,6 +207,7 @@
 			</p>
 			<form method="post">
 				<input type="submit" name="action" value="Weiter">
+				<?php if(isset($_POST['token'])): ?><input type="hidden" name="token" value="<?=htmlspecialchars($_POST['token'])?>"><?php endif; ?>
 			</form>
 			</div><?php
 			return;
@@ -223,6 +295,7 @@
 		<label><span>Kennwort</span><input type="password" name="pass" value=""></label>
 		<?php if($errPass) echo('<span class="error">'.$errPass.'</span>'); ?>
 		<?php if(!$is_register) echo('<input type="submit" name="action" value="Anmelden">'); ?>
+		<?php if(isset($_REQUEST['token'])): ?><input type="hidden" name="token" value="<?=htmlspecialchars($_REQUEST['token'])?>"><?php endif; ?>
 		<input type="submit" name="action" value="Registrieren">
 	</div>
 <?php if(!is_mobile()): ?>
