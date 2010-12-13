@@ -104,7 +104,7 @@
 						mail($_POST['register_mail'], '=?utf-8?Q?=C3=9Cbungszetteldienst?= Registrierung', $message, $headers);
 
 						status_message("Die Registrierungsmail wurde versandt und sollte bald bei Dir eintreffen.");
-						gotop("login");
+						gotop("index.php");
 					}
 				}
 
