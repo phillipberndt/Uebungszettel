@@ -47,6 +47,7 @@
 	// (Das sind reguläre Ausdrücke)
 	$restrict_registration_mail_allow = array(
 		//'#[@.][fth]u-berlin\.de$#i',
+		//'#@localhost$#i',
 	);
 
 	// Sollen generell alle HTTP-Links gecached werden?
