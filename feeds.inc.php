@@ -138,7 +138,9 @@
 			}
 
 			// Kurse aus der Datenbank, die es nicht mehr gibt, killen
-			$database->exec('DELETE FROM user_feeds WHERE user_id = '.user()->id.' AND feed_id IN ('.implode(',', array_keys($lectures)).')');
+			if($lectures) {
+				$database->exec('DELETE FROM user_feeds WHERE user_id = '.user()->id.' AND feed_id IN ('.implode(',', array_keys($lectures)).')');
+			}
 
 			status_message("Deine Kurse wurden erfolgreich gespeichert.");
 
