@@ -62,6 +62,7 @@
 			$database->exec('CREATE UNIQUE INDEX did_uid ON user_data (data_id, user_id);');
 			$database->exec('CREATE TABLE user_feeds        (user_id INTEGER, feed_id INTEGER);');
 			$database->exec('CREATE INDEX uid ON user_feeds (user_id);');
+			$database->exec('CREATE UNIQUE INDEX uid_feed ON user_feeds (user_id, feed_id);');
 			$database->exec('CREATE TABLE suggestions       (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, text MEDIUMTEXT);');
 			$database->exec('CREATE TABLE url_age_cache     (url MEDIUMTEXT, age INTEGER)');
 		}
@@ -72,7 +73,8 @@
 			$database->exec('CREATE INDEX uauto ON user_autologin (id)');
 			$database->exec('CREATE INDEX user ON user_autologin (user_id)');
 			$database->exec('CREATE TABLE feeds         (id INTEGER PRIMARY KEY AUTO_INCREMENT, owner INTEGER, `desc` VARCHAR(120), short VARCHAR(120),
-				code LONGTEXT, public INTEGER DEFAULT 0, update_timestamp INT) DEFAULT CHARSET=utf8;');
+				code LONGTEXT, public INTEGER DEFAULT 0, update_timestamp INT,
+				UNIQUE KEY uid_feed (user_id, feed_id)) DEFAULT CHARSET=utf8;');
 			$database->exec('CREATE TABLE data          (id INTEGER PRIMARY KEY AUTO_INCREMENT, feed_id INTEGER,
 				data MEDIUMTEXT, timestamp INT(11)) DEFAULT CHARSET=utf8');
 			$database->exec('CREATE INDEX fid ON data       (feed_id);');

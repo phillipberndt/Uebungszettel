@@ -28,7 +28,12 @@
 			$database->query('DELETE FROM user_feeds WHERE user_id = '.user()->id.' AND feed_id = '.$feed_id);
 		}
 		else {
-			$database->query('INSERT INTO user_feeds (user_id, feed_id) VALUES ('.user()->id.', '.$feed_id.')');
+			try {
+				$database->query('INSERT INTO user_feeds (user_id, feed_id) VALUES ('.user()->id.', '.$feed_id.')');
+			}
+			catch(Exception $e) {
+				// Ignorieren: Den Kurs hatte der User schon bestellt
+			}
 		}
 		gotop("index.php?q=details&f=".$feed_id);
 	}
