@@ -97,7 +97,8 @@
 
 						$message = "Hallo,\r\n\r\n" .
 							"Du erhälst Diese Mail, weil Du einen Registrierungslink für den Übungszettelaggregator\r\n" .
-							"angefordert hast. Bitte klicke auf folgenden Link, um Dich anzumelden:\r\n\r\n" .
+							"angefordert hast. Bitte klicke auf folgenden Link und verwende dann den „Registrieren“-Button,\r\n".
+							"um Dir dann einen Benutzer anzulegen:\r\n\r\n" .
 							" " . $link . "\r\n\r\n" .
 							"Dieser Link wird zwei Tage lang gültig sein. Solltest Du diesen Link nicht angefordert haben,\r\n" .
 							"kannst Du diese Mail einfach ignorieren.\r\n\r\nGruß,\r\nDein Übungszettelservice";
@@ -141,7 +142,7 @@
 					<li><?=$key?></li>
 					<?php endforeach; ?>
 				</ul>
-				<p>Wir senden Dir einen speziellen Link zu, über den Du Dich registrieren kannst. Dein Account wird nicht
+				<p>Wir senden Dir einen speziellen Link zu, über den Du Dir dann einen Benutzernamen anlegen kannst. Dein Account wird nicht
 					mit der Email-Adresse verknüpft und die Adresse wird von uns auch nicht gespeichert.</p>
 
 				<h3>Login-Link anfordern</h3>
