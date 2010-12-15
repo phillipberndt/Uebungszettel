@@ -74,6 +74,7 @@
 					list($time, $hash) = explode('-', $_POST['token'], 2);
 					if($time > time() - 3600 * 24 * 2 && substr(md5($time . "register" . $secure_token), 0, 5) == $hash) {
 						$register_ok = true;
+						$is_register = true;
 					}
 				}
 
@@ -292,7 +293,7 @@
 	<div>
 		<input type="hidden" name="destination" value="<?=htmlspecialchars($_REQUEST['destination'])?>">
 		<?php if($is_register) echo("<span class='info'>Um Dich zu registrieren wähle bitte einen Benutzernamen und ein Passwort aus.</span>"); ?>
-		<label><span>Benutzername</span><input type="text" name="name" value="<?=htmlspecialchars($_POST['name'])?>"></label>
+		<label><span>Benutzername</span><input type="text" name="name" maxlength="50" value="<?=htmlspecialchars($_POST['name'])?>"></label>
 		<?php if($errName) echo('<span class="error">'.$errName.'</span>'); ?>
 		<label><span>Kennwort</span><input type="password" name="pass" value=""></label>
 		<?php if($errPass) echo('<span class="error">'.$errPass.'</span>'); ?>

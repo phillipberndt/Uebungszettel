@@ -47,7 +47,7 @@
 		// Tabellen anlegen
 		$database->beginTransaction();
 		if($database->getAttribute(PDO::ATTR_DRIVER_NAME) == 'sqlite') {
-			$database->exec('CREATE TABLE users         (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(30),
+			$database->exec('CREATE TABLE users         (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(50),
 				pass VARCHAR(40), salt VARCHAR(2) DEFAULT "", level INT DEFAULT 0, flags INTEGER DEFAULT 0, 
 				settings LONGTEXT DEFAULT "a:0:{}");'); 
 			$database->exec('CREATE TABLE user_autologin (id VARCHAR(40), token VARCHAR(40), user_id INTEGER)');
@@ -67,7 +67,7 @@
 			$database->exec('CREATE TABLE url_age_cache     (url MEDIUMTEXT, age INTEGER)');
 		}
 		else {
-			$database->exec('CREATE TABLE users         (id INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(30),
+			$database->exec('CREATE TABLE users         (id INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(50),
 				pass VARCHAR(40), salt VARCHAR(2) DEFAULT "", level INT DEFAULT 0, flags INTEGER DEFAULT 0, settings LONGTEXT) DEFAULT CHARSET=utf8;');
 			$database->exec('CREATE TABLE user_autologin (id VARCHAR(40), token VARCHAR(40), user_id INTEGER) DEFAULT CHARSET=utf8');
 			$database->exec('CREATE INDEX uauto ON user_autologin (id)');
