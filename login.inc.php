@@ -51,6 +51,11 @@
 		die();
 	}
 
+	// Registierungsinfo nochmals anzeigen, falls Token gesetzt
+	if(isset($_REQUEST['token'])) {
+		$is_register = true;
+	}
+
 	$errName = $errPass = '';
 	if(isset($_REQUEST['action'])) { // Request statt Post ist Absicht!
 		if($_POST['action'] != 'Anmelden') {
@@ -74,7 +79,6 @@
 					list($time, $hash) = explode('-', $_POST['token'], 2);
 					if($time > time() - 3600 * 24 * 2 && substr(md5($time . "register" . $secure_token), 0, 5) == $hash) {
 						$register_ok = true;
-						$is_register = true;
 					}
 				}
 
