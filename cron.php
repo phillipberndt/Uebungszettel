@@ -229,6 +229,9 @@
 	}
 
 	// Newsletter versenden
+	// Das kann noch einmal lange dauern, also neues Time-Limit
+	set_time_limit(600);
+
 	$user_mails = array();
 	foreach($database->query('SELECT f.feed_id, fd.short, u.name, u.id, u.settings FROM user_feeds f, users u, feeds fd WHERE u.id = f.user_id AND
 		fd.id = f.feed_id AND u.flags & '.USER_FLAG_WANTSMAIL.' != 0') as $data) {
