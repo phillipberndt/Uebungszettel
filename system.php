@@ -388,6 +388,11 @@
 		// zu regulieren
 		if(!function_exists('sem_get')) return;
 
+		// Für den Cron-Job soll keine Beschränkung gelten, denn der muss ja
+		// ausgeführt werden
+		if(basename($_SERVER['PHP_SELF']) == "cron.php") return;
+
+		// Ansonsten entsprechend der Konfiguration  aussperren
 		global $_active_semaphore;
 		if(!$_active_semaphore) {
 			$id = ftok(__FILE__, 'v');
