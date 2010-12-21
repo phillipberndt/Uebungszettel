@@ -175,6 +175,24 @@
 		die();
 	}
 
+	// Der eigentliche Cronjob soll nicht mehrfach parallel ausgeführt werden
+	if(function_exists('sem_get')) {
+		$start_time = time();
+		$id = ftok(__FILE__, 'c');
+		$semaphore = sem_get($id, 1, 0666, 1);
+		sem_acquire($semaphore);
+		// Leider blockiert sem_acquire unabhängig vom time-limit. Daher müssen
+		// wir die Zeit gegenchecken.
+		if(time() - $start_time > 2) {
+			// Da lief noch ein anderer Cron-Job. Wir wollen nicht unmittelbar
+			// danach den nächsten starten..
+			if($cron_debug) {
+				echo "Multiple cron execution detected on " . date("c") . "\n";
+			}
+			die();
+		}
+	}
+
 	// Alle Feeds in Unterabfragen verarbeiten
 	$curl = curl_multi_init();
 	foreach($database->query('SELECT id FROM feeds') as $feed) {
