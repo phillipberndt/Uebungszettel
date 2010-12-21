@@ -70,6 +70,7 @@
 
 	// Mit diesem Sicherheitstoken kann Cron vor Zugriff von außen geschützt werden. Cron wird
 	// dann nur ausgeführt, falls ?t=<token> gesetzt ist
+	// Wird der Cronjob aus der Kommandozeile aufgerufen, wird dieser Token nicht verwendet.
 	$cron_token = '';
 
 	// Soll Cron detaillierte Debug-Informationen ausgeben? (Zur Fehlerbehandlung durch den

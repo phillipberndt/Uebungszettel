@@ -5,8 +5,16 @@
 		error_reporting(0);
 	}
 
-	// Das Cron-Script funktioniert asynchron. Für jeden Feed wird eine Unterabfrage
-	// erzeugt, die den Feed verarbeitet. Die Ausgabe wird dann in ein zentrales Array
+	// Bei einem Aufruf via Kommandozeile Parameter korrekt verteilen
+	if(isset($_SERVER['argc']) && $_SERVER['argc'] > 0) {
+		if($_SERVER['argc'] > 1) {
+			parse_str($_SERVER['argv'][1], $_GET);
+		}
+		$called_from_commandline = true;
+	}
+
+	// Das Cron-Script erzeugt für jeden Feed eine Unterabfrage, die den
+	// Feed verarbeitet. Die Ausgabe wird dann in ein zentrales Array
 	// eingepflegt und ganz am Ende werden die Mails versendet.
 
 	header('Content-Type: text/plain; charset=UTF-8');
@@ -25,8 +33,11 @@
 		// Dieser Code verarbeitet NUR ein Feed, nämlich das aus $_GET['f'].
 		// Unten wird diese Seite rekursiv aufgerufen für alle Feeds
 
-		// Sicherheitstoken muss stimmen
-		if($_GET['s'] != sha1($secure_token . $_GET['t']) || $_GET['t'] > time() || $_GET['t'] < time() - 30) die(serialize(array(array(), array())));
+		// Sicherheitstoken muss stimmen, falls aus dem Web aufgerufen
+		if(!isset($called_from_commandline) &&
+		  ($_GET['s'] != sha1($secure_token . $_GET['t']) || $_GET['t'] > time() || $_GET['t'] < time() - 30)) {
+			die(serialize(array(array(), array())));
+		}
 
 		// Ein bestimmtes Feed verarbeiten
 		$feed = $database->query('SELECT id, code FROM feeds WHERE id = '.intval($_GET['f']))->fetch();
@@ -170,7 +181,8 @@
 	ignore_user_abort();
 
 	// Sicherheitstoken checken
-	if(isset($cron_token) && !empty($cron_token) && $_GET['t'] != $cron_token) {
+	if(!isset($called_from_commandline) &&
+	  (isset($cron_token) && !empty($cron_token) && $_GET['t'] != $cron_token)) {
 		sleep(10);
 		die();
 	}
@@ -193,18 +205,61 @@
 		}
 	}
 
+	// Ausführung von der Kommandozeile: Unterabfragen via popen() durchführen
+	if($called_from_commandline):
+
+	// In diesem Fall können wir das Zeitlimit getrost erst einmal ganz abschalten,
+	// denn eigene Prozesse kann man notfalls killen
+	set_time_limit(0);
+
+	// Alle Feeds in Unterprozessen verarbeiten
+	foreach($database->query('SELECT id FROM feeds')->fetchAll() as $feed) {
+		// Die Verarbeitung hier findet rein seriell statt
+		$feed_id = $feed['id'];
+		$query = 'f=' . $feed_id;
+
+		$sub_query = popen("php " . __FILE__ . " " . $query, "r");
+		$output = stream_get_contents($sub_query);
+		pclose($sub_query);
+
+		list($add_new_content, $add_content_ids) = @unserialize($output);
+		if(!is_array($add_new_content) || !is_array($add_content_ids)) {
+			if($cron_debug) {
+				echo "Subrequest failed for feed " . $feed_id . ":\n  " . str_replace("\n", "\n  ", $output)
+					. "\n";
+			}
+		}
+		else {
+			foreach($add_new_content as $key => $val) {
+				$new_content[$key] = isset($new_content[$key]) ? array_merge($new_content[$key], $val) : $val;
+			}
+			$content_ids = array_merge_recursive($content_ids, $add_content_ids);
+
+			// In die Tabelle eintragen, dass ein Update stattgefunden hat
+			$database->query('UPDATE feeds SET update_timestamp = ' . time() . ' WHERE id = ' . $feed_id);
+		}
+	}
+
+	else:
+	// Ausführung via Webserver: Unterabfragen via curl durchführen
+
 	// Alle Feeds in Unterabfragen verarbeiten
 	$curl = curl_multi_init();
-	foreach($database->query('SELECT id FROM feeds') as $feed) {
+	foreach($database->query('SELECT id FROM feeds')->fetchAll() as $feed) {
 		$sub = curl_init();
 		$time = time();
-		$sub_url = 'http://' . $_SERVER['SERVER_NAME'] . preg_replace('#\?.+$#', '', $_SERVER['REQUEST_URI']) . '?f=' . $feed['id'] .
-			'&s=' . sha1($secure_token . $time) . "&t=" . $time;
+		$sub_url = 'http://' . $_SERVER['SERVER_NAME'] . preg_replace('#\?.+$#', '', $_SERVER['REQUEST_URI']) . '?f=' .
+			$feed['id'] . '&s=' . sha1($secure_token . $time) . "&t=" . $time;
 
 		curl_setopt($sub, CURLOPT_URL, $sub_url);
 		curl_setopt($sub, CURLOPT_TIMEOUT, 160);
 		curl_setopt($sub, CURLOPT_RETURNTRANSFER, 1);
 		curl_multi_add_handle($curl, $sub);
+
+		// Die Abfrage schon einmal abschicken und eine Weile warten, um den Server nicht zu überlasten
+		curl_multi_exec($curl, $running);
+		sleep(10);
+		set_time_limit(60);
 	}
 	$running = true;
 	while($running) {
@@ -223,10 +278,11 @@
 
 		if($transfer['result'] == CURLE_OK) {
 			$output = curl_multi_getcontent($transfer['handle']);
-			list($add_new_content, $add_content_ids) = unserialize($output);
+			list($add_new_content, $add_content_ids) = @unserialize($output);
 			if(!is_array($add_new_content) || !is_array($add_content_ids)) {
 				if($cron_debug) {
-					echo "Subrequest failed for feed " . $feed_id . ":\n  " . str_replace("\n", "\n  ", $output) . "\n";
+					echo "Subrequest failed for feed " . $feed_id . ":\n  " . str_replace("\n", "\n  ", $output)
+						. "\n";
 				}
 			}
 			else {
@@ -246,15 +302,19 @@
 		}
 	}
 
+	endif; // Unterscheidung zwischen Command Line / Webserver
+
 	// Newsletter versenden
-	// Das kann noch einmal lange dauern, also neues Time-Limit
-	set_time_limit(600);
+	if(!isset($called_from_commandline)) {
+		// Das kann noch einmal lange dauern, also neues Time-Limit
+		set_time_limit(600);
+	}
 
 	$user_mails = array();
 	foreach($database->query('SELECT f.feed_id, fd.short, u.name, u.id, u.settings FROM user_feeds f, users u, feeds fd WHERE u.id = f.user_id AND
 		fd.id = f.feed_id AND u.flags & '.USER_FLAG_WANTSMAIL.' != 0') as $data) {
 		$settings = unserialize($data['settings']);
-		if(is_array($new_content[$data['feed_id']]) && $settings['newsletter']) {
+		if(isset($new_content[$data['feed_id']]) && is_array($new_content[$data['feed_id']]) && $settings['newsletter']) {
 			$user_mails[$settings['newsletter']]['name'] = $data['name'];
 			if(!isset($user_mails[$settings['newsletter']]['content'])) $user_mails[$settings['newsletter']]['content'] = array();
 			foreach($new_content[$data['feed_id']] as $content) {
