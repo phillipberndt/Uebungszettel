@@ -4,7 +4,7 @@ else:
 	$hide_invisible = !(isset($_GET['inv']) && $_GET['inv'] == 1);
 	$only_feed = isset($_GET['f']) && $_GET['f'] ? intval($_GET['f']) : false;
 
-	if($database->query('SELECT COUNT(*) FROM user_feeds WHERE user_id = '.user()->id)->fetchColumn() == 0) {
+	if($database->query('SELECT COUNT(*) FROM user_feeds WHERE user_id = '.user()->id)->fetchColumn() == 0 && user()->level < 1) {
 		gotop('index.php?q=feeds');
 	}
 
