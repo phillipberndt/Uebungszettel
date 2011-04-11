@@ -347,7 +347,15 @@
 			if($sheet_url) {
 				$text .= ' (Siehe Attachment)';
 				$file_contents = cache_contents($sheet_url);
-				$file_name = $sheet_text ? $sheet_text : basename($sheet_url);
+				// Hier raten wir den Namen etwas intelligenter, denn Email-Programme kommen
+				// mit komischen Dateinamen nicht so gut klar wie Browser.
+				if(preg_match('#\.[a-z]{2,3}$#', $sheet_url) &&
+				  !preg_match('#\.[a-z]{2,3}$#', $sheet_text)) {
+					$file_name = basename($sheet_url);
+				}
+				else {
+					$file_name = $sheet_text;
+				}
 				$mime_type = get_mime_type($file_contents, true);
 				$attachments .= "--".$boundary."\r\n".
 					"Content-Type: ".$mime_type."; name*=UTF-8''" . rawurlencode($file_name) . "\r\n" .
