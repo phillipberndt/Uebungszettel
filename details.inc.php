@@ -1,11 +1,6 @@
 <?php
 	force_login();
 
-	// Funktion zum entfernen von Authentifizierungsinformationen aus URLs
-	function remove_authentication_from_urls($data) {
-		return preg_replace('#(http|ftp)://([^:/]+?):[^/]*?[^\\\\]@(\S+)#i', '$1://$2@$3', $data);
-	}
-
 	// Daten laden
 	$feed_id = intval($_GET['f']);
 	$stmt = $database->prepare('SELECT * FROM feeds WHERE id = ?');

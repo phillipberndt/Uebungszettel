@@ -223,6 +223,10 @@
 		fwrite($log_file, "[".date('d.m.Y H:i:s')." ".user()->name."] ".$text."\n");
 		fclose($log_file);
 	}/*}}}*/
+	function remove_authentication_from_urls($data) { /*{{{*/
+		// Funktion zum entfernen von Authentifizierungsinformationen aus URLs
+		return preg_replace('#(http|ftp)://([^:/]+?):[^/]*?[^\\\\]@(\S+)#i', '$1://$2@$3', $data);
+	}/*}}}*/
 	function get_mime_type($fileOrInline, $inline = false) {/*{{{*/
 		$type = false;
 		if(!$inline && !file_exists($fileOrInline)) return false;
@@ -349,6 +353,7 @@
 				return '<a class="exercise" href="cache.php?data_id=' . htmlspecialchars($id) . '">'.htmlspecialchars($text ? $text : basename($url)).'</a>';
 			}
 			else {
+				$url = remove_authentication_from_urls($url);
 				return '<a class="exercise" href="'.htmlspecialchars($url).'">'.htmlspecialchars($text ? $text : basename($url)).'</a>';
 			}
 		}
