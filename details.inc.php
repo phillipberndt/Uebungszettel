@@ -132,7 +132,7 @@
 		<?php
 			if(isset($code['code'])) {
 				if(!$can_edit) {
-					$code['url'] = remove_authentication_from_urls($code['code']);
+					$code['code'] = remove_authentication_from_urls($code['code']);
 				}
 				echo('<p>Führt PHP-Code aus:</p><div id="edit-code" class="code editable">');
 				echo(preg_replace('/&lt;\?php/', '', str_replace(array("&nbsp;", "<br />"),
@@ -142,6 +142,7 @@
 			else {
 				if(!$can_edit) {
 					$code['url'] = remove_authentication_from_urls($code['url']);
+					$code['exercise'] = remove_authentication_from_urls($code['exercise']);
 				}
 				echo('<p>Sucht in der URL</p><p id="edit-url" class="editable url"><a href="'.htmlspecialchars($code['url']).'">'.
 					htmlspecialchars($code['url']).'</a></p><p>
