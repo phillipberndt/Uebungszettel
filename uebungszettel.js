@@ -53,6 +53,18 @@ $(document).ready(function() {
 				}
 			});
 		});
+		var resolve_sug = $(".resolve_sug");
+		if(resolve_sug.length > 0) {
+			resolve_sug.after($("<a href='#'>").text("Rückfragen").click(function() {
+				var question = prompt("Rückfrage:", "");
+
+				if(question) {
+					var sug = resolve_sug[0].href.match(/delsug=([0-9]+)/)[1];
+					document.location.search = "delsug=" + sug + "&response=" + encodeURIComponent(question);
+				}
+				return false;
+			})).after(", ");
+		}
 	}
 	$("td:has(input[type=checkbox])").click(function(e) {
 		if(e.originalTarget != this) return;

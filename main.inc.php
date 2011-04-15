@@ -125,7 +125,12 @@ else:
 		if(isset($_GET['delsug'])) {
 			$uid = $database->query('SELECT user_id FROM suggestions WHERE id = '.intval($_GET['delsug']))->fetchColumn();
 			if($uid) {
-				status_message('Deine vorgeschlagenen Kurse wurden von uns eingestellt! Du kannst sie nun abbonieren.', $uid);
+				if($_GET['response']) {
+					status_message('Es gibt eine Rückfrage zu Deinem vorgeschlagenen Kurs:<br/>' . htmlspecialchars($_GET['response']), $uid);
+				}
+				else {
+					status_message('Deine vorgeschlagenen Kurse wurden von uns eingestellt! Du kannst sie nun abbonieren.', $uid);
+				}
 			}
 			$database->query('DELETE FROM suggestions WHERE id = '.intval($_GET['delsug']));
 			gotop("index.php");
@@ -138,7 +143,7 @@ else:
 		<ul>
 			<?php
 				foreach($suggestions as $suggestion) {
-					echo('<li>'.$suggestion['text'].' (<a class="confirm" href="index.php?delsug='.$suggestion['id'].'">Erledigt</a>)</li>');
+					echo('<li>'.$suggestion['text'].' (<a class="confirm resolve_sug" href="index.php?delsug='.$suggestion['id'].'">Erledigt</a>)</li>');
 				}
 			?>
 		</ul>
