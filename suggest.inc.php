@@ -15,7 +15,9 @@
 		bis jemand den Kurs für Dich einträgt!
 	</p>
 	<p>
-		Trage in das Textfeld bitte alle notwendigen Informationen ein:
+		Trage in das Textfeld bitte alle notwendigen Informationen ein. Dazu gehören auch
+		URLs und vorallem Logins! Derjenige, der den Kurs für Dich einträgt, sitzt vermutlich
+		<em>nicht</em> in Deiner Vorlesung.
 	</p>
 	<form method="post" action="index.php?q=suggest">
 		<textarea name="suggest"></textarea>
