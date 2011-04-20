@@ -132,7 +132,7 @@
 	}
 	session_start();
 	function logged_in() {
-		return $_SESSION['logged_in'] == true;
+		return $_SESSION['logged_in'] === true;
 	}
 	function force_login() {
 		if(!logged_in()) gotop("index.php?q=login&destination=" . urlencode($_SERVER['REQUEST_URI']));

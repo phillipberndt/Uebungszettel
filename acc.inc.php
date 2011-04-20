@@ -61,6 +61,54 @@
 			status_message("Deine Einstellungen wurden gespeichert.");
 			gotop("index.php?q=acc");
 		}
+
+		// SSH-Schlüssel erzeugen
+		if(isset($_POST['ssh']) && $ssh_printing_enabled) {
+			if($_POST['security_code'] && user()->ssh && $_POST['security_code'] == user()->ssh['code'] && $_POST['fb_account'] == user()->ssh['account']) {
+				// Sicherheitscode bestätigt.
+				user()->ssh = array('account' => $_POST['fb_account'], 'validated' => true);
+				user_save();
+				status_message("Dein Fachbereichsaccount wurde gespeichert.");
+				gotop("index.php?q=acc");
+			}
+			elseif($_POST['security_code'] && user()->ssh) {
+				status_message("Der eingegebene Sicherheitscode ist falsch");
+			}
+
+			// Sicherheitscode versenden
+			if(!preg_match('#^[0-9A-Za-z_-]+$#', $_POST['fb_account'])) {
+				status_message("Ungültige Eingabe!");
+				gotop("index.php?q=acc");
+			}
+			$security_code = md5($secure_token . $_POST['fb_account'] . microtime());
+			mail($_POST['fb_account'] . $ssh_printing_email_suffix, 'Validierung Deines Accounts',
+				"Hallo " . user()->name . ",\r\n\r\n" .
+				"Du bekommst diese Mail, weil Du beim Übungszetteldienst Deinen\r\n" .
+				"Fachbereichsaccount registriert hast. Du musst jetzt den Sicherheitscode in den\r\n" .
+				"Einstellungen eingeben und eine Datei in Deinem Fachbereichsaccount ändern.\r\n" .
+				"Dann steht Dir die Drucken-Funktion zur Verfügung.\r\n\r\n".
+				"Der Sicherheitscode lautet:\r\n\r\n     " . $security_code . "\r\n\r\n" .
+				"In Deinem Fachbereichsaccount öffne bitte die Datei ~/.ssh/authorized_keys in\r\n" .
+				"einem Editor. Eventuell musst Du diese Datei auch erst anlegen. Füge unten ans\r\n" .
+				"Ende die folgende Zeile ein:\r\n\r\n" .
+				file_get_contents($ssh_printing_pubkey_file) . "\r\n\r\n" .
+				"Den dort angegebenen Drucker musst Du gegebenenfalls auf Deinen Lieblingsdrucker am\r\n" .
+				"Fachbereich ändern.\r\n\r\nNoch einmal als Info: Mit dieser Änderung erhalten wir die\r\n" .
+				"Möglichkeit, uns auf Deinem Account einzuloggen. Dabei können wir aber nur den\r\n" .
+				"am Anfang der Zeile angegebenen Befehl ausführen, in diesem Fall ein\r\n" .
+				"Druckbefehl. Möchtest Du das nicht länger, reicht es, diese Zeile wieder zu\r\n" .
+				"entfernen.\r\n" .
+				"\r\nGruß,\r\nDein Übungszettelservice\r\n\r\n" .
+				"Ps. Wenn Du diese Email unbeabsichtigt bekommst, schreibe uns " .
+				"eine Antwort. Wir bestellen diesen Dienst dann für Dich ab.",
+				"Content-type: text/plain; charset=UTF-8\r\n" .
+				"From: =?utf-8?Q?=C3=9Cbungen?= <noreply@" . $_SERVER['SERVER_NAME'] . ">\r\n".
+				"Reply-To: ".$support_mail."\r\n");
+			user()->ssh = array('account' => $_POST['fb_account'], 'code' => $security_code);
+			user_save();
+			status_message("Wir haben Dir Deinen neuen Sicherheitscode zugeschickt!");
+			gotop("index.php?q=acc");
+		}
 	}
 	elseif(!empty($_POST)) {
 		status_message("Dein altes Kennwort war nicht korrekt.");
@@ -103,5 +151,22 @@
 					verfügbar.</p>
 			<input type="submit" name="settings" value="Einstellungen ändern">
 		</fieldset>
+		<?php if($ssh_printing_enabled): ?>
+		<fieldset>
+			<legend>Drucken</legend>
+			<p class="small indent">Wenn Du willst, kannst Du mithilfe der „PDFs kombinieren“ Funktion der Übersicht Deine Zettel direkt ausdrucken.
+				Dazu musst Du aber Deinen Fachbereichsaccount so konfigurieren, dass dieser Dienst darüber drucken kann.
+			</p>
+			<label><span>FB-Account</span> <input type="text" name="fb_account" value="<?=htmlspecialchars(user()->ssh ? user()->ssh['account'] : user()->name)?>"></label>
+			<?php if(user()->ssh && user()->ssh['validated']): ?>
+				<p>Dein Account wurde bestätigt. Du kannst die Drucken-Funktion jetzt verwenden!</p>
+			<?php else: ?>
+				<label><span>Sicherheitscode</span> <input type="text" name="security_code" value=""></label>
+				<p class="small indent">Den Sicherheitscode bekommst Du bei Änderungen hier per Email an Deinen Fachbereichsaccount geschickt. Du
+					musst ihn eingeben, bevor die Drucken-Funktion aktiviert wird.</p>
+			<?php endif; ?>
+			<input type="submit" name="ssh" value="Fachbereichsaccount speichern">
+		</fieldset>
+		<?php endif; ?>
 	</form>
 </div>

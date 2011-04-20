@@ -203,7 +203,38 @@ $(document).ready(function() {
 			}
 		});
 		$("p.right").append(" | ").append($("<a href='#'>PDFs kombinieren</a>").toggle(function() {
+			var pdf_link = $(this);
 			$(window).data("exercise-mode", true);
+			var exercise_info = $("<div id='exercise_info'>").html("<h4>PDFs kombinieren</h4><p>Bitte wähle die Übungen durch anklicken aus, die in eine PDF-Datei zusammengefasst werden sollen. Übungen mit der roten Markierung werden berücksichtigt. Klicke danach auf den Link unten:</p>").appendTo(document.body);
+			var send_handler = function() {
+				if($(".exercise.selected").length > 0) {
+					var form = $("<form method='post' action='combine.php'>");
+					$("body").append(form);
+					form.append($("<input type='hidden' name='action'>").val($(this).text()));
+					$(".exercise.selected").each(function() {
+						var data_id = $(this).closest("tr").attr("id").match(/data-([0-9]+)/)[1];
+						form.append($("<input type='hidden' name='d[]'>").val(data_id));
+					});
+					if(!$(window).data("is-submitted")) {
+						$(window).data("is-submitted", true);
+						if($(this).text() == "Drucken") {
+							ajax_box();
+						}
+						setTimeout(function() {
+							form.submit();
+						}, 100);
+					}
+				}
+				pdf_link.click();
+				return false;
+			};
+			$("<a href='#'>Als PDF speichern</a>").appendTo(exercise_info).click(send_handler);
+			$.get("index.php?q=main&ajax=can-print", function(can_print) {
+				if(can_print) {
+					exercise_info.append(" | ");
+					$("<a href='#'>Drucken</a>").appendTo(exercise_info).click(send_handler);
+				}
+			});
 			$(this).addClass("selected");
 			$(".exercise").toggle(function() {
 				$(this).removeClass("selected");
@@ -216,16 +247,8 @@ $(document).ready(function() {
 		}, function() {
 			$(window).data("exercise-mode", false);
 			$(this).removeClass("selected");
-			if($(".exercise.selected").length > 0) {
-				var form = $("<form method='post' action='combine.php'>");
-				$("body").append(form);
-				$(".exercise.selected").each(function() {
-					var data_id = $(this).closest("tr").attr("id").match(/data-([0-9]+)/)[1];
-					form.append($("<input type='hidden' name='d[]'>").val(data_id));
-				});
-				form.submit();
-			}
 			$(".exercise").removeClass("selected").unbind("click");
+			$("#exercise_info").remove();
 			return false;
 		}));
 	}
@@ -317,10 +340,13 @@ $(document).ready(function() {
 		}
 	}
 	if(document.location.search.match(/q=acc/)) {
-		$("input").attr("disabled", "disabled");
-		$("input[name=old_pass]").removeAttr("disabled").keypress(function() {
-			$(this).unbind('keypress');
-			$("input").removeAttr("disabled");
-		}).focus();
+		var op = $("input[name=old_pass]");
+		if(op.attr("type") != "hidden") {
+			$("input").attr("disabled", "disabled");
+			op.removeAttr("disabled").keypress(function() {
+				$(this).unbind('keypress');
+				$("input").removeAttr("disabled");
+			}).focus();
+		}
 	}
 });

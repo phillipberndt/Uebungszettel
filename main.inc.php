@@ -8,6 +8,13 @@ else:
 		gotop('index.php?q=feeds');
 	}
 
+	// Rückfrage ob die Drucken Funktion verfügbar ist; per Ajax
+	if(isset($_GET['ajax']) && $_GET['ajax'] == 'can-print') {
+		header('Content-type: application/json');
+		ob_end_clean();
+		die($ssh_printing_enabled && user()->ssh && user()->ssh['validated'] ? 'true' : 'false');
+	}
+
 	// Notiz ändern
 	if(isset($_POST['note_id']) && isset($_POST['value'])) {
 		ob_end_clean();

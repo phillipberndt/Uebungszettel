@@ -68,6 +68,16 @@
 	// Hashfunktionen zusätzlich abzusichern.
 	$secure_token = '';
 
+	// SSH-Zugang für die Druckenfunktion
+	$ssh_printing_enabled = true;
+	$ssh_printing_pubkey_file = 'cache/key.pub';  // SSH-Schlüsselpaar, erzeugt via ssh-keygen
+	  // Der öffentliche Schlüssel wird Benutzern so per Email geschickt, zum Eintragen in die
+	  // known_hosts Datei. Es ist daher ratsam, command="lp" an den Anfang zu schreiben (für
+	  // Benutzer, die sich mit ssh nicht auskennen)
+	$ssh_printing_privkey_file = 'cache/key';
+	$ssh_printing_host = 'localhost';             // Für den Login
+	$ssh_printing_email_suffix = '@localhost';    // Für die Sicherheitsabfrage
+
 	// Mit diesem Sicherheitstoken kann Cron vor Zugriff von außen geschützt werden. Cron wird
 	// dann nur ausgeführt, falls ?t=<token> gesetzt ist
 	// Wird der Cronjob aus der Kommandozeile aufgerufen, wird dieser Token nicht verwendet.
