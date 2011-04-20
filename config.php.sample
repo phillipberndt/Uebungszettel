@@ -28,7 +28,8 @@
 		'application/postscript',
 		'text/html',
 		'text/plain',
-		'application/xhtml+xml'
+		'application/xhtml+xml',
+		'application/xml'
 	);
 
 	// Das Script verwendet eine Semaphore, um Toolkit-Ausführungen zu kanalisieren
@@ -69,7 +70,7 @@
 	$secure_token = '';
 
 	// SSH-Zugang für die Druckenfunktion
-	$ssh_printing_enabled = true;
+	$ssh_printing_enabled = false;
 	$ssh_printing_pubkey_file = 'cache/key.pub';  // SSH-Schlüsselpaar, erzeugt via ssh-keygen
 	  // Der öffentliche Schlüssel wird Benutzern so per Email geschickt, zum Eintragen in die
 	  // known_hosts Datei. Es ist daher ratsam, command="lp" an den Anfang zu schreiben (für
