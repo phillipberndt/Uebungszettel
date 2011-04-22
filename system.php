@@ -420,7 +420,7 @@
 				}
 			}
 
-			$retval[$file_name] = $cache_url;
+			$retval[$file_name] = $cache_url . ' ' . $file_name;
 		}
 		return $retval;
 	} /*}}}*/
