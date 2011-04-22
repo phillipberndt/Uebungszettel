@@ -316,7 +316,8 @@
 		curl_close($curl);
 
 		if(strlen($content) > $GLOBALS['allowed_cache_file_size']) {
-			throw new Exception("Datei zu groß. Dateien über 2Mb Größe können aus Sicherheitsgründen nicht heruntergeladen werden.");
+			throw new Exception("Datei zu groß. Dateien über " . round($GLOBALS['allowed_cache_file_size'] / 1024 / 1024) .
+				"Mb Größe können aus Sicherheitsgründen nicht heruntergeladen werden.");
 		}
 		$type = get_mime_type($content, true);
 		if(preg_match('/^[^;]+/', $type, &$match)) $type = $match[0];
@@ -387,6 +388,42 @@
 		$cache_id = cache_file($url, false, true, true);
 		return file_get_contents($GLOBALS['cache_dir'] . $cache_id);
 	}/*}}}*/
+	function cache_zip_file_contents($url) { /*{{{*/
+		$cache_id = cache_file($url, false, true, true);
+		$retval = array();
+		$directory = dirname($_SERVER['REQUEST_URI']); if(substr($directory, -1) != '/') $directory .= '/';
+		$zip = new ZipArchive;
+		if(!$zip->open($GLOBALS['cache_dir'] . '/' . $cache_id)) {
+			throw new Execption("Failed to open ZIP archive from $url");
+		}
+		for($i=0; $i<$zip->numFiles; $i++) {
+			$file_name = basename($zip->getNameIndex($i));
+			if(isset($retval[$file_name])) {
+				$n = 0;
+				while(isset($retval[$n . '~' . $file_name])) $n++;
+				$file_name = $n . '~' . $file_name;
+			}
+			$content = $zip->getFromIndex($i);
+			$cache_id = sha1($url . '#' . $file_name);
+			$cache_file = $GLOBALS['cache_dir'] . '/' . $cache_id;
+
+			$cache_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['SERVER_NAME'] . $directory .
+				'cache.php?cache_id=' . $cache_id . '&filename=' . $file_name;
+
+			$cache_exists = file_exists($cache_file);
+			if($content) {
+				// Nur den Cache neu schreiben, wenn sich tatsächlich etwas verändert hat
+				// Dadurch verhindern wir, dass Zettel immer wieder als „Neu“ zählen, weil
+				// ein Webserver schlampig konfiguriert ist.
+				if(!file_exists($cache_file) || sha1_file($cache_file) != sha1($content)) {
+					file_put_contents($cache_file, $content);
+				}
+			}
+
+			$retval[$file_name] = $cache_url;
+		}
+		return $retval;
+	} /*}}}*/
 	function in_shell_execution($begin) {/*{{{*/
 		// Benutzt, falls möglich, die Semaphore-Implementation von
 		// PHP, um die maximale Anzahl gleichzeitiger Shell-Invocations

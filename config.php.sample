@@ -29,7 +29,8 @@
 		'text/html',
 		'text/plain',
 		'application/xhtml+xml',
-		'application/xml'
+		'application/xml',
+		'application/zip',
 	);
 
 	// Das Script verwendet eine Semaphore, um Toolkit-Ausführungen zu kanalisieren
