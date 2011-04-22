@@ -1,6 +1,4 @@
 <?php
-	// Obwohl system.php eingebunden wird sind wir nicht eingeloggt, da das Session-Cookie
-	// aus Sicherheitsgründen auf /index.php beschränkt ist!
 	require("system.php");
 	if(system("which convert 2>&1 > /dev/null") != 0) {
 		status_message("Dieser Dienst steht nur zur Verfügung, wenn ImageMagick auf dem Serversystem installiert ist");
