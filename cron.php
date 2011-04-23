@@ -349,7 +349,10 @@
 				$file_contents = cache_contents($sheet_url);
 				// Hier raten wir den Namen etwas intelligenter, denn Email-Programme kommen
 				// mit komischen Dateinamen nicht so gut klar wie Browser.
-				if(preg_match('#\.[a-z]{2,3}$#', $sheet_url) &&
+				if(preg_match('#cache.php.+filename=(.+)$#', $sheet_url, &$match)) {
+					$file_name = $match[1];
+				}
+				elseif(preg_match('#\.[a-z]{2,3}$#', $sheet_url) &&
 				  !preg_match('#\.[a-z]{2,3}$#', $sheet_text)) {
 					$file_name = basename($sheet_url);
 				}
