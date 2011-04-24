@@ -161,7 +161,7 @@
 			$has_course = false;
 			$query = 'SELECT id, `desc`, public, update_timestamp, 
 			(SELECT COUNT(*) FROM user_feeds WHERE feed_id = feeds.id AND user_id = '.user()->id.') AS checked,
-			(SELECT COUNT(*) FROM data WHERE feed_id = feeds.id) AS count
+			(SELECT COUNT(*) FROM data WHERE feed_id = feeds.id AND timestamp IS NOT NULL) AS count
 			FROM feeds
 			WHERE owner = '.user()->id.' OR public = 1 '.(user()->level >= 1 ? ' OR 1 ' : '').'
 			ORDER BY `desc` ASC';
