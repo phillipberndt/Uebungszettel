@@ -27,6 +27,9 @@
 			// Benutzer einloggen
 			$user = user_load('id', $result->user_id);
 			if(!$user) {
+				setcookie('autologin', null, time() - 1,
+					(dirname($_SERVER['REQUEST_URI']) == '/' ? '/' : dirname($_SERVER['REQUEST_URI']) . '/'),
+					null, false, true);
 				gotop("index.php");
 			}
 			else {
