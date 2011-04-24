@@ -388,7 +388,8 @@
 		$cache_id = cache_file($url, false, true, true);
 		return file_get_contents($GLOBALS['cache_dir'] . $cache_id);
 	}/*}}}*/
-	function cache_zip_file_contents($url) { /*{{{*/
+	function cache_zip_file_contents($url, $identifier = null) { /*{{{*/
+		if($identifier === null) $identifier = $url;
 		$cache_id = cache_file($url, false, true, true);
 		$retval = array();
 		$directory = dirname($_SERVER['REQUEST_URI']); if(substr($directory, -1) != '/') $directory .= '/';
@@ -404,7 +405,7 @@
 				$file_name = $n . '~' . $file_name;
 			}
 			$content = $zip->getFromIndex($i);
-			$cache_id = sha1($url . '#' . $file_name);
+			$cache_id = sha1($identifier . '#' . $file_name);
 			$cache_file = $GLOBALS['cache_dir'] . '/' . $cache_id;
 
 			$cache_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['SERVER_NAME'] . $directory .
