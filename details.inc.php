@@ -1,6 +1,18 @@
 <?php
 	force_login();
 
+	// Helferfunktionen anzeigen
+	if(file_exists('local.php') && isset($_GET['show']) && $_GET['show'] == 'helper') {
+		?>
+		<div id="content">
+			<h2>Helferfunktionen</h2>
+			<p>Diese Funktionen stehen beim Schreiben von eigenem PHP-Code zusätzlich zur Verfügung:</p>
+		<?php
+		echo(preg_replace('/&lt;\?php/', '', str_replace(array("&nbsp;", "<br />"), array(" ", "<br />\n"), highlight_file('local.php', true))));
+		echo('</div>');
+		return;
+	}
+
 	// Daten laden
 	$feed_id = intval($_GET['f']);
 	$stmt = $database->prepare('SELECT * FROM feeds WHERE id = ?');
@@ -134,7 +146,11 @@
 				if(!$can_edit) {
 					$code['code'] = remove_authentication_from_urls($code['code']);
 				}
-				echo('<p>Führt PHP-Code aus:</p><div id="edit-code" class="code editable">');
+				$helper = '';
+				if(file_exists('local.php')) {
+					$helper = '<span class="right small">(<a href="index.php?q=details&amp;show=helper">Helferfunktionen</a>)</span>';
+				}
+				echo('<p>Führt PHP-Code aus:' . $helper . '</p><div id="edit-code" class="code editable">');
 				echo(preg_replace('/&lt;\?php/', '', str_replace(array("&nbsp;", "<br />"),
 					array(" ", "<br />\n"), highlight_string("<?php ".$code['code'], true))));
 				echo('</div>');

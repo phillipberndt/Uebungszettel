@@ -93,3 +93,6 @@
 	if(!isset($_SERVER['SERVER_NAME'])) {
 		$_SERVER['SERVER_NAME'] = gethostname();
 	}
+
+	// Eigene PHP-Funktionen für die Verwendung in eigenen Feeds können in die Datei
+	// local.php gespeichert werden.

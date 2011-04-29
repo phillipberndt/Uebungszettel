@@ -68,6 +68,7 @@ div#content table input[type=text] { border: none; font-size: medium;
 .bes-right pre { margin: 0; margin-left: 30px; padding: 0; }
 .bes-right .fun { background: #ddf; display: block; font-weight: bold; font-size: small; padding: 1px 1px 1px 3px; margin: -10px -10px; }
 .small { font-size: small; }
+.right { display: block; float: right; }
 .buttons, .abbo { padding: 0; margin: 0; }
 .indent { margin: 0 0 5px 20px; }
 p.url { font-family: monospace; margin-left: 30px; }

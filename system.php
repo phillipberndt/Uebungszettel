@@ -453,3 +453,10 @@
 		}
 	}/*}}}*/
 	// }}}
+
+	// Angepasste Helfer-Funktionen für eine bestimmte Installation
+	// Ist online sichtbar, vorallem praktisch, um Hilfsfunktionen für
+	// Zettel zu definieren.
+	if(file_exists('local.php')) {
+		include('local.php');
+	}
