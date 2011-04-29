@@ -8,7 +8,7 @@
 			<h2>Helferfunktionen</h2>
 			<p>Diese Funktionen stehen beim Schreiben von eigenem PHP-Code zusätzlich zur Verfügung:</p>
 		<?php
-		echo(preg_replace('/&lt;\?php/', '', str_replace(array("&nbsp;", "<br />"), array(" ", "<br />\n"), highlight_file('local.php', true))));
+		echo(preg_replace('/&lt;\?php/', '', str_replace("<br />", "<br>\n", highlight_file('local.php', true))));
 		echo('</div>');
 		return;
 	}
@@ -57,7 +57,7 @@
 			$stmt = $database->prepare('UPDATE feeds SET code = ? WHERE id = ?');
 			$stmt->execute(array(serialize($code), $feed_id));
 
-			echo(preg_replace('/&lt;\?php/', '', str_replace(array("&nbsp;", "<br />"), array(" ", "<br />\n"), highlight_string("<?php ".$value, true))));
+			echo(preg_replace('/&lt;\?php/', '', str_replace(array("&nbsp;", "<br />"), array(" ", "<br>\n"), highlight_string("<?php ".$value, true))));
 		}
 
 		if($property == 'desc') {
@@ -152,7 +152,7 @@
 				}
 				echo('<p>Führt PHP-Code aus:' . $helper . '</p><div id="edit-code" class="code editable">');
 				echo(preg_replace('/&lt;\?php/', '', str_replace(array("&nbsp;", "<br />"),
-					array(" ", "<br />\n"), highlight_string("<?php ".$code['code'], true))));
+					array(" ", "<br>\n"), highlight_string("<?php ".$code['code'], true))));
 				echo('</div>');
 			}
 			else {
