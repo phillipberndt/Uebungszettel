@@ -142,7 +142,7 @@
 		?></dd>
 		<dt>Öffentlich sichtbar</dt>
 		<dd><?=$feed['public'] ? 'Ja' : 'Nein'?></dd>
-		<dt>Kurs Homepage</dt>
+		<dt>Kurs-Homepage</dt>
 		<dd class="editable url short" id="edit-course_url"><?
 			if($feed['course_url']) {
 				$link_title = parse_url($feed['course_url'], PHP_URL_HOST);
