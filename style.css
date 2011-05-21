@@ -126,6 +126,7 @@ ul.hover_menu li {
 }
 ul.hover_menu li a {
 	text-decoration: none;
+	display: block;
 }
 ul.hover_menu li:hover {
 	background: #f5f5f5;
