@@ -106,7 +106,7 @@ else:
 				$outputted = true;
 				$formatted_data = format_data($exercise['data'], $exercise['id']);
 				$classes = ($formatted_data != $data && !$exercise['known']) ? ' neu' : '';
-				echo('<tr class="'.$classes.'" id="data-'.$exercise['id'].'"><td><a href="index.php?inv=' . ($hide_invisible ? 0 : 1 ) .
+				echo('<tr class="'.$classes.'" id="data-'.$exercise['id'].'"><td><a class="course-disp-only" href="index.php?inv=' . ($hide_invisible ? 0 : 1 ) .
 					'&amp;f=' . $exercise['feed_id'] . '">'.
 					htmlspecialchars($descs[$exercise['feed_id']]).'</a></td><td>'.
 					$formatted_data.'</td><td class="editable-note" id="edit-'.$exercise['id'].'">'.
@@ -127,6 +127,19 @@ else:
 		| <a href="index.php?inv=<?=$hide_invisible ? 0 : 1?>">Alle Fächer anzeigen</a>
 		<?php endif; ?>
 	</p>
+
+	<div id="course_links">
+		<h3>Links auf Deine Kurse</h3>
+		<ul>
+		<?php
+			$course_urls = $database->query('SELECT id, course_url, short FROM feeds WHERE id IN (SELECT feed_id FROM user_feeds WHERE user_id = ' . user()->id . ')
+				AND course_url NOT LIKE "" AND course_url IS NOT NULL');
+			foreach($course_urls as $course) {
+				echo('<li><a href="' . htmlspecialchars($course['course_url']) . '">' . htmlspecialchars($course['short']) . '</a></li>');
+			}
+		?>
+		</ul>
+	</div>
 
 	<?php if(user()->level >= 1):
 		if(isset($_GET['delsug'])) {

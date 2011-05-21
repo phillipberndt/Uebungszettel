@@ -70,6 +70,14 @@
 			$stmt->execute(array($value, $feed_id));
 		}
 
+		if($property == 'course_url') {
+			if(!preg_match('#^http://#i', $value)) {
+				die(htmlspecialchars($feed['course_url']));
+			}
+			$stmt = $database->prepare('UPDATE feeds SET course_url = ? WHERE id = ?');
+			$stmt->execute(array($value, $feed_id));
+		}
+
 		if(array_search($property, array('url', 'search', 'exercise')) !== false) {
 			if($property == 'url'    &! preg_match('#^https?://#i', $value)) {
 				die(htmlspecialchars($code[$property]));
@@ -134,6 +142,16 @@
 		?></dd>
 		<dt>Öffentlich sichtbar</dt>
 		<dd><?=$feed['public'] ? 'Ja' : 'Nein'?></dd>
+		<dt>Kurs URL</dt>
+		<dd class="editable url short" id="edit-course_url"><?
+			if($feed['course_url']) {
+				$link_title = parse_url($feed['course_url'], PHP_URL_HOST);
+				echo '<a href="' . htmlspecialchars($feed['course_url']) . '">' . htmlspecialchars($link_title) . '</a>';
+			}
+			else {
+				echo 'Keine';
+			}
+		?></dd>
 		<dt>Genutzt von Benutzern</dt>
 		<dd><?php
 			echo $database->query('SELECT COUNT(*) FROM user_feeds WHERE feed_id = '.$feed_id)->fetchColumn();

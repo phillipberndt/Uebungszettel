@@ -251,6 +251,46 @@ $(document).ready(function() {
 			$("#exercise_info").remove();
 			return false;
 		}));
+		$("a.course-disp-only").each(function() {
+			var $this = $(this);
+			var course_timeout;
+			var has_fired = false;
+			var menu = $("<ul class='hover_menu'>");
+			var f = $this.attr("href").match(/f=([0-9]+)/)[1];
+			$("<a>").attr("href", $this.attr("href")).text("Nur diesen Kurs anzeigen").appendTo(menu).wrap("<li>");
+			$("<a>").attr("href", "index.php?q=details&f=" + f).text("Informationen anzeigen").appendTo(menu).wrap("<li>");
+			$("#course_links a").each(function() {
+				if($(this).text() == $this.text()) {
+					$("<a>").attr("href", $(this).attr("href")).text("Zur Homepage").appendTo(menu).wrap("<li>");
+				}
+			});
+
+			var do_action = function(o) {
+				menu.appendTo($this);
+			}
+			var undo_action = function(o) {
+				menu.remove();
+			}
+
+			$this.hover(function() {
+				if(course_timeout) {
+					return;
+				}
+				course_timeout = window.setTimeout(function() {
+					if(!has_fired) do_action($this);
+					has_fired = true;
+				}, 250);
+			}, function() {
+				if(course_timeout) {
+					window.clearTimeout(course_timeout);
+					course_timeout = null;
+				}
+				if(has_fired) {
+					undo_action($this);
+					has_fired = false;
+				}
+			});
+		});
 	}
 	if(document.location.toString().match(/q=details/) && $(".can_edit").length > 0) {
 		var feed_id = document.location.search.toString().match(/f=([0-9]+)/);
@@ -260,13 +300,15 @@ $(document).ready(function() {
 				var $this = $(this);
 				var is_url = $this.hasClass("url");
 				var is_code = $this.hasClass("code");
+				var is_to_be_shortened = $this.hasClass("short");
 				var attr_name = this.id.match(/edit-(.+)/);
 				if(!attr_name) return;
 				attr_name = attr_name[1];
-				$this.click(function() {
+				$this.click(function(e) {
+					if(e.target && e.target.nodeName == "A") return;
 					if(typeof $this.transformed != "undefined") return;
 					$this.transformed = 1;
-					var value = $this.text();
+					var value = is_url ? $this.find("a").attr("href") : $this.text();
 					if(is_code) {
 						$this.html("<textarea style='width: 90%; height: 160px;'></textarea>");
 					}
@@ -278,7 +320,14 @@ $(document).ready(function() {
 						if(is_url) {
 							content = $this.find("input, textarea").val().replace(/^\s+|\s+$/g, '');
 							if(content == "") return;
-							$this.html("<a href=''></a>").find("a").attr("href", content).text(content);
+							var content_text = content;
+							if(is_to_be_shortened) {
+								var content_text_domain = content_text.match(/^http:\/\/([^\/]+).+$/i);
+							}
+							if(content_text_domain) {
+								content_text = content_text_domain[1];
+							}
+							$this.html("<a href=''></a>").find("a").attr("href", content).text(content_text);
 						}
 						else if(is_code) {
 							content = $this.find("input, textarea").val().replace(/^\s+|\s+$/g, '');
