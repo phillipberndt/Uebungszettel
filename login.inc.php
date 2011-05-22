@@ -192,7 +192,7 @@
 				Die Seite speichert von Dir Deinen Loginnamen, einen (gesalteten SHA1-)Hash Deines Passwortes sowie
 				welche Kurse Du abboniert hast, welche Übungszettel Du bereits bearbeitet und welche
 				Notizen Du hinterlegt hast. Du kannst Deinen Account jederzeit kündigen und all das
-				wird umgehend gelöscht. Beim Login wird ein Autologin-Cookie für Dich gespeichert, dass Dich
+				wird umgehend gelöscht. Beim Login wird ein Autologin-Cookie für Dich gespeichert, der Dich
 				beim nächsten Besuch automatisch wieder einloggt. Loggst Du Dich manuell aus, werden
 				alle Deine Autologin-Cookies automatisch deaktiviert.
 			</p>
