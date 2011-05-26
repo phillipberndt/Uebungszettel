@@ -225,7 +225,13 @@
 	}/*}}}*/
 	function remove_authentication_from_urls($data) { /*{{{*/
 		// Funktion zum entfernen von Authentifizierungsinformationen aus URLs
-		return preg_replace('#(http|ftp)://([^:/]+?):[^/]*?[^\\\\]@(\S+)#i', '$1://$2@$3', $data);
+		global $remove_authentication_for_viewing;
+		if(isset($remove_authentication_for_viewing) && $remove_authentication_for_viewing) {
+			return preg_replace('#(http|ftp)://([^:/]+?):[^/]*?[^\\\\]@(\S+)#i', '$1://$2@$3', $data);
+		}
+		else {
+			return $data;
+		}
 	}/*}}}*/
 	function get_mime_type($fileOrInline, $inline = false) {/*{{{*/
 		$type = false;

@@ -59,6 +59,10 @@
 	// ist das für's erste standardmäßig deaktiviert..
 	$cache_everything = false;
 
+	// Sollen Zugangsdaten aus öffentlich sichtbaren URLs entfernt werden?
+	// (Das gilt /nicht/ für die verlinkbare Webseite)
+	$remove_authentication_for_viewing = true;
+
 	// Ist diese Variable gesetzt, so wird eine Logdatei über alle Administrator-
 	// aktionen erstellt
 	$admin_log_file = getcwd().'/cache/adminlog.log';
