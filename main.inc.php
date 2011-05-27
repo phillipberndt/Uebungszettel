@@ -67,7 +67,7 @@ else:
 		// Gibt es Kurse, deren Update im Verzug ist?
 		$update_timestamp = $database->query('SELECT min(update_timestamp) FROM feeds WHERE id IN
 			(SELECT feed_id FROM user_feeds WHERE user_id = ' . user()->id . ')')->fetchColumn();
-		if($update_timestamp > 0 && $update_timestamp < time() - 3600):
+		if($update_timestamp > 0 && $update_timestamp < time() - (isset($outdated_timeout) ? $outdated_timeout : 3600)):
 		?>
 		<p class="info nomargin"><strong>Achtung:</strong> Die Übungsaufgaben sind nicht aktuell. Ein Feed konnte seit <?php
 				$time = time() - $update_timestamp;

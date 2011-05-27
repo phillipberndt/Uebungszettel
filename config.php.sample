@@ -89,6 +89,9 @@
 	// Wird der Cronjob aus der Kommandozeile aufgerufen, wird dieser Token nicht verwendet.
 	$cron_token = '';
 
+	// Ab wann zählen Feeds als veraltet?
+	$outdated_timeout = 3600;
+
 	// Soll Cron detaillierte Debug-Informationen ausgeben? (Zur Fehlerbehandlung durch den
 	// Administrator)
 	$cron_debug = true;
