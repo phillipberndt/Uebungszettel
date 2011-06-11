@@ -282,7 +282,7 @@
 			throw new Exception("Die URL konnte nicht geladen werden: " . curl_error($curl));
 		}
 		$current_age = curl_getinfo($curl, CURLINFO_FILETIME);
-		if($current_age == -1 && preg_match('#^Last-Modified: (.+)#mi', $headers, &$matches)) {
+		if($current_age == -1 && preg_match('#^Last-Modified: (.+)#mi', $headers, $matches)) {
 			$current_age = strtotime($matches[1]);
 		}
 
@@ -326,7 +326,7 @@
 				"Mb Größe können aus Sicherheitsgründen nicht heruntergeladen werden.");
 		}
 		$type = get_mime_type($content, true);
-		if(preg_match('/^[^;]+/', $type, &$match)) $type = $match[0];
+		if(preg_match('/^[^;]+/', $type, $match)) $type = $match[0];
 		if(array_search($type, $GLOBALS['allowed_cache_types']) === false) {
 			throw new Exception("Dateityp unbekannt. Aus Sicherheitsgründen können nur bestimmte Dateitypen heruntergeladen werden.");
 		}
@@ -341,7 +341,7 @@
 	}/*}}}*/
 	function split_data($data) {/*{{{*/
 		// Eine Übung aufteilen in URL und Text
-		if(preg_match('#^(https?://[^ ]+)( .+)?$#is', $data, &$match)) {
+		if(preg_match('#^(https?://[^ ]+)( .+)?$#is', $data, $match)) {
 			return array($match[1], trim($match[2]));
 		}
 		else {

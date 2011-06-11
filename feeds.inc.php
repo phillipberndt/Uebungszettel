@@ -52,7 +52,7 @@
 				$error = 'URL ungültig.';
 			}
 			else if(
-				preg_match('/^(.).+\1([a-zA-Z]*)$/', $_POST['search'], &$modifier) && strpos($modifier[2], 'e') === false
+				preg_match('/^(.).+\1([a-zA-Z]*)$/', $_POST['search'], $modifier) && strpos($modifier[2], 'e') === false
 			) {
 				set_error_handler(function($errno, $errstr) use ($error) {
 					$error .= $errstr;
@@ -64,7 +64,7 @@
 					$error .= $e->getMessage();
 				}
 				$contents = html_entity_decode($contents, ENT_COMPAT, "utf-8");
-				preg_match_all($_POST['search'], $contents, &$matches,  PREG_SET_ORDER);
+				preg_match_all($_POST['search'], $contents, $matches,  PREG_SET_ORDER);
 				restore_error_handler();
 				if(preg_last_error() != PREG_NO_ERROR) {
 					$error = "Regulärer Ausdruck ungültig.";

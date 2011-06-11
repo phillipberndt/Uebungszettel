@@ -68,7 +68,7 @@
 				die();
 			}
 			$file = html_entity_decode($file, ENT_COMPAT, "utf-8");
-			preg_match_all($code['search'], $file, &$matches,  PREG_SET_ORDER);
+			preg_match_all($code['search'], $file, $matches,  PREG_SET_ORDER);
 			$contents = array();
 			foreach($matches as $match) {
 				$contents[] = preg_replace_callback('/\$([0-9]+)/', function($vmatch) use ($match) {
@@ -349,7 +349,7 @@
 				$file_contents = cache_contents($sheet_url);
 				// Hier raten wir den Namen etwas intelligenter, denn Email-Programme kommen
 				// mit komischen Dateinamen nicht so gut klar wie Browser.
-				if(preg_match('#cache.php.+filename=(.+)$#', $sheet_url, &$match)) {
+				if(preg_match('#cache.php.+filename=(.+)$#', $sheet_url, $match)) {
 					$file_name = $match[1];
 				}
 				elseif(preg_match('#\.[a-z]{2,3}$#', $sheet_url) &&

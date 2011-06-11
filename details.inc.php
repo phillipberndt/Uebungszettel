@@ -90,7 +90,7 @@
 				die(htmlspecialchars($oldvalue));
 			});
 			if($property == 'search' && (
-				(preg_match('/^(.).+\1([a-zA-Z]*)$/', $value, &$modifier) && strpos($modifier[2], 'e') !== false) ||
+				(preg_match('/^(.).+\1([a-zA-Z]*)$/', $value, $modifier) && strpos($modifier[2], 'e') !== false) ||
 				(preg_match($value, '') || preg_last_error() != PREG_NO_ERROR)
 			)) {
 				echo('<script><!--

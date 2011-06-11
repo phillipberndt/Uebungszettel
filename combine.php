@@ -21,7 +21,7 @@
 		list($url, $title) = split_data($data['data']);
 		if(!$url) continue;
 
-		if(preg_match('/cache_id=([^&]+)/', $url, &$match)) {
+		if(preg_match('/cache_id=([^&]+)/', $url, $match)) {
 			$cache_id = basename($match[1]);
 		}
 		else {
