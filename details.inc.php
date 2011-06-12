@@ -45,10 +45,38 @@
 		gotop("index.php?q=details&f=".$feed_id);
 	}
 
+	// Zusätzliche URLs
+	if($_GET['get'] == 'urls') {
+		ob_end_clean();
+		header('Content-Type: application/json');
+		$urls = array();
+		foreach($database->query('SELECT title, url FROM feed_links WHERE feed_id = ' . intval($feed_id)) as $urlset) {
+			$urls[$urlset['title']] = $urlset['url'];
+		}
+		die(json_encode($urls));
+	}
+
 	// Bearbeiten per AJAX
+	if($can_edit && isset($_POST['additional_urls'])) {
+		ob_end_clean();
+		$title = trim($_POST['title']);
+		if(!$title) die('0');
+		$url = trim($_POST['url']);
+		if(!$url) {
+			$database->prepare('DELETE FROM feed_links WHERE feed_id = ? AND title = ?')->execute(array($feed_id, $title));
+			die('1');
+		}
+		if($url && !preg_match('#^http://#i', $url)) {
+			die('0');
+		}
+		$database->prepare('REPLACE INTO feed_links (feed_id, title, url) VALUES (?, ?, ?)')->execute(array($feed_id, $title, $url));
+		die('1');
+	}
+
 	if($can_edit && isset($_POST['property'])) {
 		ob_end_clean();
 		$property = $_POST['property'];
+
 		$value = trim($_POST['value']);
 		if($value == "" || strlen($value) > 5000) die();
 
@@ -74,8 +102,8 @@
 			if(!preg_match('#^http://#i', $value)) {
 				die(htmlspecialchars($feed['course_url']));
 			}
-			$stmt = $database->prepare('UPDATE feeds SET course_url = ? WHERE id = ?');
-			$stmt->execute(array($value, $feed_id));
+			$stmt = $database->prepare('REPLACE INTO feed_links (feed_id, title, url) VALUES (?, "Homepage", ?)');
+			$stmt->execute(array($feed_id, $value));
 		}
 
 		if(array_search($property, array('url', 'search', 'exercise')) !== false) {
@@ -144,9 +172,12 @@
 		<dd><?=$feed['public'] ? 'Ja' : 'Nein'?></dd>
 		<dt>Kurs-Homepage</dt>
 		<dd class="editable url short" id="edit-course_url"><?
-			if($feed['course_url']) {
-				$link_title = parse_url($feed['course_url'], PHP_URL_HOST);
-				echo '<a href="' . htmlspecialchars($feed['course_url']) . '">' . htmlspecialchars($link_title) . '</a>';
+			$course_url = $database->query('SELECT url FROM feed_links WHERE feed_id = ' .
+				intval($feed['id']) . ' AND title = "Homepage"')->fetchColumn();
+
+			if($course_url) {
+				$link_title = parse_url($course_url, PHP_URL_HOST);
+				echo '<a href="' . htmlspecialchars($course_url) . '">' . htmlspecialchars($link_title) . '</a>';
 			}
 			else {
 				echo 'Keine';

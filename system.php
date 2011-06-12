@@ -54,7 +54,8 @@
 			$database->exec('CREATE INDEX uauto ON user_autologin (id)');
 			$database->exec('CREATE INDEX user ON user_autologin (user_id)');
 			$database->exec('CREATE TABLE feeds         (id INTEGER PRIMARY KEY AUTOINCREMENT, owner INT, desc VARCHAR(120), short VARCHAR(120),
-				code LONGTEXT, public INT DEFAULT 0, update_timestamp INT, course_url VARCHAR(255));');
+				code LONGTEXT, public INT DEFAULT 0, update_timestamp INT);');
+			$database->query('CREATE TABLE feed_links (feed_id INTEGER, title VARCHAR(120), url TEXT, PRIMARY KEY (feed_id, title));');
 			$database->exec('CREATE TABLE data          (id INTEGER PRIMARY KEY AUTOINCREMENT, feed_id INTEGER,
 				data MEDIUMTEXT, timestamp INT(11))');
 			$database->exec('CREATE INDEX fid ON data       (feed_id);');
@@ -74,6 +75,8 @@
 			$database->exec('CREATE INDEX user ON user_autologin (user_id)');
 			$database->exec('CREATE TABLE feeds         (id INTEGER PRIMARY KEY AUTO_INCREMENT, owner INTEGER, `desc` VARCHAR(120), short VARCHAR(120),
 				code LONGTEXT, public INTEGER DEFAULT 0, update_timestamp INT, course_url VARCHAR(255)
+				DEFAULT CHARSET=utf8;');
+			$database->query('CREATE TABLE feed_links (feed_id INTEGER, title VARCHAR(120), url TEXT, PRIMARY KEY (feed_id, title))
 				DEFAULT CHARSET=utf8;');
 			$database->exec('CREATE TABLE data          (id INTEGER PRIMARY KEY AUTO_INCREMENT, feed_id INTEGER,
 				data MEDIUMTEXT, timestamp INT(11)) DEFAULT CHARSET=utf8');

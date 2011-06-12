@@ -29,9 +29,13 @@ div#error { display: block; width: 400px; margin-top: 200px; border: 1px solid #
 
 div#content { margin: 0 20px; width: 80%; margin-bottom: 50px; }
 
-div#content table { width: 100%; border-collapse: collapse;  }
-div#content th { text-align: left; background: #eef; }
-div#content td, div#content th { border: 1px solid #eee; padding: 3px; vertical-align: top;}
+div.dialog table, div#content table { width: 100%; border-collapse: collapse;  }
+div.dialog th, div#content th { text-align: left; background: #eef; }
+div.dialog td, div.dialog th, div#content td, div#content th { border: 1px solid #eee; padding: 3px; vertical-align: top;}
+div.dialog th, div.dialog td { border: 1px solid #aaa; height: 1.5em; font-size: small; }
+div.dialog td input { margin: -1px; width: 100%; }
+div.dialog td:first-child { width: 200px; }
+div.dialog td { background: #fff; }
 table#kurse td + td + td { width: 100px; }
 table#kurse tr td:first-child { width: 20px; }
 table#kurse-uebersicht td:first-child  { width: 130px; }
@@ -91,7 +95,16 @@ div#content p.right a.selected { color: red ; }
 div#ajax_info img { float: right; margin-top: -7px; }
 div#ajax_info { position: fixed; width: 20%; border: 1px solid #488; top: 40%; left: 40%; padding: 10px; background: #eef; padding:  1em 10px 1em 10px; z-index: 5; }
 div#exercise_info { position: fixed; width: 20%; border: 1px solid #488; right: 20px; bottom: 20px; padding: 10px; background: #eef; padding:  1em 10px 1em 10px; z-index: 5; font-size: small; }
-div#greyout { position: fixed; left: 0; top: 0; width: 100%; height: 100%; background: #000; opacity: 0.5; z-index: 4; }
+div#greyout { position: fixed; left: 0; top: 0; width: 100%; height: 100%; background: #eee; opacity: 0.8; z-index: 4; }
+div.dialog {
+	position: fixed; width: 70%; border: 1px solid #488; top: 10%; left: 10%; height: 500px; padding: 10px; background: #eef; padding: 1em 10px 1em 10px; z-index: 5; overflow: auto;
+}
+div.dialog h2 {
+	margin: -15px -10px 5px -10px;
+	padding: 3px;
+	background: #ddf;
+	font-size: small;
+}
 
 a:visited {
 	color: #008;

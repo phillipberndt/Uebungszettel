@@ -253,15 +253,20 @@ $(document).ready(function() {
 		}));
 		$("a.course-disp-only").each(function() {
 			var $this = $(this);
+			var f = $this.attr("href").match(/f=([0-9]+)/)[1];
+			var href = $this.attr("href");
+			var spanReplacement = $("<span>").css({"textDecoration": "underline", "cursor": "pointer"}).text($this.text());
+			$this.replaceWith(spanReplacement);
+			$this = spanReplacement;
+
 			var course_timeout;
 			var has_fired = false;
 			var menu = $("<ul class='hover_menu'>");
-			var f = $this.attr("href").match(/f=([0-9]+)/)[1];
-			$("<a>").attr("href", $this.attr("href")).text("Nur diesen Kurs anzeigen").appendTo(menu).wrap("<li>");
+			$("<a>").attr("href", href).text("Nur diesen Kurs anzeigen").appendTo(menu).wrap("<li>");
 			$("<a>").attr("href", "index.php?q=details&f=" + f).text("Informationen anzeigen").appendTo(menu).wrap("<li>");
 			$("#course_links a").each(function() {
-				if($(this).text() == $this.text()) {
-					$("<a>").attr("href", $(this).attr("href")).text("Zur Homepage").appendTo(menu).wrap("<li>");
+				if($(this).data("id") == f) {
+					$("<a>").attr("href", $(this).attr("href")).text($(this).data("title")).appendTo(menu).wrap("<li>");
 				}
 			});
 
@@ -296,6 +301,82 @@ $(document).ready(function() {
 		var feed_id = document.location.search.toString().match(/f=([0-9]+)/);
 		if(feed_id) {
 			feed_id = feed_id[1];
+
+			var edit_course_url = $("#edit-course_url");
+			if(edit_course_url.length > 0) {
+				var pos = edit_course_url.position();
+				$("<div><a title='Zusätzliche URLs editieren' href='#'><img src='images/application_form_edit.png'/></a></div>").css({
+					'position': 'absolute',
+					'left': pos.left + edit_course_url.width() - 16,
+					'top': pos.top + 2
+				}).appendTo(document.body).find('img').css('border', 'none').end().find("a").click(function() {
+					$.get('index.php?q=details&f=' + feed_id + '&get=urls', function(urls) {
+						var edit_form = $("<div class='dialog' id='course_edit_form'>Lade..</div><div id='greyout'></div>").appendTo(document.body);
+						var inner_div = $("div#course_edit_form");
+						inner_div.css({"height": "300px"}).css({
+							left: ($(window).width() - inner_div.width()) / 2,
+							top: ($(window).height() - inner_div.height()) / 2
+						});
+						inner_div.html('<h2>Zusätzliche URLs</h2><table><tr><th>Titel</th><th>URL</th></tr></table>');
+						var table = inner_div.find("table");
+						var rows = 5;
+						function addRow(title, url) {
+							var row = $("<tr>");
+							var td_title = $("<td>").text(title).appendTo(row);
+							var td_url = $("<td>").text(url).appendTo(row);
+
+							td_title.click(function() {
+								var old_title = td_title.text().replace(/ $/, '');
+								var edit = $("<input>").val(td_title.text().replace(/ $/, "")).blur(function() {
+									var $this = $(this);
+									if(td_url.text() == "") {
+										td_title.text($this.val() + " ");
+										return;
+									}
+									$.post("index.php?q=details&f=" + feed_id, "additional_urls=1&title=" +
+									  encodeURIComponent(old_title) + "&url=", function() {
+										$.post("index.php?q=details&f=" + feed_id, "additional_urls=1&title=" +
+										 encodeURIComponent($this.val()) + "&url=" + encodeURIComponent(td_url.text()), function() {
+											td_title.text($this.val() + " ");
+										});
+									});
+								});
+								td_title.html(edit);
+								edit.focus();
+							});
+							td_url.click(function() {
+								var edit = $("<input>").val(td_url.text()).blur(function() {
+									var $this = $(this);
+									if(td_title.text() == " ") {
+										td_url.text($this.val() + " ");
+										return;
+									}
+									$.post("index.php?q=details&f=" + feed_id, "additional_urls=1&title=" + 
+									 encodeURIComponent(td_title.text().replace(/ $/, '')) + 
+									 "&url=" + encodeURIComponent($this.val()), function() {
+										td_url.text($this.val() + " ");
+									});
+								});
+								td_url.html(edit);
+								edit.focus();
+							});
+
+							row.appendTo(table);
+						}
+						for(title in urls) {
+							rows--;
+							addRow(title + " ", urls[title]);
+						}
+						while(rows-- > 0) {
+							addRow(" ", "");
+						}
+						$("<button>Zurück</button>").css({"display": "block", "marginTop": "5px", "float": "right"}).
+							appendTo(inner_div).click(function() { edit_form.remove(); return false; });
+					});
+					return false;
+				});
+			}
+
 			$(".editable").each(function() {
 				var $this = $(this);
 				var is_url = $this.hasClass("url");

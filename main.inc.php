@@ -132,10 +132,12 @@ else:
 		<h3>Links auf Deine Kurse</h3>
 		<ul>
 		<?php
-			$course_urls = $database->query('SELECT id, course_url, short FROM feeds WHERE id IN (SELECT feed_id FROM user_feeds WHERE user_id = ' . user()->id . ')
-				AND course_url NOT LIKE "" AND course_url IS NOT NULL');
+			$course_urls = $database->query('SELECT feed_id, title, url FROM feed_links WHERE feed_id IN
+				(SELECT feed_id FROM user_feeds WHERE user_id = ' . user()->id . ')');
 			foreach($course_urls as $course) {
-				echo('<li><a href="' . htmlspecialchars($course['course_url']) . '">' . htmlspecialchars($course['short']) . '</a></li>');
+				echo('<li><a data-id="' . $course['feed_id'] . '" data-title="' . htmlspecialchars($course['title']) . '"
+					href="' . htmlspecialchars($course['url']) . '">' . htmlspecialchars($descs[$course['feed_id']]) . ': ' .
+					htmlspecialchars($course['title']) . '</a></li>');
 			}
 		?>
 		</ul>
