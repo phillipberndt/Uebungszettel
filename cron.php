@@ -339,7 +339,7 @@
 			"From: =?utf-8?Q?=C3=9Cbungen?= <noreply@" . $_SERVER['SERVER_NAME'] . ">" . PHP_EOL . 
 			"Reply-To: ".$support_mail. PHP_EOL;
 		$text = 'Hallo '.$data['name']."," . PHP_EOL . PHP_EOL . "für Dich stehen neue Übungszettel bereit:" . PHP_EOL;
-		$attachments . PHP_EOL;
+		$attachments = PHP_EOL;
 		foreach($data['content'] as $content) {
 			$short = $content[0]; $sheet = $content[1];
 			$text .= ' · '.$short.': '.$sheet;
