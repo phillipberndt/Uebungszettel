@@ -335,11 +335,11 @@
 	}
 	foreach($user_mails as $mail => $data) {
 		$boundary = md5(time());
-		$headers = "Content-Type: multipart/mixed; boundary=\"" . $boundary . "\"\r\n".
-			"From: =?utf-8?Q?=C3=9Cbungen?= <noreply@" . $_SERVER['SERVER_NAME'] . ">\r\n".
-			"Reply-To: ".$support_mail."\r\n";
-		$text = 'Hallo '.$data['name'].",\r\n\r\nfür Dich stehen neue Übungszettel bereit:\r\n";
-		$attachments = "\r\n";
+		$headers = "Content-Type: multipart/mixed; boundary=\"" . $boundary . "\"" . PHP_EOL . 
+			"From: =?utf-8?Q?=C3=9Cbungen?= <noreply@" . $_SERVER['SERVER_NAME'] . ">" . PHP_EOL . 
+			"Reply-To: ".$support_mail. PHP_EOL;
+		$text = 'Hallo '.$data['name']."," . PHP_EOL . PHP_EOL . "für Dich stehen neue Übungszettel bereit:" . PHP_EOL;
+		$attachments . PHP_EOL;
 		foreach($data['content'] as $content) {
 			$short = $content[0]; $sheet = $content[1];
 			$text .= ' · '.$short.': '.$sheet;
@@ -360,18 +360,18 @@
 					$file_name = $sheet_text;
 				}
 				$mime_type = get_mime_type($file_contents, true);
-				$attachments .= "--".$boundary."\r\n".
-					"Content-Type: ".$mime_type."; name*=UTF-8''" . rawurlencode($file_name) . "\r\n" .
-					"Content-Transfer-Encoding: base64\r\n" .
-					"Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode($file_name) . "\r\n\r\n" .
-					chunk_split(base64_encode($file_contents)) . "\r\n\r\n";
+				$attachments .= "--".$boundary . PHP_EOL .
+					"Content-Type: ".$mime_type."; name*=UTF-8''" . rawurlencode($file_name) . PHP_EOL .
+					"Content-Transfer-Encoding: base64" . PHP_EOL .
+					"Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode($file_name) . PHP_EOL . PHP_EOL .
+					chunk_split(base64_encode($file_contents)) . PHP_EOL . PHP_EOL;
 				unset($file_contents);
 			}
-			$text .= "\r\n";
+			$text .= PHP_EOL;
 		}
-		$text .= "\r\nGruß,\r\nDein Übungszettelservice\r\n\r\nPs. Wenn Du diese Email unbeabsichtigt bekommst, schreibe uns " .
+		$text .. PHP_EOL . "Gruß," . PHP_EOL . "Dein Übungszettelservice" . PHP_EOL . PHP_EOL . "Ps. Wenn Du diese Email unbeabsichtigt bekommst, schreibe uns " .
 			"eine Antwort. Wir bestellen diesen Dienst dann für Dich ab.";
-		$message = "--" . $boundary . "\r\nContent-Type: text/plain;charset=UTF-8\r\n" .
-			"Content-Transfer-Encoding: 8bit\r\n\r\n" . $text . $attachments . "\r\n--" . $boundary . "--";
+		$message = "--" . $boundary . PHP_EOL . "Content-Type: text/plain;charset=UTF-8" . PHP_EOL .
+			"Content-Transfer-Encoding: 8bit" . PHP_EOL . PHP_EOL . $text . $attachments . PHP_EOL . "--" . $boundary . "--";
 		mail($data['name'] . ' <'. $mail . '>', 'Neue =?utf-8?Q?=C3=9Cbungszettel?=', $message, $headers);
 	}

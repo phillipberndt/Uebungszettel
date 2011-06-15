@@ -94,22 +94,22 @@
 						gotop("index.php?q=login&action=Registrieren");
 					}
 					else {
-						$headers = "Content-Type: text/plain;charset=UTF-8\r\n".
-							"Content-Transfer-Encoding: 8bit\r\n".
-							"From: =?utf-8?Q?=C3=9Cbungen?= <noreply@" . $_SERVER['SERVER_NAME'] . ">\r\n".
+						$headers = "Content-Type: text/plain;charset=UTF-8" . PHP_EOL .
+							"Content-Transfer-Encoding: 8bit" . PHP_EOL .
+							"From: =?utf-8?Q?=C3=9Cbungen?= <noreply@" . $_SERVER['SERVER_NAME'] . ">" . PHP_EOL .
 							"Reply-To: ".$support_mail;
 						$directory = dirname($_SERVER['REQUEST_URI']); if(substr($directory, -1) != '/') $directory .= '/';
 						$time = time();
 						$token = $time . "-" . substr(md5($time . "register" . $secure_token), 0, 5);
 						$link = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['SERVER_NAME'] . $directory . 'index.php?q=login&token=' . $token;
 
-						$message = "Hallo,\r\n\r\n" .
-							"Du erhälst Diese Mail, weil Du einen Registrierungslink für den Übungszettelaggregator\r\n" .
-							"angefordert hast. Bitte klicke auf folgenden Link und verwende dann den „Registrieren“-Button,\r\n".
-							"um Dir dann einen Benutzer anzulegen:\r\n\r\n" .
-							" " . $link . "\r\n\r\n" .
-							"Dieser Link wird zwei Tage lang gültig sein. Solltest Du diesen Link nicht angefordert haben,\r\n" .
-							"kannst Du diese Mail einfach ignorieren.\r\n\r\nGruß,\r\nDein Übungszettelservice";
+						$message = "Hallo," . PHP_EOL . PHP_EOL .
+							"Du erhälst Diese Mail, weil Du einen Registrierungslink für den Übungszettelaggregator" . PHP_EOL .
+							"angefordert hast. Bitte klicke auf folgenden Link und verwende dann den „Registrieren“-Button," . PHP_EOL .
+							"um Dir dann einen Benutzer anzulegen:" . PHP_EOL . PHP_EOL .
+							" " . $link . PHP_EOL . PHP_EOL .
+							"Dieser Link wird zwei Tage lang gültig sein. Solltest Du diesen Link nicht angefordert haben," . PHP_EOL .
+							"kannst Du diese Mail einfach ignorieren." . PHP_EOL . PHP_EOL . "Gruß," . PHP_EOL . "Dein Übungszettelservice";
 
 						mail($_POST['register_mail'], '=?utf-8?Q?=C3=9Cbungszetteldienst?= Registrierung', $message, $headers);
 

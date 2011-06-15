@@ -82,28 +82,28 @@
 			}
 			$security_code = md5($secure_token . $_POST['fb_account'] . microtime());
 			mail($_POST['fb_account'] . $ssh_printing_email_suffix, 'Validierung Deines Accounts',
-				"Hallo " . user()->name . ",\r\n\r\n" .
-				"Du bekommst diese Mail, weil Du beim Übungszetteldienst Deinen\r\n" .
-				"Fachbereichsaccount registriert hast. Du musst jetzt den Sicherheitscode in den\r\n" .
-				"Einstellungen eingeben und eine Datei in Deinem Fachbereichsaccount ändern.\r\n" .
-				"Dann steht Dir die Drucken-Funktion zur Verfügung.\r\n\r\n".
-				"Der Sicherheitscode lautet:\r\n\r\n     " . $security_code . "\r\n\r\n" .
-				"In Deinem Fachbereichsaccount öffne bitte die Datei ~/.ssh/authorized_keys in\r\n" .
-				"einem Editor. Eventuell musst Du diese Datei auch erst anlegen. Füge unten ans\r\n" .
-				"Ende die folgende Zeile ein:\r\n\r\n" .
-				file_get_contents($ssh_printing_pubkey_file) . "\r\n\r\n" .
-				"Den dort angegebenen Drucker musst Du gegebenenfalls auf Deinen Lieblingsdrucker am\r\n" .
-				"Fachbereich ändern.\r\n\r\nNoch einmal als Info: Mit dieser Änderung erhalten wir die\r\n" .
-				"Möglichkeit, uns auf Deinem Account einzuloggen. Dabei können wir aber nur den\r\n" .
-				"am Anfang der Zeile angegebenen Befehl ausführen, in diesem Fall ein\r\n" .
-				"Druckbefehl. Möchtest Du das nicht länger, reicht es, diese Zeile wieder zu\r\n" .
-				"entfernen.\r\n" .
-				"\r\nGruß,\r\nDein Übungszettelservice\r\n\r\n" .
+				"Hallo " . user()->name . "," . PHP_EOL . PHP_EOL .
+				"Du bekommst diese Mail, weil Du beim Übungszetteldienst Deinen" . PHP_EOL .
+				"Fachbereichsaccount registriert hast. Du musst jetzt den Sicherheitscode in den" . PHP_EOL .
+				"Einstellungen eingeben und eine Datei in Deinem Fachbereichsaccount ändern." . PHP_EOL .
+				"Dann steht Dir die Drucken-Funktion zur Verfügung." . PHP_EOL . PHP_EOL .
+				"Der Sicherheitscode lautet:" . PHP_EOL . PHP_EOL . "     " . $security_code . PHP_EOL . PHP_EOL .
+				"In Deinem Fachbereichsaccount öffne bitte die Datei ~/.ssh/authorized_keys in" . PHP_EOL .
+				"einem Editor. Eventuell musst Du diese Datei auch erst anlegen. Füge unten ans" . PHP_EOL .
+				"Ende die folgende Zeile ein:" . PHP_EOL . PHP_EOL .
+				file_get_contents($ssh_printing_pubkey_file) . PHP_EOL . PHP_EOL .
+				"Den dort angegebenen Drucker musst Du gegebenenfalls auf Deinen Lieblingsdrucker am" . PHP_EOL .
+				"Fachbereich ändern." . PHP_EOL . PHP_EOL . "Noch einmal als Info: Mit dieser Änderung erhalten wir die" . PHP_EOL .
+				"Möglichkeit, uns auf Deinem Account einzuloggen. Dabei können wir aber nur den" . PHP_EOL .
+				"am Anfang der Zeile angegebenen Befehl ausführen, in diesem Fall ein" . PHP_EOL .
+				"Druckbefehl. Möchtest Du das nicht länger, reicht es, diese Zeile wieder zu" . PHP_EOL .
+				"entfernen." . PHP_EOL .
+				"" . PHP_EOL . "Gruß," . PHP_EOL . "Dein Übungszettelservice" . PHP_EOL . PHP_EOL .
 				"Ps. Wenn Du diese Email unbeabsichtigt bekommst, schreibe uns " .
 				"eine Antwort. Wir bestellen diesen Dienst dann für Dich ab.",
-				"Content-type: text/plain; charset=UTF-8\r\n" .
-				"From: =?utf-8?Q?=C3=9Cbungen?= <noreply@" . $_SERVER['SERVER_NAME'] . ">\r\n".
-				"Reply-To: ".$support_mail."\r\n");
+				"Content-type: text/plain; charset=UTF-8" . PHP_EOL .
+				"From: =?utf-8?Q?=C3=9Cbungen?= <noreply@" . $_SERVER['SERVER_NAME'] . ">" . PHP_EOL .
+				"Reply-To: ".$support_mail."" . PHP_EOL;
 			user()->ssh = array('account' => $_POST['fb_account'], 'code' => $security_code);
 			user_save();
 			status_message("Wir haben Dir Deinen neuen Sicherheitscode zugeschickt!");
