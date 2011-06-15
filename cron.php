@@ -364,7 +364,7 @@
 					"Content-Type: ".$mime_type."; name*=UTF-8''" . rawurlencode($file_name) . PHP_EOL .
 					"Content-Transfer-Encoding: base64" . PHP_EOL .
 					"Content-Disposition: attachment; filename*=UTF-8''" . rawurlencode($file_name) . PHP_EOL . PHP_EOL .
-					chunk_split(base64_encode($file_contents)) . PHP_EOL . PHP_EOL;
+					chunk_split(base64_encode($file_contents), 76, "\n") . PHP_EOL . PHP_EOL;
 				unset($file_contents);
 			}
 			$text .= PHP_EOL;
