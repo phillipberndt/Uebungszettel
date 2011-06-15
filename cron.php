@@ -369,7 +369,7 @@
 			}
 			$text .= PHP_EOL;
 		}
-		$text .. PHP_EOL . "Gruß," . PHP_EOL . "Dein Übungszettelservice" . PHP_EOL . PHP_EOL . "Ps. Wenn Du diese Email unbeabsichtigt bekommst, schreibe uns " .
+		$text .= PHP_EOL . "Gruß," . PHP_EOL . "Dein Übungszettelservice" . PHP_EOL . PHP_EOL . "Ps. Wenn Du diese Email unbeabsichtigt bekommst, schreibe uns " .
 			"eine Antwort. Wir bestellen diesen Dienst dann für Dich ab.";
 		$message = "--" . $boundary . PHP_EOL . "Content-Type: text/plain;charset=UTF-8" . PHP_EOL .
 			"Content-Transfer-Encoding: 8bit" . PHP_EOL . PHP_EOL . $text . $attachments . PHP_EOL . "--" . $boundary . "--";

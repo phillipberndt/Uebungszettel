@@ -103,7 +103,7 @@
 				"eine Antwort. Wir bestellen diesen Dienst dann für Dich ab.",
 				"Content-type: text/plain; charset=UTF-8" . PHP_EOL .
 				"From: =?utf-8?Q?=C3=9Cbungen?= <noreply@" . $_SERVER['SERVER_NAME'] . ">" . PHP_EOL .
-				"Reply-To: ".$support_mail."" . PHP_EOL;
+				"Reply-To: ".$support_mail . PHP_EOL);
 			user()->ssh = array('account' => $_POST['fb_account'], 'code' => $security_code);
 			user_save();
 			status_message("Wir haben Dir Deinen neuen Sicherheitscode zugeschickt!");
