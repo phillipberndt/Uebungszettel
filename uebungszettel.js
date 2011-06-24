@@ -326,7 +326,7 @@ $(document).ready(function() {
 							var td_url = $("<td>").text(url).appendTo(row);
 
 							td_title.click(function() {
-								var old_title = td_title.text().replace(/ $/, '');
+								var old_title = td_title.text().replace(/ +$/, '');
 								var edit = $("<input>").val(td_title.text().replace(/ $/, "")).blur(function() {
 									var $this = $(this);
 									if(td_url.text() == "") {
