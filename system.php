@@ -230,9 +230,9 @@
 		fclose($log_file);
 	}/*}}}*/
 	function activity_email($text) {/*{{{*/
-		if(!$GLOBALS['activity_email']) return;
+		if(!$GLOBALS['activity_mail']) return;
 		$directory = dirname($_SERVER['REQUEST_URI']); if(substr($directory, -1) != '/') $directory .= '/';
-		mail($GLOBALS['activity_email'], '=?utf-8?Q?=C3=9Cbungszettel?= Moderation notwendig',
+		mail($GLOBALS['activity_mail'], '=?utf-8?Q?=C3=9Cbungszettel?= Moderation notwendig',
 			"Moderator-Information für http://" . $_SERVER['SERVER_NAME'] . $directory . PHP_EOL . PHP_EOL .
 			$text .
 			PHP_EOL . PHP_EOL . "Gruß," . PHP_EOL . "Dein Übungszettelservice",
