@@ -220,11 +220,25 @@
 	function admin_log($text) {/*{{{*/
 		// Log von Administrator-Aufgaben
 		// Vorallem für PHP-Ausführung wichtig
+		$log_line = "[".date('d.m.Y H:i:s')." ".user()->name."] ".$text;
+		activity_email("Administrator-Aktivität:" . PHP_EOL . $text);
+
 		if(!$GLOBALS['admin_log_file']) return;
 		$log_file = fopen($GLOBALS['admin_log_file'], 'a');
 		flock($log_file, LOCK_EX);
-		fwrite($log_file, "[".date('d.m.Y H:i:s')." ".user()->name."] ".$text."\n");
+		fwrite($log_file, $log_line."\n");
 		fclose($log_file);
+	}/*}}}*/
+	function activity_email($text) {/*{{{*/
+		if(!$GLOBALS['activity_email']) return;
+		$directory = dirname($_SERVER['REQUEST_URI']); if(substr($directory, -1) != '/') $directory .= '/';
+		mail($GLOBALS['activity_email'], '=?utf-8?Q?=C3=9Cbungszettel?= Moderation notwendig',
+			"Moderator-Information für http://" . $_SERVER['SERVER_NAME'] . $directory . PHP_EOL . PHP_EOL .
+			$text .
+			PHP_EOL . PHP_EOL . "Gruß," . PHP_EOL . "Dein Übungszettelservice",
+			"From: =?utf-8?Q?=C3=9Cbungen?= <noreply@" . $_SERVER['SERVER_NAME'] . ">" . PHP_EOL . 
+			"Reply-To: " . $GLOBALS['support_mail'] . PHP_EOL .
+			"Content-Type: text/plain; charset=utf-8");
 	}/*}}}*/
 	function remove_authentication_from_urls($data) { /*{{{*/
 		// Funktion zum entfernen von Authentifizierungsinformationen aus URLs

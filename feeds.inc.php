@@ -117,9 +117,12 @@
 				)),
 				$short));
 				$stmt = $database->prepare("INSERT INTO user_feeds (user_id, feed_id) VALUES (?, ?);");
-				$stmt->execute(array(user()->id, $database->lastInsertId()));
+				$feed_id = $database->lastInsertId();
+				$stmt->execute(array(user()->id, $feed_id));
 				$database->commit();
 				status_message("Der Feed wurde erfolgreich erstellt.");
+				$directory = dirname($_SERVER['REQUEST_URI']); if(substr($directory, -1) != '/') $directory .= '/';
+				activity_email("Neuer Feed angelegt: http://" . $_SERVER['SERVER_NAME'] . $directory . "/index.php?q=details&f=" . $feed_id);
 				gotop('index.php?q=feeds');
 			}
 		}

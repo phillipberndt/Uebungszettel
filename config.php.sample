@@ -70,6 +70,9 @@
 	// Support-Email (wird auf der Login-Seite verlinkt)
 	$support_mail = 'uebungen@lists.spline.inf.fu-berlin.de';
 
+	// Aktivitäts-Email (erhält Emails, wenn Moderatoraktivität nötig ist)
+	$activity_mail = '';
+
 	// Hier kann ein zufälliger String eingetragen werden, der verwendet wird um verschiedene
 	// Hashfunktionen zusätzlich abzusichern.
 	$secure_token = '';
