@@ -165,7 +165,7 @@ else:
 		<ul>
 			<?php
 				foreach($suggestions as $suggestion) {
-					echo('<li>'.$suggestion['text'].' (<a class="confirm resolve_sug" href="index.php?delsug='.$suggestion['id'].'">Erledigt</a>)</li>');
+					echo('<li>'.nl2br(htmlspecialchars($suggestion['text'])).' (<a class="confirm resolve_sug" href="index.php?delsug='.$suggestion['id'].'">Erledigt</a>)</li>');
 				}
 			?>
 		</ul>
