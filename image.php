@@ -25,8 +25,8 @@
 		$extension = 'pdf';
 	}
 
-	$hash = sha1('img-'.$image);
-	$cache_file = 'cache/'.$hash;
+	$hash = sha1('img-' . $image);
+	$cache_file = $cache_dir . $hash;
 
 	$cache_exists = file_exists($cache_file);
 	try {
@@ -45,6 +45,13 @@
 		unlink($cache_file . '.' . $extension);
 		in_shell_execution(false);
 	}
+
+	// In der Datenbank ein Update ausführen
+	// Das auch, wenn eigentlich nichts geändert wurde - weil wir nämlich durch
+	// den Aufruf wissen, dass die Daten noch gebraucht werden.
+	// Die erzeugten Bilder einen Tag im Cache vorhalten
+	$query = $database->prepare('REPLACE INTO cache (id, created_timestamp, max_age, filename) VALUES (?, ?, ?, ?)');
+	$query->execute(array($hash, time(), 3600 * 24, 'image.png'));
 
 	header("Last-Modified: ".gmdate('r', filemtime($cache_file)).' GMT');
 	header('Expires: '.gmdate('r', time() + 3600).' GMT');

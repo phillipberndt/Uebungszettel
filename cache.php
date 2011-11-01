@@ -1,6 +1,4 @@
 <?php
-	// Obwohl system.php eingebunden wird sind wir nicht eingeloggt, da das Session-Cookie
-	// aus Sicherheitsgründen auf /index.php beschränkt ist!
 	require("system.php");
 	set_time_limit(30);
 
@@ -13,26 +11,28 @@
 			die();
 		}
 		try {
-			$_GET['cache_id'] = cache_file($url, false, true);
+			$_GET['cache_id'] = cache_file($url, false, true, 3600 * 24);
 		}
 		catch(Exception $e) {
 			// Geht anscheinend nicht - dann leiten wir halt weiter.
 			header('Location: ' . $image);
 			die();
 		}
-		$_GET['filename'] = basename($url);
 	}
 
 	// Daten direkt aus dem Cache laden
-	$cache_file = $cache_dir . basename($_GET['cache_id']);
-	$file_name = $_GET['filename'];
+	$cache_id = $_GET['cache_id'];
+	$cache_file = $cache_dir . basename($cache_id);
 
-	if(!file_exists($cache_file)) {
+	$query = $database->prepare('SELECT * FROM cache WHERE id = ?');
+	$query->execute(array($cache_id));
+	$cache_object = $query->fetch(PDO::FETCH_OBJ);
+	if(!$cache_object || !file_exists($cache_file)) {
 		header("HTTP/1.1 404 Not found");
 		die();
 	}
 
-	header('Content-disposition: inline; filename="' . addcslashes($file_name, '"') . '"');
+	header('Content-disposition: inline; filename="' . addcslashes($cache_object->filename, '"') . '"');
 	header('Last-Modified: '.date('r', filemtime($cache_file)));
 	if($_SERVER["HTTP_IF_MODIFIED_SINCE"]) {
 		$time = strtotime(preg_replace('/;.*$/', '', $_SERVER['HTTP_IF_MODIFIED_SINCE']));
@@ -47,7 +47,7 @@
 		'png' => 'image/png',
 		'jpg' => 'image/jpg',
 	) as $extension => $ct) {
-		if(preg_match('/\.'.$extension.'/i', $file_name)) {
+		if(preg_match('/\.'.$extension.'/i', $cache_object->filename)) {
 			header('Content-type: '.$ct);
 		}
 	}

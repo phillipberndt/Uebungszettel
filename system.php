@@ -66,6 +66,7 @@
 			$database->exec('CREATE UNIQUE INDEX uid_feed ON user_feeds (user_id, feed_id);');
 			$database->exec('CREATE TABLE suggestions       (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, text MEDIUMTEXT);');
 			$database->exec('CREATE TABLE url_age_cache     (url MEDIUMTEXT, age INTEGER)');
+			$database->exec('CREATE TABLE cache             (id VARCHAR(40) PRIMARY KEY, created_timestamp INT, max_age INT, filename VARCHAR(255));');
 		}
 		else {
 			$database->exec('CREATE TABLE users         (id INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(50),
@@ -87,6 +88,7 @@
 			$database->exec('CREATE INDEX uid ON user_feeds (user_id);');
 			$database->exec('CREATE TABLE suggestions       (id INTEGER PRIMARY KEY AUTO_INCREMENT, user_id INTEGER, text MEDIUMTEXT) DEFAULT CHARSET=utf8;');
 			$database->exec('CREATE TABLE url_age_cache     (url MEDIUMTEXT, age INTEGER) DEFAULT CHARSET=utf8');
+			$database->exec('CREATE TABLE cache             (id VARCHAR(40) PRIMARY KEY, created_timestamp INT, max_age INT, filename VARCHAR(255));');
 		}
 		$salt = base_convert(rand(0, 36*36 - 1), 10, 36);
 		$database->exec('INSERT INTO users (id, name, pass, level, salt) VALUES (1, "admin", "d033e22ae348aeb5660fc2140aec35850c4da997", 2, "' . $salt . '");'); 
@@ -338,14 +340,15 @@
 		}
 		curl_close($curl);
 
-		if(strlen($content) > $GLOBALS['allowed_cache_file_size']) {
-			throw new Exception("Datei zu groß. Dateien über " . round($GLOBALS['allowed_cache_file_size'] / 1024 / 1024) .
+		$maximal_cache_size = parse_human_readable_file_size($GLOBALS['allowed_cache_file_size']);
+		if(strlen($content) > $maximal_cache_size) {
+			throw new Exception("Datei zu groß. Dateien über " . round($maximal_cache_size / 1024 / 1024) .
 				"Mb Größe können aus Sicherheitsgründen nicht heruntergeladen werden.");
 		}
 		$type = get_mime_type($content, true);
 		if(preg_match('/^[^;]+/', $type, $match)) $type = $match[0];
 		if(array_search($type, $GLOBALS['allowed_cache_types']) === false) {
-			throw new Exception("Dateityp unbekannt. Aus Sicherheitsgründen können nur bestimmte Dateitypen heruntergeladen werden.");
+			throw new Exception("Dateityp " . $type . " unbekannt. Aus Sicherheitsgründen können nur bestimmte Dateitypen heruntergeladen werden.");
 		}
 
 		if(!$fix_encoding) return $content;
@@ -385,13 +388,13 @@
 			return htmlspecialchars($text);
 		}
 	}/*}}}*/
-	function cache_file($url, $file_name = false, $return_id = false, $safeForDeletion = true) {/*{{{*/
+	function cache_file($url, $file_name = false, $return_id = false, $cache_timeout = 15552000) {/*{{{*/
+		global $database;
 		$cache_id = sha1($url);
-		if(!$safeForDeletion) $cache_id = 'st_'.$cache_id;
 		$cache_file = $GLOBALS['cache_dir'] . '/' . $cache_id;
 		$directory = dirname($_SERVER['REQUEST_URI']); if(substr($directory, -1) != '/') $directory .= '/';
 		$cache_url = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['SERVER_NAME'] . $directory . 
-			'cache.php?cache_id=' . $cache_id . '&filename=' . ($file_name === false ? $cache_id : $file_name);
+			'cache.php?cache_id=' . $cache_id;
 
 		$cache_exists = file_exists($cache_file);
 		$content = load_url($url, false, $cache_exists ? filemtime($cache_file) : false);
@@ -402,18 +405,25 @@
 			if(!file_exists($cache_file) || sha1_file($cache_file) != sha1($content)) {
 				file_put_contents($cache_file, $content);
 			}
+
+			// In der Datenbank ein Update ausführen
+			// Das auch, wenn eigentlich nichts geändert wurde - weil wir nämlich durch
+			// den Aufruf wissen, dass die Daten noch gebraucht werden.
+			$query = $database->prepare('REPLACE INTO cache (id, created_timestamp, max_age, filename) VALUES (?, ?, ?, ?)');
+			$query->execute(array($cache_id, time(), $cache_timeout, $file_name ? $file_name : basename($url)));
 		}
 
 		if($return_id) return $cache_id;
 		return $cache_url;
 	}/*}}}*/
 	function cache_contents($url) {/*{{{*/
-		$cache_id = cache_file($url, false, true, true);
+		$cache_id = cache_file($url, false, true);
 		return file_get_contents($GLOBALS['cache_dir'] . $cache_id);
 	}/*}}}*/
 	function cache_zip_file_contents($url, $identifier = null) { /*{{{*/
+		global $database;
 		if($identifier === null) $identifier = $url;
-		$cache_id = cache_file($url, false, true, true);
+		$cache_id = cache_file($url, false, true, 3600 * 24 * 7);
 		$retval = array();
 		$directory = dirname($_SERVER['REQUEST_URI']); if(substr($directory, -1) != '/') $directory .= '/';
 		$zip = new ZipArchive;
@@ -442,6 +452,13 @@
 				if(!file_exists($cache_file) || sha1_file($cache_file) != sha1($content)) {
 					file_put_contents($cache_file, $content);
 				}
+
+				// In der Datenbank ein Update ausführen
+				// Das auch, wenn eigentlich nichts geändert wurde - weil wir nämlich durch
+				// den Aufruf wissen, dass die Daten noch gebraucht werden.
+				// Die hierrüber geladenen Daten ein halbes Jahr aufbewahren.
+				$query = $database->prepare('REPLACE INTO cache (id, created_timestamp, max_age, filename) VALUES (?, ?, ?, ?)');
+				$query->execute(array($cache_id, time(), 3600 * 24 * 30 * 6, $file_name));
 			}
 
 			$retval[$file_name] = $cache_url . ' ' . $file_name;
@@ -474,6 +491,18 @@
 			ignore_user_abort(false);
 			sem_release($_active_semaphore);
 		}
+	}/*}}}*/
+	function parse_human_readable_file_size($size) {/*{{{*/
+		if(!preg_match('/^\s*([0-9]*\.[0-9]+|[0-9]+\.[0-9]*|[0-9]+)(M(?:ega)?|K(?:ilo)?|G(?:iga)?)(B(?:ytes)?)?\s*$/i', $size, $match)) {
+			return 0;
+		}
+		$multiplier = 1;
+		switch(strtoupper($match[2][0])) {
+			case 'G': $multiplier *= 1024;
+			case 'M': $multiplier *= 1024;
+			case 'K': $multiplier *= 1024;
+		}
+		return $match[1] * $multiplier;
 	}/*}}}*/
 	// }}}
 

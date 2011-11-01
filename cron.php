@@ -205,6 +205,28 @@
 		}
 	}
 
+	// Bevor wir die neuen Daten laden, prüfen, ob der Cache zu groß wird
+	if($allowed_cumulated_cache_size) {
+		$maximal_cache_size = parse_human_readable_file_size($allowed_cumulated_cache_size);
+
+		// Prüfen, wie groß das Cache-Verzeichnis ist
+		$cache_size = 0;
+		$deletion_query = $database->prepare('DELETE FROM cache WHERE id = ?');
+		foreach(glob($cache_dir . '*') as $file) $cache_size += filesize($file);
+		if($cache_size > $maximal_cache_size) {
+			// Wir müssen etwas löschen
+			$deletion_candidates = $database->query('SELECT id FROM cache WHERE created_timestamp + max_age < ' . time() . ' ORDER BY created_timestamp + max_age ASC');
+			while($cache_size > $maximal_cache_size && $candidate = $deletion_candidates->fetchColumn()) {
+				$cache_size -= filesize($cache_dir . $candidate);
+				unlink($cache_dir . $candidate);
+				$deletion_query->execute(array($candidate));
+			}
+		}
+		if($cache_size > $maximal_cache_size) {
+			echo "Warning: Maximum cache size exceeded by " . round(($cache_size - $maximal_cache_size) / 1024 / 1024, 2) . " Mb!\n";
+		}
+	}
+
 	// Ausführung von der Kommandozeile: Unterabfragen via popen() durchführen
 	if($called_from_commandline):
 
@@ -351,6 +373,12 @@
 				// mit komischen Dateinamen nicht so gut klar wie Browser.
 				if(preg_match('#cache.php.+filename=(.+)$#', $sheet_url, $match)) {
 					$file_name = $match[1];
+				}
+				elseif(preg_match('#cache.php.+data_id=(.+)$#', $sheet_url, $match)) {
+					$query = $database->prepare('SELECT filename FROM cache WHERE id = ?');
+					$query->execute(array($match[1]));
+					$cache_object = $query->fetch(PDO::FETCH_OBJ);
+					$file_name = $cache_object->filename;
 				}
 				elseif(preg_match('#\.[a-z]{2,3}$#', $sheet_url) &&
 				  !preg_match('#\.[a-z]{2,3}$#', $sheet_text)) {

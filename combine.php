@@ -26,7 +26,7 @@
 		}
 		else {
 			try {
-				$cache_id = cache_file($url, '', true);
+				$cache_id = cache_file($url, false, true, 3600 * 24);
 			}
 			catch(Exception $e) {
 				status_message("Dieser Dienst funktioniert nur mit PDF-Dateien");
@@ -47,6 +47,12 @@
 		exec($execute);
 		in_shell_execution(false);
 	}
+
+	// In der Datenbank ein Update ausführen
+	// Das auch, wenn eigentlich nichts geändert wurde - weil wir nämlich durch
+	// den Aufruf wissen, dass die Daten noch gebraucht werden.
+	$query = $database->prepare('REPLACE INTO cache (id, created_timestamp, max_age, filename) VALUES (?, ?, ?, ?)');
+	$query->execute(array($final_cache_id, time(), 3600 * 24 * 2, 'drucken.pdf'));
 
 	// Je nach Aktion handeln
 	$action = $_POST['action'];
@@ -82,5 +88,5 @@
 	}
 	else {
 		// PDF herunterladen
-		gotop('cache.php?cache_id='.$final_cache_id.'&filename=drucken.pdf');
+		gotop('cache.php?cache_id='.$final_cache_id);
 	}

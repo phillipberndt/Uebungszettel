@@ -13,10 +13,13 @@
 
 	// Das Verzeichnis, in dem der Cache angelegt werden soll. Muss nicht im Document
 	// Root liegen
-	$cache_dir = getcwd().'/cache/';
+	$cache_dir = getcwd() . '/cache/';
+
+	// Maximale Gesamtgröße des Caches. Ist er größer, werden alte Daten gelöscht
+	$allowed_cumulated_cache_size = '1G';
 	
 	// Maximale Dateigröße im Cache
-	$allowed_cache_file_size = 1024 * 1024 * 2;
+	$allowed_cache_file_size = '2M';
 
 	// Erlaubte MIME-Dateitypen im Cache
 	$allowed_cache_types = array(
