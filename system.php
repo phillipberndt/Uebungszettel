@@ -258,6 +258,12 @@
 		if(class_exists('finfo')) {
 			$finfo = new finfo(FILEINFO_MIME, "/usr/share/misc/magic");
 			$type = $inline ? $finfo->buffer($fileOrInline) : $finfo->file($fileOrInline);
+
+			// Bugfix: PHP erkennt PDF-Dateien leider oft falsch
+			if(substr($type, 0, 24) == 'application/octet-stream') {
+				$file_header = $inline ? substr($fileOrInline, 0, 100) : file_get_contents($fileOrInline, false, NULL, 0, 100);
+				if(substr($file_header, 0, 4) == "%PDF") $type = "application/pdf";
+			}
 		}
 		else {
 			in_shell_execution(true);
