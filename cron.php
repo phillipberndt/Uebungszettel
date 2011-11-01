@@ -52,7 +52,7 @@
 			}
 			catch(Exception $exception) {
 				if($cron_debug) {
-					echo $exception . "\n";
+					echo $exception->getMessage();
 				}
 				die();
 			}
@@ -63,7 +63,7 @@
 			}
 			catch(Exception $exception) {
 				if($cron_debug) {
-					echo $exception . "\n";
+					echo $exception->getMessage();
 				}
 				die();
 			}
