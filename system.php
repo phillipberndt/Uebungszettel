@@ -500,7 +500,7 @@
 	}/*}}}*/
 	function parse_human_readable_file_size($size) {/*{{{*/
 		if(!preg_match('/^\s*([0-9]*\.[0-9]+|[0-9]+\.[0-9]*|[0-9]+)(M(?:ega)?|K(?:ilo)?|G(?:iga)?)(B(?:ytes)?)?\s*$/i', $size, $match)) {
-			return 0;
+			return intval($size);
 		}
 		$multiplier = 1;
 		switch(strtoupper($match[2][0])) {
