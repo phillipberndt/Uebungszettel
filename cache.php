@@ -32,7 +32,7 @@
 		die('<DOCTYPE HTML><h1>Not found</h1>');
 	}
 
-	header('Content-disposition: inline; filename="' . addcslashes($cache_object->filename, '"') . '"');
+	header('Content-disposition: attachment; filename="' . addcslashes($cache_object->filename, '"') . '"');
 	header('Last-Modified: '.date('r', filemtime($cache_file)));
 	if($_SERVER["HTTP_IF_MODIFIED_SINCE"]) {
 		$time = strtotime(preg_replace('/;.*$/', '', $_SERVER['HTTP_IF_MODIFIED_SINCE']));

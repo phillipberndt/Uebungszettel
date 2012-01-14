@@ -55,13 +55,6 @@
 		//'#@localhost$#i',
 	);
 
-	// Sollen generell alle HTTP-Links gecached werden?
-	// Das Cachen von Dateien ist nicht ganz unproblematisch - der Zugang zu den
-	// Cookies wird zwar beschränkt, trotzdem sind Angriffe via AJAX, bzw. auf Frames
-	// der Seite, möglich! Da auch andere Content-Typen als HTML scriptbar sind,
-	// ist das für's erste standardmäßig deaktiviert..
-	$cache_everything = false;
-
 	// Sollen Zugangsdaten aus öffentlich sichtbaren URLs entfernt werden?
 	// (Das gilt /nicht/ für die verlinkbare Webseite)
 	$remove_authentication_for_viewing = true;

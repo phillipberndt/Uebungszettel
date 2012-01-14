@@ -382,13 +382,8 @@
 				$url = 'image.php?data_id='.htmlspecialchars($id);
 			}
 
-			if($id && $GLOBALS['cache_everything']) {
-				return '<a class="exercise" href="cache.php?data_id=' . htmlspecialchars($id) . '">'.htmlspecialchars($text ? $text : basename($url)).'</a>';
-			}
-			else {
-				$url = remove_authentication_from_urls($url);
-				return '<a class="exercise" href="'.htmlspecialchars($url).'">'.htmlspecialchars($text ? $text : basename($url)).'</a>';
-			}
+			$url = remove_authentication_from_urls($url);
+			return '<a class="exercise" href="'.htmlspecialchars($url).'">'.htmlspecialchars($text ? $text : basename($url)).'</a>';
 		}
 		else {
 			return htmlspecialchars($text);
