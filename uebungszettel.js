@@ -201,8 +201,13 @@ $(document).ready(function() {
 			var data_id = link.closest("tr").attr("id").match(/data-([0-9]+)/);
 			if(data_id) {
 				link.attr("href", "cache.php?data_id=" + data_id[1]);
+				setTimeout(function() {
+					var original_href = link.data("original-href")
+					if(!original_href) return;
+					link.data("original-href", false).attr("href", original_href);
+				}, 100);
 			}
-		});
+		})
 		$("tr.neu td:first-child + td a").click(function() {
 			if($(window).data("exercise-mode")) return true;
 			var match = $(this).closest("tr").find("td:last-child a")[0].toString().match(/d=([0-9]+)/);
