@@ -8,7 +8,7 @@
 	set_time_limit(0);
 	if(!isset($_GET['data_id'])) {
 		header('HTTP/1.1 404 Not found');
-		die("<h1>File not found</h1>");
+		die("<DOCTYPE HTML><h1>File not found</h1>");
 	}
 
 	$data = $database->query('SELECT data FROM data WHERE id = ' . intval($_GET['data_id']))->fetchColumn();
@@ -16,7 +16,7 @@
 
 	if(!preg_match('#^https?://#i', $image)) {
 		header('HTTP/1.1 404 Not found');
-		die("<h1>File not found</h1>");
+		die("<DOCTYPE HTML><h1>File not found</h1>");
 	}
 	if(preg_match('#\.([^\.]+)$#', $image, $extension)) {
 		$extension = $extension[1];
@@ -33,7 +33,7 @@
 		$data = load_url($image, false, $cache_exists ? filemtime($cache_file) : false);
 	}
 	catch(Exception $e) {
-		// Geht anscheinend nicht - dann leiten wir halt weiter.
+		// Geht anscheinend nicht - dann leiten wir halt weiter auf das Original.
 		header('Location: ' . $image);
 		die();
 	}

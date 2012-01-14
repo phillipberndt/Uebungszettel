@@ -3,19 +3,19 @@
 	set_time_limit(30);
 
 	// Cachen von gespeicherten Übungen
-	if(isset($_GET['data_id']) && $cache_everything) {
+	if(isset($_GET['data_id'])) {
 		$data = $database->query('SELECT data FROM data WHERE id = ' . intval($_GET['data_id']))->fetchColumn();
 		list($url, $text) = split_data($data);
 		if(!$url) {
 			header("HTTP/1.1 404 Not found");
-			die();
+			die('<DOCTYPE HTML><h1>Not found</h1>');
 		}
 		try {
 			$_GET['cache_id'] = cache_file($url, false, true, 3600 * 24);
 		}
 		catch(Exception $e) {
-			// Geht anscheinend nicht - dann leiten wir halt weiter.
-			header('Location: ' . $image);
+			// Geht anscheinend nicht - dann leiten wir halt weiter auf das Original
+			header('Location: ' . $url);
 			die();
 		}
 	}
@@ -29,7 +29,7 @@
 	$cache_object = $query->fetch(PDO::FETCH_OBJ);
 	if(!$cache_object || !file_exists($cache_file)) {
 		header("HTTP/1.1 404 Not found");
-		die();
+		die('<DOCTYPE HTML><h1>Not found</h1>');
 	}
 
 	header('Content-disposition: inline; filename="' . addcslashes($cache_object->filename, '"') . '"');

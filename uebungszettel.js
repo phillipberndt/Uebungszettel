@@ -194,6 +194,15 @@ $(document).ready(function() {
 				return false;
 			});
 		});
+		$("#kurse-uebersicht .exercise").mousedown(function() {
+			var link = $(this);
+			if(link.data("original-href")) return;
+			link.data("original-href", link.attr("href"));
+			var data_id = link.closest("tr").attr("id").match(/data-([0-9]+)/);
+			if(data_id) {
+				link.attr("href", "cache.php?data_id=" + data_id[1]);
+			}
+		});
 		$("tr.neu td:first-child + td a").click(function() {
 			if($(window).data("exercise-mode")) return true;
 			var match = $(this).closest("tr").find("td:last-child a")[0].toString().match(/d=([0-9]+)/);
