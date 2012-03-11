@@ -50,8 +50,15 @@
 	// Das auch, wenn eigentlich nichts geändert wurde - weil wir nämlich durch
 	// den Aufruf wissen, dass die Daten noch gebraucht werden.
 	// Die erzeugten Bilder einen Tag im Cache vorhalten
-	$query = $database->prepare('REPLACE INTO cache (id, created_timestamp, max_age, filename) VALUES (?, ?, ?, ?)');
-	$query->execute(array($hash, time(), 3600 * 24, 'image.png'));
+	$query = $database->prepare('SELECT COUNT(*) FROM cache WHERE id = ?');
+	$query->execute(array($hash));
+	if($query->fetchColumn() == 0) {
+		$query = $database->prepare('INSERT INTO cache (created_timestamp, max_age, filename, id) VALUES (?, ?, ?, ?)');
+	}
+	else {
+		$query = $database->prepare('UPDATE cache SET created_timestamp = ?, max_age = ?, filename = ? WHERE id = ?');
+	}
+	$query->execute(array(time(), 3600 * 24, 'image.png', $cache_id));
 
 	header("Last-Modified: ".gmdate('r', filemtime($cache_file)).' GMT');
 	header('Expires: '.gmdate('r', time() + 3600).' GMT');

@@ -3,7 +3,9 @@
 
 	if(isset($_POST['submit'])) {
 		foreach($_POST['user'] as $id => $change) {
+			$id = intval($id);
 			if($id == 1) continue;
+
 			$user = user_load('id', $id);
 			if(!$user) continue;
 			if($change['delete']) {

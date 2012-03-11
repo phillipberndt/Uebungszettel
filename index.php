@@ -60,6 +60,8 @@
 			user_save();
 		}
 
+		$_SESSION['status_messages'][] = 'Wir testen im Moment ein neues Datenbankbackup. Deswegen kommt es zu Beeinträchtigungen!';
+
 		if(isset($_SESSION['status_messages']) && $_SESSION['status_messages']):
 		?>
 			<ul id="status">

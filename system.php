@@ -68,6 +68,28 @@
 			$database->exec('CREATE TABLE url_age_cache     (url MEDIUMTEXT, age INTEGER)');
 			$database->exec('CREATE TABLE cache             (id VARCHAR(40) PRIMARY KEY, created_timestamp INT, max_age INT, filename VARCHAR(255));');
 		}
+		elseif($database->getAttribute(PDO::ATTR_DRIVER_NAME) == 'pgsql') {
+			$database->exec("CREATE TABLE users         (id SERIAL PRIMARY KEY, name VARCHAR(50),
+				pass VARCHAR(40), salt VARCHAR(2) DEFAULT '', level INT DEFAULT 0, flags INTEGER DEFAULT 0, 
+				settings LONGTEXT DEFAULT 'a:0:{}');"); 
+			$database->exec('CREATE TABLE user_autologin (id VARCHAR(40), token VARCHAR(40), user_id INTEGER)');
+			$database->exec('CREATE INDEX uauto ON user_autologin (id)');
+			$database->exec('CREATE INDEX "user" ON user_autologin (user_id)');
+			$database->exec('CREATE TABLE feeds         (id SERIAL PRIMARY KEY, owner INT, "desc" VARCHAR(120), short VARCHAR(120),
+				code TEXT, public INT DEFAULT 0, update_timestamp INT);');
+			$database->query('CREATE TABLE feed_links (feed_id INTEGER, title VARCHAR(120), url TEXT, PRIMARY KEY (feed_id, title));');
+			$database->exec('CREATE TABLE data          (id SERIAL PRIMARY KEY, feed_id INTEGER,
+				data TEXT, timestamp INTEGER)');
+			$database->exec('CREATE INDEX fid ON data       (feed_id);');
+			$database->exec("CREATE TABLE user_data         (data_id INTEGER, user_id INTEGER, comment TEXT DEFAULT '', invisible INTEGER DEFAULT 0, known INTEGER DEFAULT 0);");
+			$database->exec('CREATE UNIQUE INDEX did_uid ON user_data (data_id, user_id);');
+			$database->exec('CREATE TABLE user_feeds        (user_id INTEGER, feed_id INTEGER);');
+			$database->exec('CREATE INDEX uid ON user_feeds (user_id);');
+			$database->exec('CREATE UNIQUE INDEX uid_feed ON user_feeds (user_id, feed_id);');
+			$database->exec('CREATE TABLE suggestions       (id SERIAL PRIMARY KEY, user_id INTEGER, text TEXT);');
+			$database->exec('CREATE TABLE url_age_cache     (url TEXT, age INTEGER)');
+			$database->exec('CREATE TABLE cache             (id VARCHAR(40) PRIMARY KEY, created_timestamp INT, max_age INT, filename VARCHAR(255));');
+		}
 		else {
 			$database->exec('CREATE TABLE users         (id INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(50),
 				pass VARCHAR(40), salt VARCHAR(2) DEFAULT "", level INT DEFAULT 0, flags INTEGER DEFAULT 0, settings LONGTEXT) DEFAULT CHARSET=utf8;');
@@ -91,7 +113,7 @@
 			$database->exec('CREATE TABLE cache             (id VARCHAR(40) PRIMARY KEY, created_timestamp INT, max_age INT, filename VARCHAR(255));');
 		}
 		$salt = base_convert(rand(0, 36*36 - 1), 10, 36);
-		$database->exec('INSERT INTO users (id, name, pass, level, salt) VALUES (1, "admin", "d033e22ae348aeb5660fc2140aec35850c4da997", 2, "' . $salt . '");'); 
+		$database->exec("INSERT INTO users (id, name, pass, level, salt) VALUES (1, 'admin', 'd033e22ae348aeb5660fc2140aec35850c4da997', 2, '" . $salt . "');"); 
 		$database->commit();
 		$database = null;
 		die("Datenbank angelegt. Der Standardbenutzer ist admin mit Passwort admin.");
@@ -203,7 +225,12 @@
 			$user = user();
 			$stmt = $database->prepare('INSERT INTO users (name, pass, salt, level, flags, settings) VALUES (?, ?, ?, ?, ?, ?)');
 			$stmt->execute(array($user->name, $user->pass, $user->salt, $user->level, $user->flags, serialize($settings)));
-			$user->id = $database->lastInsertId();
+			if($database->getAttribute(PDO::ATTR_DRIVER_NAME) == 'pgsql') {
+				$user->id = $database->lastInsertId('users_id_seq');
+			}
+			else {
+				$user->id = $database->lastInsertId();
+			}
 		}
 	}
 	// }}}
@@ -410,8 +437,15 @@
 			// In der Datenbank ein Update ausführen
 			// Das auch, wenn eigentlich nichts geändert wurde - weil wir nämlich durch
 			// den Aufruf wissen, dass die Daten noch gebraucht werden.
-			$query = $database->prepare('REPLACE INTO cache (id, created_timestamp, max_age, filename) VALUES (?, ?, ?, ?)');
-			$query->execute(array($cache_id, time(), $cache_timeout, $file_name ? $file_name : basename($url)));
+			$query = $database->prepare('SELECT COUNT(*) FROM cache WHERE id = ?');
+			$query->execute(array($cache_id));
+			if($query->fetchColumn() == 0) {
+				$query = $database->prepare('INSERT INTO cache (created_timestamp, max_age, filename, id) VALUES (?, ?, ?, ?)');
+			}
+			else {
+				$query = $database->prepare('UPDATE cache SET created_timestamp = ?, max_age = ?, filename = ? WHERE id = ?');
+			}
+			$query->execute(array(time(), $cache_timeout, $file_name ? $file_name : basename($url), $cache_id));
 		}
 
 		if($return_id) return $cache_id;
@@ -458,8 +492,15 @@
 				// Das auch, wenn eigentlich nichts geändert wurde - weil wir nämlich durch
 				// den Aufruf wissen, dass die Daten noch gebraucht werden.
 				// Die hierrüber geladenen Daten ein halbes Jahr aufbewahren.
-				$query = $database->prepare('REPLACE INTO cache (id, created_timestamp, max_age, filename) VALUES (?, ?, ?, ?)');
-				$query->execute(array($cache_id, time(), 3600 * 24 * 30 * 6, $file_name));
+				$query = $database->prepare('SELECT COUNT(*) FROM cache WHERE id = ?');
+				$query->execute(array($cache_id));
+				if($query->fetchColumn() == 0) {
+					$query = $database->prepare('INSERT INTO cache (created_timestamp, max_age, filename, id) VALUES (?, ?, ?, ?)');
+				}
+				else {
+					$query = $database->prepare('UPDATE cache SET created_timestamp = ?, max_age = ?, filename = ? WHERE id = ?');
+				}
+				$query->execute(array(time(), 3600 * 24 * 30 * 6, $file_name, $cache_id));
 			}
 
 			$retval[$file_name] = $cache_url . ' ' . $file_name;

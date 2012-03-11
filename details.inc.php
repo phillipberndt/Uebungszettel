@@ -69,7 +69,14 @@
 		if($url && !preg_match('#^http://#i', $url)) {
 			die('0');
 		}
-		$database->prepare('REPLACE INTO feed_links (feed_id, title, url) VALUES (?, ?, ?)')->execute(array($feed_id, $title, $url));
+		$query = $database->prepare('SELECT COUNT(*) FROM feed_links WHERE feed_id = ? AND title = ?');
+		$query->execute(array($feed_id, $title));
+		if($query->fetchColumn() == 1) {
+			$database->prepare('UPDATE feed_links SET title = ?, url = ? WHERE feed_id = ?')->execute(array($title, $url, $feed_id));
+		}
+		else {
+			$database->prepare('INSERT INTO feed_links (feed_id, title, url) VALUES (?, ?, ?)')->execute(array($feed_id, $title, $url));
+		}
 		die('1');
 	}
 
@@ -89,7 +96,12 @@
 		}
 
 		if($property == 'desc') {
-			$stmt = $database->prepare('UPDATE feeds SET `desc` = ? WHERE id = ?');
+			if($database->getAttribute(PDO::ATTR_DRIVER_NAME) == 'pgsql') {
+				$stmt = $database->prepare('UPDATE feeds SET "desc" = ? WHERE id = ?');
+			}
+			else {
+				$stmt = $database->prepare('UPDATE feeds SET `desc` = ? WHERE id = ?');
+			}
 			$stmt->execute(array($value, $feed_id));
 		}
 
@@ -102,8 +114,15 @@
 			if(!preg_match('#^http://#i', $value)) {
 				die(htmlspecialchars($feed['course_url']));
 			}
-			$stmt = $database->prepare('REPLACE INTO feed_links (feed_id, title, url) VALUES (?, "Homepage", ?)');
-			$stmt->execute(array($feed_id, $value));
+
+			$query = $database->prepare("SELECT COUNT(*) FROM feed_links WHERE feed_id = ? AND title = 'Homepage'");
+			$query->execute(array($feed_id));
+			if($query->fetchColumn() == 1) {
+				$database->prepare("UPDATE feed_links SET url = ? WHERE feed_id = ? AND title = 'Homepage'")->execute(array($value, $feed_id));
+			}
+			else {
+				$database->prepare("INSERT INTO feed_links (feed_id, title, url) VALUES (?, 'Homepage', ?)")->execute(array($feed_id, $value));
+			}
 		}
 
 		if(array_search($property, array('url', 'search', 'exercise')) !== false) {
@@ -173,8 +192,8 @@
 		<dd><?=$feed['public'] ? 'Ja' : 'Nein'?></dd>
 		<dt>Kurs-Homepage</dt>
 		<dd class="editable url short" id="edit-course_url"><?
-			$course_url = $database->query('SELECT url FROM feed_links WHERE feed_id = ' .
-				intval($feed['id']) . ' AND title = "Homepage"')->fetchColumn();
+			$course_url = $database->query("SELECT url FROM feed_links WHERE feed_id = " .
+				intval($feed['id']) . " AND title = 'Homepage'")->fetchColumn();
 
 			if($course_url) {
 				$link_title = parse_url($course_url, PHP_URL_HOST);

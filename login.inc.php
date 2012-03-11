@@ -277,8 +277,8 @@
 				// Autologin-Cookie anlegen
 				$autologin = sha1($user->salt . $secure_token . time() . $user->id . $_SERVER['REMOTE_ADDR']);
 				$token = sha1($autologin . '-' . microtime() . '-' . rand());
-				$database->query('INSERT INTO user_autologin (id, token, user_id) VALUES("' . $autologin . '",
-					"' . $token . '", ' . $user->id . ');');
+				$database->query("INSERT INTO user_autologin (id, token, user_id) VALUES('" . $autologin . "',
+					'" . $token . "', " . $user->id . ');');
 				setcookie('autologin', $autologin . '-' . $token, time() + 15552000, 
 					(dirname($_SERVER['REQUEST_URI']) == '/' ? '/' : dirname($_SERVER['REQUEST_URI']) . '/'),
 					null, false, true);
