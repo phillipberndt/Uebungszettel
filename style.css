@@ -132,6 +132,7 @@ ul.hover_menu {
 	font-size: small;
 	padding: 0;
 	margin-left: 15px;
+	margin-top: -1px;
 }
 ul.hover_menu li {
 	padding: 2px;
