@@ -4,6 +4,7 @@
 	// Datenbankverbindung. Dieses Script verwendet PDO, dessen Syntax
 	// ist demnach zu verwenden. z.B. für MySQL:
 	//  $database_conn = array('mysql:host=localhost;dbname=zettel', "root", "");
+	// oder pgsql für Postgre.
 	// Vorkonfiguriert ist SQLite:
 	$database_conn = array('sqlite:'.getcwd().'/database.sqlite', null, null);
 

@@ -122,7 +122,12 @@
 				}
 				$stmt->execute(array($feed_id, $content, time()));
 				$new_content[$feed_id][] = $content;
-				$content_ids[$content] = $database->lastInsertId();
+				if($database->getAttribute(PDO::ATTR_DRIVER_NAME) == 'pgsql') {
+					$content_ids[$content] = $database->lastInsertId('data_id_seq');
+				}
+				else {
+					$content_ids[$content] = $database->lastInsertId();
+				}
 			}
 			else
 			{

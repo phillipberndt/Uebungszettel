@@ -44,9 +44,9 @@
 			FROM
 				data
 			WHERE feed_id IN (SELECT feed_id FROM user_feeds WHERE user_id = '.$user->id.')
-			AND timestamp IS NOT NULL
-			GROUP BY id HAVING (invisible IS NULL OR invisible != 1)');
+			AND timestamp IS NOT NULL');
 		foreach($exercises as $exercise):
+			if($exercise['invisible'] && $hide_invisible) continue;
 
 		?>
 			

@@ -35,10 +35,20 @@
 				$database->beginTransaction();
 				$short = trim($_POST['short']);
 				if(empty($short)) $short = $_POST['desc'];
-				$stmt = $database->prepare("INSERT INTO feeds (owner, `desc`, code, public, short) VALUES (?, ?, ?, 1, ?);");
+				if($database->getAttribute(PDO::ATTR_DRIVER_NAME) == 'pgsql') {
+					$stmt = $database->prepare('INSERT INTO feeds (owner, "desc", code, public, short) VALUES (?, ?, ?, 1, ?);');
+				}
+				else {
+					$stmt = $database->prepare("INSERT INTO feeds (owner, `desc`, code, public, short) VALUES (?, ?, ?, 1, ?);");
+				}
 				$stmt->execute(array(user()->id, trim($_POST['desc']), serialize(array('code' => $_POST['code'])), $short));
 				$stmt = $database->prepare("INSERT INTO user_feeds (user_id, feed_id) VALUES (?, ?);");
-				$stmt->execute(array(user()->id, $database->lastInsertId()));
+				if($database->getAttribute(PDO::ATTR_DRIVER_NAME) == 'pgsql') {
+					$stmt->execute(array(user()->id, $database->lastInsertId('feeds_id_seq')));
+				}
+				else {
+					$stmt->execute(array(user()->id, $database->lastInsertId()));
+				}
 				$database->commit();
 				gotop('index.php?q=feeds');
 			}
@@ -109,7 +119,12 @@
 				$database->beginTransaction();
 				$short = trim($_POST['short']);
 				if(empty($short)) $short = $_POST['desc'];
-				$stmt = $database->prepare("INSERT INTO feeds (owner, `desc`, code, short) VALUES (?, ?, ?, ?);");
+				if($database->getAttribute(PDO::ATTR_DRIVER_NAME) == 'pgsql') {
+					$stmt = $database->prepare('INSERT INTO feeds (owner, "desc", code, short) VALUES (?, ?, ?, ?);');
+				}
+				else {
+					$stmt = $database->prepare("INSERT INTO feeds (owner, `desc`, code, short) VALUES (?, ?, ?, ?);");
+				}
 				$stmt->execute(array(user()->id, trim($_POST['desc']), serialize(array(
 					'search' => $_POST['search'],
 					'exercise' => $_POST['exercise'],
@@ -117,7 +132,12 @@
 				)),
 				$short));
 				$stmt = $database->prepare("INSERT INTO user_feeds (user_id, feed_id) VALUES (?, ?);");
-				$feed_id = $database->lastInsertId();
+				if($database->getAttribute(PDO::ATTR_DRIVER_NAME) == 'pgsql') {
+					$feed_id = $database->lastInsertId('feeds_id_seq');
+				}
+				else {
+					$feed_id = $database->lastInsertId();
+				}
 				$stmt->execute(array(user()->id, $feed_id));
 				$database->commit();
 				status_message("Der Feed wurde erfolgreich erstellt.");
@@ -162,12 +182,22 @@
 		<tr><th>&nbsp;</th><th>Kurs</th><th>Zettel</th><th>&nbsp;</th></tr>
 		<?php
 			$has_course = false;
-			$query = 'SELECT id, `desc`, public, update_timestamp, 
-			(SELECT COUNT(*) FROM user_feeds WHERE feed_id = feeds.id AND user_id = '.user()->id.') AS checked,
-			(SELECT COUNT(*) FROM data WHERE feed_id = feeds.id AND timestamp IS NOT NULL) AS count
-			FROM feeds
-			WHERE owner = '.user()->id.' OR public = 1 '.(user()->level >= 1 ? ' OR 1 ' : '').'
-			ORDER BY `desc` ASC';
+			if($database->getAttribute(PDO::ATTR_DRIVER_NAME) == 'pgsql') {
+				$query = 'SELECT id, "desc", public, update_timestamp, 
+					(SELECT COUNT(*) FROM user_feeds WHERE feed_id = feeds.id AND user_id = '.user()->id.') AS checked,
+					(SELECT COUNT(*) FROM data WHERE feed_id = feeds.id AND timestamp IS NOT NULL) AS count
+					FROM feeds
+					WHERE owner = '.user()->id.' OR public = 1 '.(user()->level >= 1 ? ' OR 1=1 ' : '').'
+					ORDER BY "desc" ASC';
+			}
+			else {
+				$query = 'SELECT id, `desc`, public, update_timestamp, 
+					(SELECT COUNT(*) FROM user_feeds WHERE feed_id = feeds.id AND user_id = '.user()->id.') AS checked,
+					(SELECT COUNT(*) FROM data WHERE feed_id = feeds.id AND timestamp IS NOT NULL) AS count
+					FROM feeds
+					WHERE owner = '.user()->id.' OR public = 1 '.(user()->level >= 1 ? ' OR 1 ' : '').'
+					ORDER BY `desc` ASC';
+			}
 			foreach($database->query($query) as $course) {
 					$has_course = true;
 					$classes = ($course['public'] ? '' : 'private') . ' ' .

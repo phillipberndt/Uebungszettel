@@ -51,8 +51,16 @@
 	// In der Datenbank ein Update ausführen
 	// Das auch, wenn eigentlich nichts geändert wurde - weil wir nämlich durch
 	// den Aufruf wissen, dass die Daten noch gebraucht werden.
-	$query = $database->prepare('REPLACE INTO cache (id, created_timestamp, max_age, filename) VALUES (?, ?, ?, ?)');
-	$query->execute(array($final_cache_id, time(), 3600 * 24 * 2, 'drucken.pdf'));
+	$query = $database->prepare('SELECT COUNT(*) FROM cache WHERE id = ?');
+	$query->execute(array($final_cache_id));
+	if($query->fetchColumn() == 0) {
+		$query = $database->prepare('INSERT INTO cache (created_timestamp, max_age, filename, id) VALUES (?, ?, ?, ?)');
+	}
+	else {
+		$query = $database->prepare('UPDATE cache SET created_timestamp = ?, max_age = ?, filename = ? WHERE id = ?');
+	}
+
+	$query->execute(array(time(), 3600 * 24 * 2, 'drucken.pdf', $final_cache_id));
 
 	// Je nach Aktion handeln
 	$action = $_POST['action'];
