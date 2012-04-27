@@ -118,29 +118,27 @@ $(document).ready(function() {
 					alert("Deine Suche produziert einen Fehler und kann daher nicht ausgewertet werden.");
 				});
 				$.post("index.php?q=feeds", query + "preview=1", function(r) {
-					var mwnd = window.open("", "Vorschau", "width=350,height=600");
-					if(!mwnd || (window.opera && !mwnd.opera)) {
-						alert("Bitte deaktiviere Deinen Popupblocker um die Vorschau zu sehen.");
-						box.remove();
-						return false;
-					}
-					mwnd.document.write("<style> * { font-family: sans-serif; }</style><h1>Vorschau</h1>");
+					box.remove();
+					var lbox = $("<div class='dialog'></div><div id='greyout'></div>");
+					lbox.appendTo(document.body);
+					infoBox = $(lbox[0]);
+
 					if(r.indexOf("Fehler") != 0) {
-						mwnd.document.write("<p>Mit Deinen Suchparametern wird folgendes gefunden:</p>");
-						mwnd.document.write("<ul style='font-size: x-small'>" + r + "</ul>");
-						mwnd.document.write("<br><br><input id='sub' type='submit' value='Speichern'>");
-						mwnd.document.getElementById("sub").onclick = function() {
-							mform._ok = 1;
-							mform.submit();
-							mwnd.close();
-						}
+						infoBox.html("<div class='inner'><p>Mit Deinen Suchparametern wird folgendes gefunden:</p><ul style='font-size: x-small'>" + r + "</ul><br><br><input id='sub' type='submit' value='Speichern'> <input id='back' type='submit' value='Zurück'></div>");
 					}
 					else {
-						mwnd.document.write(r);
-						mwnd.document.write("<br><br><a href='#' onclick='window.close();'>Zurück</a>");
+						infoBox.find("#status").html("<div class='inner'>" + r + "<br><br><a href='#' id='back'>Zurück</a></div>")
 					}
-					mwnd.document.close();
-					box.remove();
+					infoBox.find("#back").click(function() {
+						lbox.remove();
+						return false;
+					});
+					infoBox.find("#sub").click(function() {
+						lbox.remove();
+						mform._ok = 1;
+						mform.submit();
+						return false;
+					});
 				});
 
 				return false;
@@ -460,23 +458,21 @@ $(document).ready(function() {
 					$(this).remove();
 				});
 				$.post("index.php?q=feeds", query + "preview=1", function(r) {
-					var mwnd = window.open("", "Vorschau", "width=350,height=600");
-					if(!mwnd || (window.opera && !mwnd.opera)) {
-						alert("Bitte deaktiviere Deinen Popupblocker um die Vorschau zu sehen.");
-						box.remove();
-						return false;
-					}
-					mwnd.document.write("<style> * { font-family: sans-serif; }</style><h1>Vorschau</h1>");
+					box.remove();
+					var lbox = $("<div class='dialog'></div><div id='greyout'></div>");
+					lbox.appendTo(document.body);
+					infoBox = $(lbox[0]);
+
 					if(r.indexOf("Fehler") != 0) {
-						mwnd.document.write("<p>Mit Deinen Suchparametern wird folgendes gefunden:</p>");
-						mwnd.document.write("<ul style='font-size: x-small'>" + r + "</ul>");
+						infoBox.html("<div class='inner'><p>Mit Deinen Suchparametern wird folgendes gefunden:</p><ul style='font-size: x-small'>" + r + "</ul><br><br><input id='back' type='submit' value='Zurück'></div>");
 					}
 					else {
-						mwnd.document.write(r);
+						infoBox.find("#status").html("<div class='inner'>" + r + "<br><br><a href='#' id='back'>Zurück</a></div>")
 					}
-					mwnd.document.write("<br><br><a href='#' onclick='window.close();'>Zurück</a>");
-					mwnd.document.close();
-					box.remove();
+					infoBox.find("#back").click(function() {
+						lbox.remove();
+						return false;
+					});
 				});
 				return false;
 			});

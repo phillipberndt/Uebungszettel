@@ -105,6 +105,12 @@ div.dialog h2 {
 	background: #ddf;
 	font-size: small;
 }
+div.dialog .inner {
+	padding: 5px;
+	margin: 5px;
+	background: #fff;
+	border: 1px solid #f5f5ff;
+}
 
 a:visited {
 	color: #008;
