@@ -127,7 +127,7 @@ $(document).ready(function() {
 						infoBox.html("<h2>Vorschau</h2><div class='inner'><p>Mit Deinen Suchparametern wird folgendes gefunden:</p><ul style='font-size: x-small'>" + r + "</ul><br><br><div class='right'><input id='sub' type='submit' value='Speichern'> <input id='back' type='submit' value='Zurück'></div></div>");
 					}
 					else {
-						infoBox.find("#status").html("<h2>Fehler</h2><div class='inner'>" + r + "<br><br><div class='right'><input id='back' type='submit' value='Zurück'></div></div>")
+						infoBox.html("<h2>Fehler</h2><div class='inner'>" + r + "<br><br><div class='right'><input id='back' type='submit' value='Zurück'></div></div>")
 					}
 					infoBox.find("#back").click(function() {
 						lbox.remove();
@@ -467,7 +467,7 @@ $(document).ready(function() {
 						infoBox.html("<h2>Vorschau</h2><div class='inner'><p>Mit Deinen Suchparametern wird folgendes gefunden:</p><ul style='font-size: x-small'>" + r + "</ul><br><br><div class='right'><input id='back' type='submit' value='Zurück'></div></div>");
 					}
 					else {
-						infoBox.find("#status").html("<h2>Fehler</h2><div class='inner'>" + r + "<br><br><div class='right'><input id='back' type='submit' value='Zurück'></div></div>")
+						infoBox.html("<h2>Fehler</h2><div class='inner'>" + r + "<br><br><div class='right'><input id='back' type='submit' value='Zurück'></div></div>")
 					}
 					infoBox.find("#back").click(function() {
 						lbox.remove();
