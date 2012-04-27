@@ -124,10 +124,10 @@ $(document).ready(function() {
 					infoBox = $(lbox[0]);
 
 					if(r.indexOf("Fehler") != 0) {
-						infoBox.html("<div class='inner'><p>Mit Deinen Suchparametern wird folgendes gefunden:</p><ul style='font-size: x-small'>" + r + "</ul><br><br><input id='sub' type='submit' value='Speichern'> <input id='back' type='submit' value='Zurück'></div>");
+						infoBox.html("<h2>Vorschau</h2><div class='inner'><p>Mit Deinen Suchparametern wird folgendes gefunden:</p><ul style='font-size: x-small'>" + r + "</ul><br><br><div class='right'><input id='sub' type='submit' value='Speichern'> <input id='back' type='submit' value='Zurück'></div></div>");
 					}
 					else {
-						infoBox.find("#status").html("<div class='inner'>" + r + "<br><br><a href='#' id='back'>Zurück</a></div>")
+						infoBox.find("#status").html("<h2>Fehler</h2><div class='inner'>" + r + "<br><br><div class='right'><input id='back' type='submit' value='Zurück'></div></div>")
 					}
 					infoBox.find("#back").click(function() {
 						lbox.remove();
@@ -464,10 +464,10 @@ $(document).ready(function() {
 					infoBox = $(lbox[0]);
 
 					if(r.indexOf("Fehler") != 0) {
-						infoBox.html("<div class='inner'><p>Mit Deinen Suchparametern wird folgendes gefunden:</p><ul style='font-size: x-small'>" + r + "</ul><br><br><input id='back' type='submit' value='Zurück'></div>");
+						infoBox.html("<h2>Vorschau</h2><div class='inner'><p>Mit Deinen Suchparametern wird folgendes gefunden:</p><ul style='font-size: x-small'>" + r + "</ul><br><br><div class='right'><input id='back' type='submit' value='Zurück'></div></div>");
 					}
 					else {
-						infoBox.find("#status").html("<div class='inner'>" + r + "<br><br><a href='#' id='back'>Zurück</a></div>")
+						infoBox.find("#status").html("<h2>Fehler</h2><div class='inner'>" + r + "<br><br><div class='right'><input id='back' type='submit' value='Zurück'></div></div>")
 					}
 					infoBox.find("#back").click(function() {
 						lbox.remove();

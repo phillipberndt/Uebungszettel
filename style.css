@@ -107,9 +107,10 @@ div.dialog h2 {
 }
 div.dialog .inner {
 	padding: 5px;
-	margin: 5px;
+	margin: 0px;
 	background: #fff;
-	border: 1px solid #f5f5ff;
+	border: 1px solid #aaa;;
+	padding-bottom: 30px;
 }
 
 a:visited {
