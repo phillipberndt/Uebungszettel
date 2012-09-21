@@ -45,6 +45,7 @@
 	$restrict_registration = array(
 		//'Freie Universität Berlin' => '160.45.0.0/16',
 		//'Technische Universität Berlin' => '130.149.0.0/16',
+		//'Technische Universität Berlin (IPv6)' => '2001:0638:0809::/48',
 		//'Humboldt Universität Berlin' => '141.20.0.0/16',
 		//'Heimnetz' => '192.168.0.1/24',
 	);

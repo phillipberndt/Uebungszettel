@@ -546,6 +546,31 @@
 		}
 		return $match[1] * $multiplier;
 	}/*}}}*/
+	function ip2bin($ip) { /*{{{*/
+		// Aus der php.net Dokumentation von ip2long()
+		// Angepasst um in v6 abgebildete v4 Adressen zu erkennen
+		if(preg_match('#^::ffff:([0-9A-F]+)$#i', $ip, $match)) {
+			$ip = base_convert($match[1], 10, 2);;
+		}
+		if(preg_match('#^::ffff:([0-9]+\.[0-9.]+)$#i', $ip, $match)) {
+			$ip = $match[1];
+		}
+		if(filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
+			return base_convert(ip2long($ip), 10, 2);
+		}
+		if(filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false) {
+			return false;
+		}
+		if(($ip_n = inet_pton($ip)) === false) return false;
+		$bits = 15;
+		$ipbin = '';
+		while ($bits >= 0) {
+			$bin = sprintf("%08b",(ord($ip_n[$bits])));
+			$ipbin = $bin . $ipbin;
+			$bits--;
+		}
+		return $ipbin;
+	}/*}}}*/
 	// }}}
 
 	// Angepasste Helfer-Funktionen für eine bestimmte Installation

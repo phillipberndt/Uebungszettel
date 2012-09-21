@@ -67,11 +67,12 @@
 			// Registrierung auf IP-Bereiche einschränken
 			if(isset($restrict_registration) && $restrict_registration) {
 				$register_ok = false;
-				$client_ip = ip2long($_SERVER['REMOTE_ADDR']);
+				$client_ip = ip2bin($_SERVER['REMOTE_ADDR']);
 				foreach($restrict_registration as $ip_range) {
 					list($ip, $sub) = explode('/', $ip_range);
-					$mask = bindec(str_repeat('1', $sub) . str_repeat('0', 32 - $sub));
-					if(long2ip(ip2long($ip) & $mask) == long2ip($client_ip & $mask)) {
+					$mask_ip = ip2bin($ip);
+
+					if(strncmp($client_ip, $mask_ip, $sub) == 0) {
 						$register_ok = true;
 						break;
 					}
