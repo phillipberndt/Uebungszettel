@@ -120,7 +120,20 @@
 	}
 	// }}}
 	// Hilfsfunktionen {{{
-	function status_message($text, $user = null) {
+	function generic_exception_handler($error) {/*{{{*/
+		global $support_mail;
+		$support_mail_show = str_replace(array('@'), array(' auf '), $support_mail);
+
+		?>
+			<div id="phperror">
+				<h3>Oops</h3>
+				<p>Beim Ausführen der Seite ist ein Fehler aufgetreten. Das tut uns leid. Bitte melde Dich bei uns (<span class="tomail"><?=$support_mail_show?></span>), damit wir das Problem möglichst schnell beseitigen können!
+			</div>
+		<?php
+		die();
+	}/*}}}*/
+	set_exception_handler('generic_exception_handler');
+	function status_message($text, $user = null) {/*{{{*/
 		// Statusmeldungen werden bei der Seitenausgabe in ein
 		// Div geschrieben.
 		if($user === null) {
@@ -141,14 +154,14 @@
 				user_save($user);
 			}
 		}
-	}
-	function gotop($url) {
+	}/*}}}*/
+	function gotop($url) {/*{{{*/
 		if(isset($_REQUEST['destination']) && $_REQUEST['destination'] && !preg_match('#^[a-z]+:#i', $_REQUEST['destination'])) {
 			$url = $_REQUEST['destination'];
 		}
 		header('Location: '.$url);
 		die();
-	}
+	}/*}}}*/
 	// Benutzerverwaltung {{{
 	function user_levels() {
 		return array(
