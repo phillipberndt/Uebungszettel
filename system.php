@@ -158,6 +158,7 @@
 	function gotop($url) {/*{{{*/
 		if(isset($_REQUEST['destination']) && $_REQUEST['destination'] && !preg_match('#^[a-z]+:#i', $_REQUEST['destination'])) {
 			$url = $_REQUEST['destination'];
+			$url = preg_replace('#^/+#', '/', $url);
 		}
 		header('Location: '.$url);
 		die();
