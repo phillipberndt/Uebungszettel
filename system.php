@@ -517,7 +517,7 @@
 				$query->execute(array(time(), 3600 * 24 * 30 * 6, $file_name, $cache_id));
 			}
 
-			$retval[$file_name] = $cache_url . ' ' . $file_name;
+			$retval[$zip->getNameIndex($i)] = $cache_url . ' ' . $file_name;
 		}
 		return $retval;
 	} /*}}}*/
