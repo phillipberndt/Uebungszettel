@@ -55,7 +55,7 @@
 		<thead><tr><th>Benutzername</th><th>Email</th><th>Passwort</th><th>Berechtigungen</th><th>Aktion</th></tr></thead>
 		<tbody>
 		<?php
-			$users = $database->query('SELECT id, name, level, settings FROM users WHERE id > 1');
+			$users = $database->query('SELECT id, name, level, settings FROM users WHERE id > 1 ORDER BY id ASC');
 			foreach($users as $user):
 				$settings = unserialize($user['settings']);
 				?>
