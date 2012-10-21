@@ -199,5 +199,11 @@
 		<dt>cache_contents</dt>
 		<dd>Wie cache_file, gibt aber den Inhalt des Caches zurück</dd>
 	</dl>
+	<?php if(file_exists('local.php')): ?>
+		<p>Außerdem stehen Dir spezielle Funktionen zur Verfügung, die speziell für
+		diese Installation des Übungszetteldienstes angepasst sind. Eine Übersicht
+		über die Helferfunktionen
+		<a href="index.php?q=details&amp;show=helper">findest Du hier</a>.
+	<?php endif; ?>
 	<p>Auch diese Art des Eintragens zeigt zunächst nur eine Vorschau an.</p>
 </div>
