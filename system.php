@@ -472,7 +472,7 @@
 	function cache_zip_file_contents($url, $identifier = null) { /*{{{*/
 		global $database;
 		if($identifier === null) $identifier = $url;
-		$cache_id = cache_file($url, false, true, 3600 * 24 * 7);
+		$cache_id = cache_file($url, false, true, 500);
 		$retval = array();
 		$directory = dirname($_SERVER['REQUEST_URI']); if(substr($directory, -1) != '/') $directory .= '/';
 		$zip = new ZipArchive;
