@@ -368,11 +368,14 @@
 			"Reply-To: ".$support_mail. PHP_EOL;
 		$text = 'Hallo '.$data['name']."," . PHP_EOL . PHP_EOL . "für Dich stehen neue Übungszettel bereit:" . PHP_EOL;
 		$attachments = PHP_EOL;
+		$subjects = array();
 		foreach($data['content'] as $content) {
 			$short = $content[0]; $sheet = $content[1];
 			$text .= ' · '.$short.': '.$sheet;
 			list($sheet_url, $sheet_text) = split_data($sheet);
 			if($sheet_url) {
+				$subjects[] = $short . ' ' . $sheet_text;
+
 				$text .= ' (Siehe Attachment)';
 				$file_contents = cache_contents($sheet_url);
 				// Hier raten wir den Namen etwas intelligenter, denn Email-Programme kommen
@@ -401,11 +404,20 @@
 					chunk_split(base64_encode($file_contents), 76, "\n") . PHP_EOL . PHP_EOL;
 				unset($file_contents);
 			}
+			else {
+				$subjects[] = $short;
+			}
 			$text .= PHP_EOL;
 		}
 		$text .= PHP_EOL . "Gruß," . PHP_EOL . "Dein Übungszettelservice" . PHP_EOL . PHP_EOL . "Ps. Wenn Du diese Email unbeabsichtigt bekommst, schreibe uns " .
 			"eine Antwort. Wir bestellen diesen Dienst dann für Dich ab.";
 		$message = "--" . $boundary . PHP_EOL . "Content-Type: text/plain;charset=UTF-8" . PHP_EOL .
 			"Content-Transfer-Encoding: 8bit" . PHP_EOL . PHP_EOL . $text . $attachments . PHP_EOL . "--" . $boundary . "--";
-		mail($data['name'] . ' <'. $mail . '>', 'Neue =?utf-8?Q?=C3=9Cbungszettel?=', $message, $headers);
+		if(function_exists('mb_encode_mimeheader')) {
+			$subject_encoded = mb_encode_mimeheader(implode(', ', $subjects), 'UTF-8', 'B', "\n");
+		}
+		else {
+			$subject_encoded = '=?UTF-8?B?' . base64_encode(implode(', ', $subjects)) . '?=';
+		}
+		mail($data['name'] . ' <'. $mail . '>', 'Neue =?utf-8?Q?=C3=9Cbungszettel?= (' . $subject_encoded . ')', $message, $headers);
 	}
