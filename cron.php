@@ -1,4 +1,5 @@
 <?php
+	$is_cron = true;
 	require('system.php');
 	$cron_debug = isset($cron_debug) ? (bool)$cron_debug : false;
 	if(!$cron_debug) {

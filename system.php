@@ -1,6 +1,9 @@
 <?php
 	// Konfiguration laden
 	if(!file_exists('config.php')) {
+		if(isset($is_cron) && $is_cron) {
+			die('Konfiguration „config.php“ nicht gefunden.');
+		}
 		die('<!DOCTYPE HTML><head><meta charset="utf-8"><title>Fehler</title></head>
 			<body><h1>Konfiguration fehlt</h1><p>Bitte lege eine Konfigurationsdatei <em>config.php</em> an. Hierzu
 			kannst Du die Vorlage aus <em>config.php.sample</em> verwenden.</p></body>');
@@ -34,6 +37,9 @@
 		$database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	}
 	catch(Exception $error) {
+		if(isset($is_cron) && $is_cron) {
+			die('Datenbankverbindung konnte nicht hergestellt werden: ' . $error->getMessage());
+		}
 		?><!DOCTYPE HTML><head><title>Fehler</title><meta charset="utf-8"></head><body><h1>Datenbankfehler</h1>
 		<p>Eine Datenbankverbindung konnte nicht hergestellt werden. Fehler:
 			<em><?=htmlspecialchars($error->getMessage())?></em>
