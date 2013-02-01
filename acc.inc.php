@@ -1,7 +1,7 @@
 <?php
 	force_login();
 
-	if(!empty($_POST) && sha1(user()->salt . $_POST['old_pass']) == user()->pass) {
+	if(!empty($_POST) && user_load_authenticate(user()->name, $_POST['old_pass'])) {
 		// Account löschen
 		if(isset($_POST['del_account'])) {
 			if(!isset($_POST['del_confirm'])) {
@@ -24,7 +24,7 @@
 		}
 
 		// Passwort ändern
-		if(isset($_POST['change_pw'])) {
+		if(isset($_POST['change_pw']) && (user()->flags & USER_FLAG_IS_LDAP_ACCOUNT) == 0 || !$ldap_server) {
 			if(!trim($_POST['new_pass_1'])) {
 				status_message("Bitte gib ein neues Kennwort ein, das nicht nur aus Whitespace besteht!");
 				gotop("index.php?q=acc");
@@ -47,12 +47,17 @@
 		// Einstellungen ändern
 		if(isset($_POST['settings'])) {
 			$flags = &user()->flags;
-			foreach(array('newsletter', 'atom_feed') as $setting) {
+			foreach(array('mail', 'atom_feed') as $setting) {
 				$value = isset($_POST[$setting]) ? trim($_POST[$setting]) : false;
 
-				if($setting == 'newsletter') {
+				if($setting == 'mail') {
 					if($value) $flags |= USER_FLAG_WANTSMAIL;
 					else $flags &= ~USER_FLAG_WANTSMAIL;
+
+					if((user()->flags & USER_FLAG_IS_LDAP_ACCOUNT) != 0 && $ldap_server) {
+						// Mail-Adresse nicht überschreiben mit dem 1/0-Wert aus dem radio-Button
+						continue;
+					}
 				}
 
 				user()->$setting = $value;
@@ -109,6 +114,25 @@
 			status_message("Wir haben Dir Deinen neuen Sicherheitscode zugeschickt!");
 			gotop("index.php?q=acc");
 		}
+
+		if(isset($_POST['ldap_connect']) && $ldap_server) {
+			if(ldap_authenticate(user()->name, $_POST['ldap_pass'])) {
+				user()->flags |= USER_FLAG_IS_LDAP_ACCOUNT;
+				user()->pass = '';
+				user()->salt = '';
+				user_save();
+
+				$database->query('DELETE FROM user_autologin WHERE user_id = ' . user()->id);
+				session_destroy();
+				session_start();
+				status_message("Dein Account ist jetzt mit dem LDAP-Server verknüpft.");
+				gotop("index.php");
+			}
+			else {
+				status_message("Dein LDAP-Kennwort war nicht korrekt, oder Du hast keinen LDAP-Account");
+			}
+			gotop("index.php?q=acc");
+		}
 	}
 	elseif(!empty($_POST)) {
 		status_message("Dein altes Kennwort war nicht korrekt.");
@@ -125,9 +149,15 @@
 		</fieldset>
 		<fieldset>
 			<legend>Kennwort ändern</legend>
+			<?php if((user()->flags & USER_FLAG_IS_LDAP_ACCOUNT) == 0 || !$ldap_server): ?>
 			<label><span>Neues Kennwort</span><input type="password" name="new_pass_1"></label>
 			<label><span>Neues Kennwort</span><input type="password" name="new_pass_2"> (Bitte gib Dein neues Kennwort zur Bestätigung 2x ein)</label>
 			<input type="submit" name="change_pw" value="Kennwort ändern">
+			<?php else: ?>
+			<p>
+				Dein Kennwort kannst Du direkt auf dem <a href="http://<?=$ldap_server?>">LDAP-Server</a> ändern.
+			</p>
+			<?php endif; ?>
 		</fieldset>
 		<fieldset>
 			<legend>Account löschen</legend>
@@ -138,8 +168,14 @@
 		</fieldset>
 		<fieldset>
 			<legend>Einstellungen</legend>
-			<label><span>Newsletter</span> <input type="text" name="newsletter" value="<?=htmlspecialchars(user()->newsletter)?>"></label>
+			<?php if((user()->flags & USER_FLAG_IS_LDAP_ACCOUNT) == 0 || !$ldap_server): ?>
+			<label><span>Mail</span> <input type="text" name="mail" value="<?=htmlspecialchars(user()->mail)?>"></label>
 			<p class="small indent">Ist hier eine Email-Adresse angegeben, werden neue Zettel per Email zugestellt</p>
+			<?php else: ?>
+			<label><span>Newsletter empfangen</span> <input type="radio" name="mail" value="1" <?=(user()->flags & USER_FLAG_WANTSMAIL) == 1 ? 'checked' : ''?>> Ja</label>
+			<label><span>&nbsp;</span> <input type="radio" name="mail" value="0" <?=(user()->flags & USER_FLAG_WANTSMAIL) == 0 ? 'checked' : ''?>> Nein</label>
+			<p class="small indent">Falls ausgewählt werden neue Zettel per Email an <em><?=htmlspecialchars(user()->mail)?></em> zugestellt</p>
+			<?php endif; ?>
 			<label><span>Atom-Feed</span> <input type="checkbox" value="1" name="atom_feed" <?php
 				if(user()->atom_feed !== false) echo('checked');
 			?>></label>
@@ -167,6 +203,23 @@
 			<?php endif; ?>
 			<input type="submit" name="ssh" value="Fachbereichsaccount speichern">
 		</fieldset>
+		<?php endif; ?>
+		<?php if($ldap_server && (user()->flags & USER_FLAG_IS_LDAP_ACCOUNT) == 0): ?>
+		<fieldset>
+			<legend>LDAP-Login</legend>
+			<p>
+				Du kannst Deinen Login mit dem LDAP-Server <a
+				href="http://<?=$ldap_server?>"><?=$ldap_server?></a>
+				verbinden. So werden Dein Benutzername, Kennwort und die
+				Email-Adresse zentral verwaltet. Beachte: Diesen Schritt kann nur
+				ein Administrator für Dich rückgängig machen!
+			</p>
+			<p>
+				Um fortzufahren, bestätige bitte den Umzug mit dem Kennwort des
+				LDAP-Benutzers <em><?=htmlspecialchars(user()->name)?></em>.
+			</p>
+			<label><span>Kennwort</span> <input type="password" name="ldap_pass" value=""></label>
+			<input type="submit" name="ldap_connect" value="Fest mit LDAP-Account verknüpfen">
 		<?php endif; ?>
 	</form>
 </div>

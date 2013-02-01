@@ -41,6 +41,13 @@
 	// Wie viele gleichzeitige Ausführungen sind erlaubt?
 	$max_concurrent_toolkit_invokations = 10;
 
+	// Login via LDAP. Sucht nach einem Eintrag mit uid=<login>, verwendet
+	// bind zur authentifikation und das mail Attribut für Emails.
+	// Lokale Accounts haben Präferenz vor LDAP-Accounts, können aber in den
+	// Einstellungen umgezogen werden.
+	$ldap_server = '';
+	$ldap_base_dn = 'ou=people,dc=example,dc=com';
+
 	// Registrierung auf bestimmte IP-Bereiche beschränken
 	$restrict_registration = array(
 		//'Freie Universität Berlin' => '160.45.0.0/16',

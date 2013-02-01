@@ -14,7 +14,8 @@
 	mb_internal_encoding('UTF-8');
 
 	// Flags für User, gespeichert in user()->flags
-	define('USER_FLAG_WANTSMAIL', 1);
+	define('USER_FLAG_WANTSMAIL',  1);
+	define('USER_FLAG_IS_LDAP_ACCOUNT', 1<<1);
 
 	// Stripslashes {{{
 	function stripslashes_deep(&$value)
@@ -211,10 +212,16 @@
 				$user->level = 0;
 			}
 		}
+		// Migration des alten $user->newsletter nach $user->mail
+		if(isset($user->newsletter)) {
+			$user->mail = $user->newsletter;
+			unset($user->newsletter);
+		}
 		return $user;
 	}
 	function user_load($key, $value) {
-		global $database;
+		global $database, $ldap_server, $ldap_base_dn;
+		static $ldap_connection = false;
 		$query = $database->prepare('SELECT * FROM users WHERE '.$key.' = ?');
 		$query->execute(array($value));
 		$user = $query->fetch(PDO::FETCH_OBJ);
@@ -227,6 +234,86 @@
 				}
 			}
 		}
+
+		// Migration des alten $user->newsletter nach $user->mail
+		if(isset($user->newsletter)) {
+			$user->mail = $user->newsletter;
+			unset($user->newsletter);
+		}
+
+		// Informationen aus dem LDAP nachladen
+		if(($user->flags & USER_FLAG_IS_LDAP_ACCOUNT) != 0 && $ldap_server) {
+			if(!$ldap_connection) {
+				$ldap_connection = ldap_connect($ldap_server);
+				if(!$ldap_connection) {
+					throw new Exception("Verbindung zum LDAP-Server fehlgeschlagen");
+				}
+				ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
+			}
+			$search = ldap_search($ldap_connection, $ldap_base_dn, "uid=" . addcslashes($user->name, ',\\#+<>;"='));
+			if(!$search) {
+				throw new Exception("Bei der LDAP-Suche ist ein Fehler aufgetreten.");
+			}
+			$results = ldap_get_entries($ldap_connection, $search);
+			if($results['count'] != 0) {
+				// Falls der User im LDAP fehlt, können wir diesen Fehler an dieser Stelle getrost ignorieren
+
+				// Mailadresse ggf. übernehmen
+				if($results[0]['mail']) {
+					$user->mail = $results[0]['mail'][0];
+				}
+			}
+		}
+
+		return $user;
+	}
+	function ldap_check_if_name_exists($name) {
+		global $ldap_server, $ldap_base_dn;
+
+		$ldap_connection = ldap_connect($ldap_server);
+		if(!$ldap_connection) {
+			throw new Exception("Verbindung zum LDAP-Server fehlgeschlagen");
+		}
+		ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
+
+		$search = ldap_search($ldap_connection, $ldap_base_dn, "uid=" . addcslashes($name, ',\\#+<>;"='));
+		if(!$search) {
+			throw new Exception("Bei der LDAP-Suche ist ein Fehler aufgetreten.");
+		}
+		$results = ldap_get_entries($ldap_connection, $search);
+		ldap_close($ldap_connection);
+
+		return $results['count'] != 0;
+	}
+	function ldap_authenticate($name, $credentials) {
+		global $ldap_server, $ldap_base_dn;
+
+		$ldap_connection = ldap_connect($ldap_server);
+		if(!$ldap_connection) {
+			throw new Exception("Verbindung zum LDAP-Server fehlgeschlagen");
+		}
+		ldap_set_option($ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
+		$bind = ldap_bind($ldap_connection, "uid=" . addcslashes($name, ',\\#+<>;"=') . ($ldap_base_dn ? ',' . $ldap_base_dn : ''), $credentials);
+		ldap_close($ldap_connection);
+
+		return $bind;
+	}
+	function user_load_authenticate($name, $credentials) {
+		global $ldap_server;
+
+		$user = user_load('name', $name);
+
+		if(($user->flags & USER_FLAG_IS_LDAP_ACCOUNT) != 0 && $ldap_server) {
+			if(!ldap_authenticate($name, $credentials)) {
+				return false;
+			}
+		}
+		else {
+			if(sha1($user->salt . $credentials) != $user->pass) {
+				return false;
+			}
+		}
+
 		return $user;
 	}
 	function user_save($user = null) {
@@ -238,7 +325,7 @@
 				$settings[$key] = $val;
 			}
 		}
-		if(user()->id) {
+		if($user->id) {
 			$stmt = $database->prepare('UPDATE users SET name = ?, pass = ?, salt = ?, level = ?, flags = ?, 
 				settings = ? WHERE id = ?');
 			$stmt->execute(array($user->name, $user->pass, $user->salt, $user->level, $user->flags, serialize($settings),

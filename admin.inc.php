@@ -60,8 +60,12 @@
 				$settings = unserialize($user['settings']);
 				?>
 				<tr><td><?=htmlspecialchars($user['name'])?></td>
-					<td><?=htmlspecialchars($settings['newsletter'])?></td>
+					<td><?=htmlspecialchars($settings['mail'] ? $settings['mail'] : $settings['newsletter'])?></td>
+					<?php if(($user->flags & USER_FLAG_IS_LDAP_ACCOUNT) != 0 && $ldap_server): ?>
+					<td>LDAP-User</td>
+					<?php else: ?>
 					<td><input type="text" name="user[<?=$user['id']?>][pass]"></td>
+					<?php endif; ?>
 					<td><select name="user[<?=$user['id']?>][level]">
 						<?php foreach(user_levels() as $key => $desc): ?>
 						<option value="<?=$key?>" <?php if($user['level'] == $key) echo('selected'); ?>><?=$desc?></option>

@@ -196,6 +196,13 @@
 				wird umgehend gelöscht. Beim Login wird ein Autologin-Cookie für Dich gespeichert, der Dich
 				beim nächsten Besuch automatisch wieder einloggt. Loggst Du Dich manuell aus, werden
 				alle Deine Autologin-Cookies automatisch deaktiviert.
+			<?php if($ldap_server): ?>
+				Falls Du bei der Registrierung einen Benutzernamen samt
+				Kennwort aus dem <a href="http://<?=htmlspecialchars($ldap_server)?>">LDAP</a>
+				angibst, speichern wir Dein Passwort nicht, sondern speichern nur die Verknüpfung Deines Accounts
+				mit dem LDAP-Verzeichnis. Diese Verknüpfung kannst Du auch noch nachträglich erstellen, falls Du
+				Dir später einen Account im LDAP anlegst.
+			<?php endif; ?>
 			</p>
 			<p>
 				Du hast auf dieser Seite die Möglichkeit, neue Kurse zu speichern. Diese Kurse werden
@@ -248,33 +255,49 @@
 				$errPass = 'Bitte gib ein Passwort ein.';
 			}
 
+			// LDAP Server gegenchecken
+			$is_ldap_account = false;
+			if($ldap_server && !$errPass && !$errName && ldap_check_if_name_exists($name)) {
+				if(!ldap_authenticate($name, $pass)) {
+					$errName = 'Dieser Benutzername ist bereits im LDAP vergeben';
+					$errPass = 'Das Passwort stimmt nicht mit dem im LDAP überein';
+				}
+				else {
+					$is_ldap_account = true;
+				}
+			}
+
 			if($errPass == $errName && $errName == "") {
 				// Benutzer erstellen
-				$salt = base_convert(rand(0, 36*36 - 1), 10, 36);
-				$passSha = sha1($salt . $pass);
 				$user = user();
 				$user->name = $name;
-				$user->pass = $passSha;
-				$user->salt = $salt;
+				if($is_ldap_account) {
+					$user->flags = USER_FLAG_IS_LDAP_ACCOUNT;
+				}
+				else {
+					$salt = base_convert(rand(0, 36*36 - 1), 10, 36);
+					$passSha = sha1($salt . $pass);
+					$user->pass = $passSha;
+					$user->salt = $salt;
+				}
 				user_save();
-				status_message('Dein Benutzer wurde angelegt. Du kannst Dich jetzt mit Deinen Benutzerdaten anmelden.');
+				status_message('Dein Benutzer wurde angelegt. Willkommen beim Übungszetteldienst!');
+
+				// Kein Autologin beim ersten Anmelden
+
+				$_SESSION['logged_in'] = true;
+				$_SESSION['login'] = $user;
 				gotop('index.php');
 			}
 		}
 
 		if($_POST['action'] == 'Anmelden') {
 			// Benutzer einloggen
-			$user = user_load("name", $name);
-			if($user) {
-				// Passwortkontrolle
-				if(sha1($user->salt . $pass) != $user->pass) {
-					$errPass = 'Benutzername oder Kennwort sind falsch.';
-				}
-			}
-			else {
+			$user = user_load_authenticate($name, $pass);
+			if(!$user) {
 				$errPass = 'Benutzername oder Kennwort sind falsch.';
 			}
-			if($errPass == '') {
+			else {
 				// Autologin-Cookie anlegen
 				$autologin = sha1($user->salt . $secure_token . time() . $user->id . $_SERVER['REMOTE_ADDR']);
 				$token = sha1($autologin . '-' . microtime() . '-' . rand());

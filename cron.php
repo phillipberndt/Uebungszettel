@@ -339,14 +339,16 @@
 	}
 
 	$user_mails = array();
-	foreach($database->query('SELECT f.feed_id, fd.short, u.name, u.id, u.settings FROM user_feeds f, users u, feeds fd WHERE u.id = f.user_id AND
+	foreach($database->query('SELECT f.feed_id, fd.short, u.id FROM user_feeds f, users u, feeds fd WHERE u.id = f.user_id AND
 		fd.id = f.feed_id AND u.flags & '.USER_FLAG_WANTSMAIL.' != 0') as $data) {
-		$settings = unserialize($data['settings']);
-		if(isset($new_content[$data['feed_id']]) && is_array($new_content[$data['feed_id']]) && $settings['newsletter']) {
-			$user_mails[$settings['newsletter']]['name'] = $data['name'];
-			if(!isset($user_mails[$settings['newsletter']]['content'])) $user_mails[$settings['newsletter']]['content'] = array();
+
+		$this_user = user_load('id', $data['id']);
+
+		if(isset($new_content[$data['feed_id']]) && is_array($new_content[$data['feed_id']]) && $this_user->mail) {
+			$user_mails[$this_user->mail]['name'] = $this_user->name;
+			if(!isset($user_mails[$this_user->mail]['content'])) $user_mails[$this_user->mail]['content'] = array();
 			foreach($new_content[$data['feed_id']] as $content) {
-				$user_mails[$settings['newsletter']]['content'][] = array($data['short'], $content);
+				$user_mails[$this_user->mail]['content'][] = array($data['short'], $content);
 
 				if(!isset($content_ids[$content])) continue;
 				$id = $content_ids[$content];
