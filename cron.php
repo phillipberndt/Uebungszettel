@@ -414,7 +414,7 @@
 		$message = "--" . $boundary . PHP_EOL . "Content-Type: text/plain;charset=UTF-8" . PHP_EOL .
 			"Content-Transfer-Encoding: 8bit" . PHP_EOL . PHP_EOL . $text . $attachments . PHP_EOL . "--" . $boundary . "--";
 		if(function_exists('mb_encode_mimeheader')) {
-			$subject_encoded = mb_encode_mimeheader(implode(', ', $subjects), 'UTF-8', 'B', "\n");
+			$subject_encoded = mb_encode_mimeheader(implode(', ', $subjects), 'UTF-8', 'Q', "\n");
 		}
 		else {
 			$subject_encoded = '=?UTF-8?B?' . base64_encode(implode(', ', $subjects)) . '?=';

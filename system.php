@@ -10,6 +10,9 @@
 	}
 	require('config.php');
 
+	// Multibyte Funktionen auf Unicode initialisieren, wichtig für mb_encode_mimeheader
+	mb_internal_encoding('UTF-8');
+
 	// Flags für User, gespeichert in user()->flags
 	define('USER_FLAG_WANTSMAIL', 1);
 
