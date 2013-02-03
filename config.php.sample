@@ -48,7 +48,11 @@
 	$ldap_server = '';
 	$ldap_base_dn = 'ou=people,dc=example,dc=com';
 
+	// Lokale Registrierung erlauben
+	$allow_local_registration = true;
+
 	// Registrierung auf bestimmte IP-Bereiche beschränken
+	// Betrifft auch den ersten Login via LDAP
 	$restrict_registration = array(
 		//'Freie Universität Berlin' => '160.45.0.0/16',
 		//'Technische Universität Berlin' => '130.149.0.0/16',
@@ -59,6 +63,7 @@
 
 	// Dann aber doch Registrierung via bestimmter Mail-Adressen erlauben
 	// (Das sind reguläre Ausdrücke)
+	// Betrifft auch den ersten Login via LDAP
 	$restrict_registration_mail_allow = array(
 		//'#[@.][fth]u-berlin\.de$#i',
 		//'#@localhost$#i',

@@ -61,9 +61,33 @@
 
 	$errName = $errPass = '';
 	if(isset($_REQUEST['action'])) { // Request statt Post ist Absicht!
-		if($_POST['action'] != 'Anmelden') {
-			// D.h. wir sind bei der Registrierung
+		// Prüfungen im Zusammenhang mit LDAP-Usern ohne lokalen Account
+		if($ldap_server && $_POST['name']) {
+			$query = $database->prepare('SELECT COUNT(*) FROM users WHERE name = ?');
+			$query->execute(array($_POST['name']));
+			if($query->fetchColumn() == 0) {
+				// Kein lokaler User.
+				if(ldap_authenticate($_POST['name'], $_POST['pass'])) {
+					// Gültiger LDAP Account, automatisch Registrieren
+					$_REQUEST['action'] = $_POST['action'] = 'Registrieren';
+				}
+				elseif(!$allow_local_registration) {
+					// Kein gültiger LDAP Account und lokale Registrierung verboten
+					if($_POST['action'] != 'Anmelden') {
+						// Sollte nie passieren, weil der Button fehlt
+						die();
+					}
+				}
+			}
+		}
+		elseif(!$allow_local_registration && $_POST['name'] && $_POST['action'] != 'Anmelden') {
+			// Kein LDAP vorhanden, aber lokale Registrierung verboten
+			// Dann sollte ein User nie an diesen Punkt kommen
+			die();
+		}
 
+		// Voraussetzungen zur Registrierung
+		if($_POST['action'] != 'Anmelden') {
 			// Registrierung auf IP-Bereiche einschränken
 			if(isset($restrict_registration) && $restrict_registration) {
 				$register_ok = false;
@@ -330,7 +354,7 @@
 		<?php if($errPass) echo('<span class="error">'.$errPass.'</span>'); ?>
 		<?php if(!$is_register) echo('<input type="submit" name="action" value="Anmelden">'); ?>
 		<?php if(isset($_REQUEST['token'])): ?><input type="hidden" name="token" value="<?=htmlspecialchars($_REQUEST['token'])?>"><?php endif; ?>
-		<input type="submit" name="action" value="Registrieren">
+		<?php if($is_register || $allow_local_registration): ?><input type="submit" name="action" value="Registrieren"><?php endif; ?>
 	</div>
 <?php if(!is_mobile()): ?>
 	<p class="info">Feedback? Fragen? Kommentare? → Mail an <span class="tomail"><?=$support_mail_show?></span></p>
