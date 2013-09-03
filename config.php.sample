@@ -46,6 +46,7 @@
 	// Lokale Accounts haben Präferenz vor LDAP-Accounts, können aber in den
 	// Einstellungen umgezogen werden.
 	$ldap_server = '';
+	$ldap_web = '';
 	$ldap_base_dn = 'ou=people,dc=example,dc=com';
 
 	// Lokale Registrierung erlauben
