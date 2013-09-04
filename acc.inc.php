@@ -155,7 +155,7 @@
 			<input type="submit" name="change_pw" value="Kennwort ändern">
 			<?php else: ?>
 			<p>
-				Dein Kennwort kannst Du direkt auf dem <a href="http://<?=$ldap_server?>">LDAP-Server</a> ändern.
+				Dein Kennwort kannst Du direkt auf dem <a href="<?=$ldap_web?>">LDAP-Server</a> ändern.
 			</p>
 			<?php endif; ?>
 		</fieldset>
@@ -208,8 +208,7 @@
 		<fieldset>
 			<legend>LDAP-Login</legend>
 			<p>
-				Du kannst Deinen Login mit dem LDAP-Server <a
-				href="http://<?=$ldap_server?>"><?=$ldap_server?></a>
+				Du kannst Deinen Login mit dem <a href="<?=$ldap_web?>">LDAP-Server</a>
 				verbinden. So werden Dein Benutzername, Kennwort und die
 				Email-Adresse zentral verwaltet. Beachte: Diesen Schritt kann nur
 				ein Administrator für Dich rückgängig machen!

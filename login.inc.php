@@ -222,7 +222,7 @@
 				alle Deine Autologin-Cookies automatisch deaktiviert.
 			<?php if($ldap_server): ?>
 				Falls Du bei der Registrierung einen Benutzernamen samt
-				Kennwort aus dem <a href="http://<?=htmlspecialchars($ldap_server)?>">LDAP</a>
+				Kennwort aus dem <a href="<?=$ldap_web?>">LDAP</a>
 				angibst, speichern wir Dein Passwort nicht, sondern speichern nur die Verknüpfung Deines Accounts
 				mit dem LDAP-Verzeichnis. Diese Verknüpfung kannst Du auch noch nachträglich erstellen, falls Du
 				Dir später einen Account im LDAP anlegst.
